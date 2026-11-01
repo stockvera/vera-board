@@ -142,6 +142,8 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
 .vt-table th[aria-sort="descending"]::after { content: " ▼"; font-size: .7em; }
 .vt-table td { padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); vertical-align: middle; }
 .vt-table .num { text-align: right; }
+.vt-static th { cursor: default; position: static; white-space: normal; }
+.vt-static td { vertical-align: top; }
 .vt-table td.good { background: color-mix(in srgb, var(--color-ok) 16%, transparent); }
 .vt-table td.bad { background: color-mix(in srgb, var(--color-bad) 12%, transparent); }
 .vt-table td.strong { font-weight: 700; }
@@ -179,6 +181,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
     <button class="vt-tab" role="tab" data-tab="indicators" aria-selected="false">지표 성적표</button>
     <button class="vt-tab" role="tab" data-tab="signals" aria-selected="false">베라 신호 검증</button>
     <button class="vt-tab" role="tab" data-tab="crisis" aria-selected="false">위기와 비중 조절</button>
+    <button class="vt-tab" role="tab" data-tab="verify" aria-selected="false">검증 결과</button>
     <button class="vt-tab" role="tab" data-tab="data" aria-selected="false">데이터와 방법</button>
   </nav>
 
@@ -225,7 +228,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
       <p data-when="state=normal&amp;window_ended=아니오" hidden style="margin-top:var(--cds-gap-sm)">바닥 신호도 위험 국면도 꺼져 있어 평소 비중을 유지합니다.</p>
       <p data-when="window_ended=예" hidden style="margin-top:var(--cds-gap-sm)"><b data-draw="v" data-source="now" data-field="last_bot" data-fmt="date">—</b>에 켜진 바닥 신호는 <b data-draw="v" data-source="now" data-field="ended_date" data-fmt="date">—</b> 코스피가 <b data-draw="v" data-source="now" data-field="ended_kospi" data-fmt="n2">—</b>로 200일선 아래에서 마감하면서 끝났습니다. 바닥 신호는 오르는 추세 안의 눌림목을 잡는 신호입니다. 추세가 깨지면 신호를 낸 전제도 깨진 것으로 보고 <span data-draw="c" data-c="hi">—</span> 구간을 바로 닫습니다. 신호 첫날 이후 코스피는 <b data-draw="v" data-source="now" data-field="since_bot" data-fmt="pct1s">—</b>입니다.</p>
       <p data-when="window_ended=예" hidden>이 종료 규칙은 이번 하락을 보고 다시 점검하면서 넣었습니다. 지난 20년 동안 바닥 신호 뒤 <span data-draw="c" data-c="win">—</span>거래일 안에 -10% 넘게 더 빠진 회차는 <b data-draw="v" data-source="now" data-field="done_n" data-fmt="int">—</b>번 중 <b data-draw="v" data-source="now" data-field="fail10_n" data-fmt="int">—</b>번뿐이었는데, 그중 하나가 올해 6월이고 이번이 또 그렇습니다. 200일선을 깨면 닫는 규칙을 20년에 다시 돌려 보니 연수익률은 <b data-draw="v" data-source="sim_summary" data-where="id=all-old" data-field="cagr" data-fmt="pct1s">—</b>에서 <b data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="cagr" data-fmt="pct1s">—</b>로, 최대 낙폭은 <b data-draw="v" data-source="sim_summary" data-where="id=all-old" data-field="mdd" data-fmt="pct1s">—</b>에서 <b data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="mdd" data-fmt="pct1s">—</b>로 조금씩 나아졌습니다. 차이가 크지는 않지만 신호의 전제와 맞는 규칙이라 넣었습니다.</p>
-      <p data-when="kospi_up=아래" hidden>코스피가 200일선 아래에 있는 동안에는 업종 바닥 게이지가 낮아도 새 바닥 신호를 켜지 않습니다. 최근 <span data-draw="c" data-c="f">—</span>거래일 사이 게이지는 <b data-draw="v" data-source="now" data-field="gauge_low20">—</b>까지 내려갔지만, 20년 동안 하락 추세 속 업종 게이지 바닥은 성적이 기준보다 못했습니다.</p>
+      <p data-when="kospi_up=아래" hidden>코스피가 200일선 아래에 있는 동안에는 업종 바닥 게이지가 낮아도 새 바닥 신호를 켜지 않습니다. 최근 <span data-draw="c" data-c="f">—</span>거래일 사이 게이지는 <b data-draw="v" data-source="now" data-field="gauge_low20">—</b>까지 내려갔지만, 20년 동안 하락 추세 속에서 게이지가 바닥까지 내려간 뒤의 성적은 하락 추세 아무 날과 별 차이가 없었습니다.</p>
       <p data-when="verdict=below_deep" hidden>대신 시장이 씻겨 나간 정도는 깊습니다. 지금처럼 코스피가 200일선 아래인데 잘 맞던 바닥 지표가 <span data-draw="c" data-c="like">—</span>개 이상 켜졌던 때는 20년 동안 <b data-draw="v" data-source="now" data-field="like_n" data-fmt="int">—</b>번 있었습니다. <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 올라 있던 비율은 <b data-draw="v" data-source="now" data-field="like_up20" data-fmt="pct0">—</b>, 평균 <b data-draw="v" data-source="now" data-field="like_avg20" data-fmt="pct1s">—</b>였고, <span data-draw="c" data-c="f60">—</span>거래일 뒤에는 <b data-draw="v" data-source="now" data-field="like_up60" data-fmt="pct0">—</b>가 올라 있었습니다. 다만 <b data-draw="v" data-source="now" data-field="like_dn5" data-fmt="pct0">—</b>는 그 뒤 <span data-draw="c" data-c="win">—</span>거래일 안에 <span data-draw="c" data-c="dn5">—</span> 넘게 더 빠졌습니다. 잘 맞던 지표를 20년 전체를 보고 골랐기 때문에 이 숫자는 실제보다 좋게 나왔을 수 있습니다.</p>
       <p data-when="verdict=below_deep" hidden><b>정리하면</b> 지금은 비중을 줄일 근거도, 신용을 더 쓸 근거도 약한 자리입니다. 규칙대로 평소 비중을 두고, 코스피가 200일선을 되찾은 뒤 새 바닥 신호가 나오거나 S&amp;P500이 125일선을 깨서 위험 국면이 켜질 때 비중을 움직이는 게 20년 검증과 맞는 대응입니다.</p>
       <p data-when="verdict=below" hidden>잘 맞던 바닥 지표는 7개 중 <b data-draw="v" data-source="now" data-field="good_on" data-fmt="int">—</b>개만 켜져 있어, 하락 추세지만 시장이 크게 씻겨 나간 상태는 아닙니다. 과거 200일선 아래에서 이 지표가 3개 이상 켜졌을 때부터 반등 확률이 눈에 띄게 높아졌습니다.</p>
@@ -677,6 +680,74 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
     </details>
   </section>
 
+  <!-- ===================== 검증 ===================== -->
+  <section class="vt-page" id="verify" hidden>
+    <h2 class="vt-h2" style="margin-top:0">공개 전 검증 결과</h2>
+    <p class="vt-lead">2026년 11월 1일에 보드의 숫자가 맞는지 세 갈래로 확인했습니다. 원자료를 외부 출처와 대조했고, 규칙 설명만 받은 별도 작업자가 코드를 새로 짜서 원자료에서 처음부터 다시 계산했고, 페이지 문장에 적힌 내용이 데이터와 맞는지 하나씩 봤습니다.</p>
+    <div class="vt-grid">
+      <div class="vt-card"><h3>코스피 두 출처</h3><div class="vt-mid">5,127 / 5,129일</div><p class="vt-note" style="margin-top:0">키움과 야후 종가가 0.1% 안에서 같은 날. 어긋난 2일도 0.6% 안</p></div>
+      <div class="vt-card"><h3>외부 숫자 대조</h3><div class="vt-mid">11건 일치 · 2건 고침</div><p class="vt-note" style="margin-top:0">코스피 종가·하루 등락, 예탁금, 신용잔고, 투자자 수급을 기사와 재조회 값에 맞춤</p></div>
+      <div class="vt-card"><h3>독립 재계산</h3><div class="vt-mid">전부 일치</div><p class="vt-note" style="margin-top:0">성과 9칸, 바닥 신호 25회, 지금 상태, 위기 9개, 지표 적중률</p></div>
+      <div class="vt-card"><h3>고친 것</h3><div class="vt-mid">2건</div><p class="vt-note" style="margin-top:0">투자자 수급 거래소 기준, 문장 한 곳</p></div>
+    </div>
+
+    <h2 class="vt-h2">원자료를 외부 숫자와 대조</h2>
+    <div class="vt-card">
+      <div class="vt-scroll" style="max-height:none">
+        <table class="vt-table vt-static">
+          <thead><tr><th>항목</th><th>보드 원자료</th><th>외부 출처</th><th>결과</th></tr></thead>
+          <tbody>
+            <tr><td>코스피 종가 20년</td><td>키움 5,135일</td><td>야후 ^KS11, 겹치는 5,129일</td><td class="good">5,127일이 0.1% 안에서 같음</td></tr>
+            <tr><td>코스피 2026.03.04</td><td>5,093.54 (-12.06%)</td><td>외신·국내 기사 12% 넘게 급락</td><td class="good">일치</td></tr>
+            <tr><td>코스피 2026.05.06</td><td>7,384.56</td><td>뉴시스 마감 기사 7,384.56</td><td class="good">일치</td></tr>
+            <tr><td>코스피 2026.07.31</td><td>6,595.45 (+17.91%)</td><td>마감 시황 6,595.45 +17.91%</td><td class="good">일치</td></tr>
+            <tr><td>코스피 2026.09.30</td><td>6,838.04</td><td>경북매일 마감 기사 6,838.04</td><td class="good">일치</td></tr>
+            <tr><td>코스피 2026.10.12</td><td>6,384.24</td><td>아시아경제 마감 기사 6,384.24</td><td class="good">일치</td></tr>
+            <tr><td>코스피 2026.10.30</td><td>5,730.74 (-3.48%)</td><td>속보 5,730.74, 206.92p 하락</td><td class="good">일치</td></tr>
+            <tr><td>투자자예탁금 2026.09.04</td><td>93조 5,499억원</td><td>SBS Biz 93조 5,499억원</td><td class="good">일치</td></tr>
+            <tr><td>신용융자 잔고 2026.09.04</td><td>33조 5,958억원</td><td>SBS Biz 33조 5,958억원</td><td class="good">일치</td></tr>
+            <tr><td>투자자예탁금 2026.10.14</td><td>97조 4,280억원</td><td>SBS Biz 97조 4,280억원</td><td class="good">일치</td></tr>
+            <tr><td>신용융자 잔고 2026.10.14</td><td>33조 7,057억원</td><td>SBS Biz 33조 7,057억원</td><td class="good">일치</td></tr>
+            <tr><td>투자자 수급 2024.08.05</td><td>개인 +1조 6,945억, 외국인 -1조 5,238억</td><td>키움 KRX 기준 재조회</td><td class="good">일치</td></tr>
+            <tr><td>투자자 수급 2026.10.12</td><td>개인 +2조 1,700억, 외국인 -2조 5,089억</td><td>기사 개인 +1조 4,748억, 외국인 -2조 205억</td><td class="bad">불일치, 고침(아래)</td></tr>
+            <tr><td>투자자 수급 2026.10.30</td><td>개인 +1조 119억, 외국인 -1조 3,082억</td><td>기사 개인 +6,210억, 외국인 -1조 6,173억</td><td class="bad">불일치, 고침(아래)</td></tr>
+            <tr><td>S&amp;P500 지수</td><td>야후 ^GSPC</td><td>야후 SPY 날짜별 등락</td><td>2008년 급변동일 15일 빼고 1% 안. 위험 국면은 125일선 위아래만 봄</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="vt-note">기사 숫자는 장 마감 직후 잠정치라 확정치와 몇십억원 다를 수 있습니다. 2008년, 2020년 같은 오래된 날짜는 두 출처 대조로 갈음했습니다.</p>
+    </div>
+
+    <h2 class="vt-h2">독립 재계산</h2>
+    <div class="vt-card vt-text">
+      <p>베라 규칙(200일선, 업종 게이지 10, S&amp;P500 125일선, 40거래일 130% 구간과 200일선 종료, 거래비용 0.05%)을 글로만 받은 별도 작업자가 기존 코드를 보지 않고 원자료에서 처음부터 계산했습니다.</p>
+      <ul>
+        <li><b>시뮬레이션 성과.</b> 고를 때 쓴 기간, 채점 기간, 전체 각각 베라 규칙·위험 70%만·그냥 보유의 연수익률과 최대 낙폭 9칸이 소수점 넷째 자리까지 같았습니다. 전체 기간 베라 규칙 연 8.37%, 최대 낙폭 -49.3%입니다.</li>
+        <li><b>바닥 신호 25회.</b> 신호 날짜, 20거래일 뒤 수익률, 40거래일 안 최저점이 25회 모두 같았습니다. 첫 회차 날짜만 하루 차이가 났는데, 평가 시작일 하루 전에 켜진 신호를 보드는 시작일로 적었기 때문입니다.</li>
+        <li><b>지금 상태.</b> 10월 30일 기준 코스피 5,730.74, 200일선 6,487, 업종 21개 중 3개가 20일선 위, 업종 게이지 13, S&amp;P500 125일선 대비 +2.1%, 다음 거래일 비중 100%가 같았습니다.</li>
+        <li><b>지표 적중률.</b> 기준(아무 날 20일 뒤 상승) 56.4%, 종목 200일선 위 비율 34회 70.6%, 거래대금 과열 30회 70.0%, 업종지수 200일선 위 비율 38회 65.8%가 같았습니다.</li>
+        <li><b>위기 9개.</b> 고점일, 저점일, 낙폭이 코스피 종가와 모두 맞았습니다.</li>
+      </ul>
+    </div>
+
+    <h2 class="vt-h2">고친 것</h2>
+    <div class="vt-card vt-text">
+      <p><b>1. 투자자 수급 거래소 기준.</b> 개인·외국인 순매수를 키움에서 받을 때 KRX와 넥스트레이드를 합친 값으로 받고 있었습니다. 넥스트레이드가 열린 2025년 3월 4일부터 값이 KRX 기준보다 커졌고, 장 마감 직후 받은 날은 넥스트레이드 저녁 거래가 덜 들어가 있었습니다. 2024년 이전 값은 KRX 재조회와 똑같아서 문제가 없습니다. 수집 코드를 KRX 기준으로 바꿨고, 2025년 3월 4일 이후 값은 다음 PC 갱신 때 KRX 기준으로 다시 받아 보드에 반영됩니다. 이 값을 쓰는 지표는 바닥 지표 7개 중 개인 20일 누적 순매수와 외국인 20일 누적 순매수 두 개입니다. 지금 두 지표는 1년 중 중간쯤이라 켜짐과 꺼짐이 바뀔 가능성은 낮지만, 다시 받은 뒤 적중률 숫자는 조금 달라질 수 있습니다.</p>
+      <p><b>2. 문장 한 곳.</b> "하락 추세 속 업종 게이지 바닥은 성적이 기준보다 못했다"고 적혀 있었습니다. 다시 세어 보니 코스피가 200일선 아래일 때 게이지가 10 이하로 내려간 52회는 20일 뒤 오른 비율이 58.8%로, 200일선 아래 아무 날의 58.4%와 거의 같았습니다. 그래서 차이가 없었다는 문장으로 고쳤습니다. 200일선 위에서 켜진 바닥 신호는 같은 기준으로 62.5%입니다.</p>
+    </div>
+
+    <h2 class="vt-h2">검증 뒤에도 남는 한계</h2>
+    <div class="vt-card vt-text">
+      <ul>
+        <li><b>지표를 고른 방식.</b> 잘 맞던 바닥 지표 7개는 20년 전체 성적을 보고 골랐습니다. 세 구간 모두에서 기준보다 나았던 지표만 남겼지만, 앞으로의 성적은 이보다 낮을 수 있습니다.</li>
+        <li><b>채점 기간 최대 낙폭.</b> 2022년 이후 베라 규칙의 최대 낙폭은 -49.3%로 그냥 보유(-40.0%)보다 컸습니다. 2026년 6~7월 하락 때 바닥 신호가 이어서 켜지며 130% 구간이 7월 30일까지 유지됐기 때문입니다. 200일선 종료 규칙은 이 하락이 200일선을 깬 뒤에야 작동했습니다.</li>
+        <li><b>진행 중인 신호.</b> 2026년 10월 7일 바닥 신호는 아직 20거래일이 지나지 않아 성적표에서 빠져 있습니다. 지금까지 신호일 종가보다 최대 19.6% 낮게 내려갔고, 40거래일 안 -10% 넘게 빠진 세 번째 회차가 됐습니다. 끝난 24회 가운데서는 2007년 8월, 2026년 6월 두 번입니다.</li>
+        <li><b>종목 기준 지표.</b> 종목 200일선 위 비율은 지금 시총 상위 300종목으로 계산해서 상장폐지된 종목이 빠져 있습니다. 베라 규칙 자체는 이 문제가 없는 업종지수를 씁니다.</li>
+        <li><b>시뮬레이션 범위.</b> 코스피 지수에 비중만 곱한 계산입니다. 거래비용 0.05%만 넣었고 세금, 신용 이자, 개별 종목 차이는 빠져 있습니다.</li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ===================== 데이터와 방법 ===================== -->
   <section class="vt-page" id="data" hidden>
     <h2 class="vt-h2">데이터 점검</h2>
@@ -715,7 +786,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
       <p><b>기간 나누기.</b> <span data-draw="v" data-source="info" data-where="key=p1" data-field="value">—</span>, <span data-draw="v" data-source="info" data-where="key=p2" data-field="value">—</span>, <span data-draw="v" data-source="info" data-where="key=p3" data-field="value">—</span> 세 구간으로 나눴습니다. 앞 두 구간으로 후보를 고르고, 마지막 구간은 채점에만 썼습니다.</p>
       <p><b>후보.</b> 결과를 보기 전에 바닥 후보와 위험 후보를 미리 적어 두고, 고를 때 쓴 기간 성적 1위를 채택했습니다. 신호가 <span data-draw="c" data-c="merge">—</span>거래일 안에 다시 켜지면 같은 회차로 묶었습니다.</p>
       <p><b>성적 재는 법.</b> 신호 뒤 <span data-draw="c" data-c="f">—</span>거래일과 <span data-draw="c" data-c="f60">—</span>거래일 수익률, <span data-draw="c" data-c="win">—</span>거래일 안에 <span data-draw="c" data-c="up5">—</span> 반등하거나 <span data-draw="c" data-c="dn5">—</span> 하락한 비율을 아무 날이나 샀을 때와 비교했습니다.</p>
-      <p><b>다시 계산.</b> 핵심 숫자는 원자료에서 처음부터 따로 계산하는 검산 코드로 한 번 더 맞춰 봤고 모두 같았습니다.</p>
+      <p><b>다시 계산.</b> 핵심 숫자는 규칙 설명만 받은 별도 작업자가 원자료에서 처음부터 다시 계산해 맞춰 봤습니다. 자세한 결과는 검증 결과 탭에 있습니다.</p>
     </div>
 
     <h2 class="vt-h2">한계</h2>
@@ -842,7 +913,7 @@ window.V = (() => {
     g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     dash.draw('tbl'); dash.draw('countchart');
   }));
-  document.querySelectorAll('.vt-table thead').forEach((hd) => hd.addEventListener('click', (e) => {
+  document.querySelectorAll('.vt-table:not(.vt-static) thead').forEach((hd) => hd.addEventListener('click', (e) => {
     const th = e.target.closest('th'); if (!th) return;
     const cur = th.getAttribute('aria-sort');
     hd.querySelectorAll('th').forEach((x) => x.removeAttribute('aria-sort'));

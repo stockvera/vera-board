@@ -1,0 +1,58 @@
+name: 데이터 갱신
+
+# 평일 장 마감 뒤, 유저 PC가 구글 드라이브에 올린 vera_regime_bundle.json.gz 를 받아 data.js 만 갱신한다.
+# 드라이브 파일이 링크 공유로 열려 있어야 받을 수 있다. 못 받으면 아무것도 바꾸지 않고 조용히 끝낸다.
+on:
+  schedule:
+    - cron: "45 7 * * 1-5"   # 16:45 KST
+    - cron: "45 11 * * 1-5"  # 20:45 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_ID: 16qWJFtGcRxmtNKGWEMqfYdhXxKLp2YDJ
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: 번들 받기
+        id: dl
+        run: |
+          curl -sSL --retry 3 -o bundle.json.gz \
+            "https://drive.usercontent.google.com/download?id=${BUNDLE_ID}&export=download&confirm=t" || true
+          if [ -s bundle.json.gz ] && [ "$(head -c 2 bundle.json.gz | xxd -p)" = "1f8b" ]; then
+            echo "ok=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::번들을 받지 못함(드라이브 링크 공유가 꺼져 있거나 파일이 바뀜). 갱신 생략."
+            echo "ok=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: data.js 갱신
+        if: steps.dl.outputs.ok == '1'
+        id: up
+        run: |
+          out="$(python3 update_data.py bundle.json.gz)"
+          echo "$out"
+          rm -f bundle.json.gz
+          if [ "$out" = "변경 없음" ]; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; echo "msg=데이터 ${out}" >> "$GITHUB_OUTPUT"; fi
+
+      - name: 커밋·푸시 (main, gh-pages)
+        if: steps.up.outputs.changed == '1'
+        run: |
+          git config user.name stockvera
+          git config user.email baram101015@gmail.com
+          git add data.js
+          git commit -m "${{ steps.up.outputs.msg }}"
+          git push origin main
+          git push origin main:gh-pages

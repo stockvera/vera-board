@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#EDEFE6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="기억 조각보">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="하루 15분, 조각을 이어 가는 두뇌 운동">
+<title>기억 조각보</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gothic+A1:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 조각보 한 장. 모시 바탕에 쪽·홍화·치자·쑥·자초 물을 들인 조각을 홈질 선으로 잇는다.
+     한 단 왼쪽 맞춤. 화면마다 할 일은 하나, 가장 큰 단추가 다음 걸음. */
+  --mosi:#EDEFE6; --paper:#FCFCF8; --ink:#16233F; --ink-soft:#4A556C; --seam:#BFC3B2;
+  --jjok:#1F3B73; --honghwa:#C4405A; --chija:#EEB238; --ssuk:#437A4E; --jacho:#6C4A80; --ok:#B9D8CC;
+  --good:#2C6E3F; --good-bg:#DCEBD9; --warm-bg:#F8E6B4; --warm-ink:#573B00; --miss-bg:#F4DCE0;
+  --display:"Do Hyeon","Gothic A1","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --body:"Gothic A1","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  --fs:20px; --r:.7rem;
+  color-scheme:light;
+}
+html{font-size:var(--fs);height:100%;-webkit-text-size-adjust:100%}
+body{height:100%}
+html.fs2{--fs:23px}
+html.fs3{--fs:26px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--mosi);color:var(--ink);font-family:var(--body);font-weight:500;
+  line-height:1.6;word-break:keep-all;overflow-wrap:anywhere;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.25;margin:0;text-wrap:balance;letter-spacing:.01em}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button:disabled{cursor:default}
+a{color:var(--jjok);text-underline-offset:.18em}
+:focus-visible{outline:3px solid var(--chija);outline-offset:3px}
+svg{display:block}
+#app{max-width:34rem;margin:0 auto;padding:1rem 1rem 1.2rem;min-height:100%;display:flex;flex-direction:column}
+
+/* ── 단추 ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;min-height:3.3rem;padding:.6rem 1rem;
+  border:2px solid var(--ink);border-radius:var(--r);background:var(--paper);color:var(--ink);
+  font-family:var(--display);font-size:1.25rem;line-height:1.25;text-align:center}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.45}
+.btn-main{min-height:4rem;background:var(--jjok);border-color:var(--jjok);color:#fff;font-size:1.5rem}
+.btn-quiet{background:none;border:0;padding:.5rem .6rem;font-family:var(--body);font-weight:700;font-size:.95rem;
+  color:var(--ink-soft);text-decoration:underline;text-underline-offset:.2em;min-height:2.6rem}
+.btn-speak{width:auto;min-height:2.8rem;font-size:1.05rem;padding:.4rem 1rem;align-self:flex-start}
+.row{display:grid;gap:.6rem}
+.row.c2{grid-template-columns:1fr 1fr}
+.row.c3{grid-template-columns:1fr 1fr 1fr}
+
+/* ── 처음 화면 ── */
+.home{display:flex;flex-direction:column;gap:1.1rem}
+.home-top{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+.year{font-weight:700;color:var(--ink-soft)}
+.today{font-family:var(--display);font-size:min(2.4rem,11vw);line-height:1.15;margin-top:-.7rem;white-space:nowrap}
+.fs-btn{flex:none;border:2px solid var(--ink);background:var(--paper);border-radius:var(--r);padding:.1rem .7rem;
+  font-family:var(--display);font-size:.95rem;min-height:2.4rem}
+.fs-btn b{font-size:1.3rem;font-weight:400}
+.greet{font-size:1.15rem}
+.quilt{background:var(--paper);border:2px solid var(--ink);border-radius:.3rem;padding:.45rem}
+.quilt svg{width:100%;height:auto}
+.quilt-cap{display:flex;justify-content:space-between;align-items:baseline;gap:.8rem;flex-wrap:wrap;
+  font-weight:700;color:var(--ink-soft);font-size:.95rem;margin-top:-.5rem}
+.quilt-cap strong{font-family:var(--display);font-weight:400;font-size:1.2rem;color:var(--ink)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:.35rem}
+.week div{border:2px dashed var(--seam);border-radius:.3rem;text-align:center;padding:.35rem 0 .3rem;
+  font-family:var(--display);font-size:1.05rem;color:var(--ink-soft);background:var(--paper)}
+.week .on{background:var(--jjok);border:2px solid var(--jjok);color:#fff}
+.week .now{border:2px solid var(--ink);color:var(--ink)}
+.week .on.now{border-color:var(--chija)}
+.done-note{background:var(--good-bg);color:#1B4A2A;border-radius:var(--r);padding:.8rem 1rem;font-family:var(--display);font-size:1.3rem}
+@keyframes dye{from{fill-opacity:0}to{fill-opacity:1}}
+.patch-new{animation:dye 1.6s ease-out both}
+@keyframes pulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.25}}
+.patch-next{animation:pulse 2.4s ease-in-out infinite}
+
+/* ── 운동 화면 ── */
+.play{display:flex;flex-direction:column;gap:.75rem;flex:1}
+.bar{display:flex;align-items:center;gap:.5rem;border-bottom:2px dashed var(--seam);padding-bottom:.4rem}
+.bar-quit{margin-left:-.6rem;flex:none}
+.bar-title{flex:1;min-width:0;font-family:var(--display);font-size:1.1rem;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-count{flex:none;min-width:3.6rem;text-align:right;font-family:var(--display);font-size:1.15rem;
+  font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.steps{display:flex;gap:.25rem}
+.steps i{flex:1;height:.4rem;border-radius:.2rem;background:var(--seam)}
+.steps i.on{background:var(--jjok)}
+.prompt{min-height:3.4rem}
+.prompt-main{font-weight:700;font-size:1.42rem;line-height:1.4;text-wrap:balance}
+.prompt-sub{color:var(--ink-soft);font-weight:700;margin-top:.25rem}
+.arena{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;min-height:9rem}
+.arena>*{max-width:100%}
+.answers{display:grid;gap:.6rem}
+.answers.cols-2{grid-template-columns:1fr 1fr}
+.answers.cols-3{grid-template-columns:1fr 1fr 1fr}
+.answers.cols-4{grid-template-columns:repeat(4,1fr)}
+.opt{min-height:3.6rem;padding:.5rem .6rem;border:2px solid var(--ink);border-radius:var(--r);background:var(--paper);
+  font-family:var(--display);font-size:1.3rem;line-height:1.25;display:flex;align-items:center;justify-content:center;gap:.5rem;text-align:center}
+.opt:active:not(:disabled){transform:translateY(1px)}
+.opt.small{font-size:1.1rem}
+.opt.long{font-family:var(--body);font-weight:700;font-size:1.02rem;justify-content:flex-start;text-align:left;padding:.65rem .8rem}
+.opt.quiet{border-style:dashed;border-color:var(--seam);color:var(--ink-soft);font-size:1.05rem;min-height:3rem}
+.opt.is-right,.pick.is-right,.tile.is-right{background:var(--good-bg);border-color:var(--good);color:#17402A;opacity:1}
+.opt.is-wrong,.pick.is-wrong,.tile.is-wrong{background:var(--miss-bg);border-color:var(--honghwa)}
+.opt.is-dim{opacity:.4}
+.fbwrap{display:grid;gap:.5rem}
+.fb{display:flex;align-items:center;gap:.6rem;border-radius:var(--r);padding:.6rem .9rem;font-weight:700;font-size:1.08rem;line-height:1.45}
+.fb.ok{background:var(--good-bg);color:#17402A}
+.fb.no{background:var(--warm-bg);color:var(--warm-ink)}
+.fb-ico{flex:none;width:1.6rem;height:1.6rem}
+.fb-ico svg{width:100%;height:100%}
+.timebar{height:.5rem;border-radius:.25rem;background:var(--seam);overflow:hidden}
+.timebar i{display:block;height:100%;background:var(--jjok);transform-origin:left;animation:shrink linear both}
+@keyframes shrink{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.tip{align-self:stretch;background:var(--warm-bg);color:var(--warm-ink);border-radius:var(--r);padding:.7rem .9rem;font-weight:700}
+.tip-h{font-family:var(--display);font-weight:400;font-size:1.1rem;margin-bottom:.1rem}
+.lv-chip{display:inline-block;font-family:var(--display);font-size:1rem;border:2px solid var(--ink);border-radius:2rem;padding:.05rem .7rem;background:var(--paper)}
+.note{color:var(--ink-soft);font-weight:700;text-align:center}
+.big{font-family:var(--display);font-size:2.6rem;line-height:1.15;text-align:center}
+.emo{font-size:3.4rem;line-height:1.1}
+
+/* 골라 담기 격자 */
+.pick-grid{display:grid;gap:.5rem;align-self:stretch}
+.pick-grid.cols-2{grid-template-columns:1fr 1fr}
+.pick-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.pick-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.pick{min-height:3.5rem;border:2px solid var(--ink);border-radius:var(--r);background:var(--paper);padding:.35rem .3rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.05rem;font-family:var(--display);font-size:1.15rem;line-height:1.2}
+.pick-emo{font-size:2rem;line-height:1.15}
+.pick.on{background:var(--jjok);border-color:var(--jjok);color:#fff}
+.pick.is-right.on{background:var(--good);border-color:var(--good);color:#fff}
+.pick:disabled:not(.on):not(.is-right):not(.is-wrong){opacity:.45}
+
+/* 낱말 카드 */
+.cards{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;align-self:stretch}
+.card{border:2px solid var(--ink);border-radius:.4rem;background:var(--paper);padding:.5rem .8rem;text-align:center;
+  font-family:var(--display);font-size:1.4rem;line-height:1.2;min-width:5.2rem}
+.card .emo{display:block;font-size:2.8rem}
+.card.c0{background:#DCE4F2}.card.c1{background:#F6DDE2}.card.c2{background:#FBEFC9}.card.c3{background:#DCEBD9}.card.c4{background:#E7DEEC}
+.group{align-self:stretch;border:2px dashed var(--seam);border-radius:.4rem;padding:.5rem .6rem .6rem;background:var(--paper)}
+.group h3{font-size:1.1rem;color:var(--ink-soft);margin-bottom:.35rem}
+.group .cards{justify-content:flex-start}
+.linkline{font-weight:700;font-size:1.3rem;line-height:1.5;text-align:center;background:var(--paper);
+  border:2px dashed var(--seam);border-radius:.4rem;padding:.7rem .8rem;align-self:stretch}
+
+/* 꽃과 나비 */
+.stage{position:relative;width:min(100%,24rem,56vh);aspect-ratio:1/1;background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;overflow:hidden;flex:none}
+.stim{position:absolute;transform:translate(-50%,-50%)}
+.stim svg{width:100%;height:auto}
+.fix{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--display);font-size:2.6rem;color:var(--ink-soft)}
+.mask{position:absolute;left:0;top:0;width:100%;height:100%;display:grid;grid-template-columns:repeat(8,1fr)}
+.spot{position:absolute;transform:translate(-50%,-50%);width:17%;aspect-ratio:1/1;border-radius:50%;border:2px solid var(--ink);background:var(--mosi);padding:0}
+.spot.is-right{background:var(--good-bg);border-color:var(--good)}
+.spot.is-wrong{background:var(--miss-bg);border-color:var(--honghwa)}
+.flower-opt{flex-direction:column;gap:.1rem;padding:.4rem}
+.flower-opt svg{width:3.6rem;height:3.6rem}
+
+/* 얼굴 */
+.person{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.person svg{width:min(11rem,44vw);height:auto}
+.person-name{font-family:var(--display);font-size:1.9rem;line-height:1.2}
+.person-job{font-weight:700;color:var(--ink-soft)}
+
+/* 집 안 자리 */
+.house{display:grid;gap:.45rem;align-self:stretch}
+.house.p4{grid-template-columns:1fr 1fr}
+.house.p6,.house.p9{grid-template-columns:repeat(3,1fr)}
+.tile{min-height:5.2rem;border:2px solid var(--ink);border-radius:.4rem;background:var(--paper);padding:.3rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--display);font-size:1.1rem;line-height:1.2;text-align:center}
+.tile .emo{font-size:2rem}
+.tile.has{background:#FBEFC9}
+.tile small{font-family:var(--body);font-weight:700;font-size:.8rem;color:var(--ink-soft)}
+
+/* 이야기 */
+.story{align-self:stretch;background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;padding:1rem 1.1rem;font-size:1.2rem;line-height:1.95;font-weight:500}
+.story mark{background:#FBEFC9;color:inherit;padding:0 .15em;border-radius:.2em}
+
+/* 숫자 */
+.digits{font-family:var(--display);font-size:3rem;letter-spacing:.12em;font-variant-numeric:tabular-nums;text-align:center;min-height:3.6rem}
+.slots{display:flex;gap:.3rem;justify-content:center;flex-wrap:wrap}
+.slots i{font-style:normal;width:2.4rem;height:3rem;border-bottom:3px solid var(--ink);font-family:var(--display);font-size:2.2rem;line-height:3rem;text-align:center}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+.key{min-height:3.3rem;border:2px solid var(--ink);border-radius:var(--r);background:var(--paper);font-family:var(--display);font-size:1.6rem}
+.key.fn{font-size:1.1rem;background:var(--mosi)}
+.key.go{background:var(--jjok);border-color:var(--jjok);color:#fff}
+.key:disabled{opacity:.4}
+
+/* 순서 잇기 */
+.board{position:relative;width:min(100%,25rem,58vh);aspect-ratio:1/1;background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;flex:none}
+.board svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.node{position:absolute;transform:translate(-50%,-50%);width:15.5%;aspect-ratio:1/1;border-radius:50%;border:2px solid var(--ink);background:var(--paper);
+  font-family:var(--display);font-size:1.45rem;padding:0;display:flex;align-items:center;justify-content:center}
+.board.g5 .node{width:14.5%;font-size:1.3rem}
+.node.hit{background:var(--jjok);border-color:var(--jjok);color:#fff}
+.node.oops{background:var(--miss-bg);border-color:var(--honghwa)}
+
+/* 색깔 글자 */
+.ink-word{font-family:var(--display);font-size:4.4rem;line-height:1.1}
+.rule{font-family:var(--display);font-size:1.15rem;border-radius:2rem;padding:.1rem .9rem;border:2px solid var(--ink)}
+.rule.word{background:var(--ink);color:#fff}
+.swatch{flex:none;width:1.5rem;height:1.5rem;border-radius:50%;border:2px solid rgba(0,0,0,.25)}
+
+/* 짝 맞추기 */
+.deck{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem;align-self:stretch}
+.deck.c3{grid-template-columns:repeat(3,1fr)}
+.flip{aspect-ratio:1/1;border:2px solid var(--ink);border-radius:.4rem;background:var(--jjok);padding:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--display);font-size:.9rem;line-height:1.1;color:var(--ink);
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.14) 0 6px,transparent 6px 12px)}
+.flip .emo,.flip span{visibility:hidden}
+.flip .emo{font-size:1.9rem}
+.flip.up,.flip.got{background:var(--paper);background-image:none}
+.flip.up .emo,.flip.up span,.flip.got .emo,.flip.got span{visibility:visible}
+.flip.got{background:var(--good-bg);border-color:var(--good)}
+
+/* 규칙 찾기 */
+.seq{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;align-self:stretch}
+.seq span{min-width:3rem;min-height:3.2rem;padding:0 .5rem;border:2px solid var(--ink);border-radius:.4rem;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.seq span.q{background:var(--chija);border-style:dashed}
+
+/* 계산 */
+.bill{align-self:stretch;background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;padding:.7rem 1rem;font-size:1.15rem}
+.bill div{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px dashed var(--seam);padding:.2rem 0;font-weight:700}
+.bill div:last-child{border-bottom:0}
+.bill b{font-family:var(--display);font-weight:400;font-size:1.3rem;font-variant-numeric:tabular-nums}
+
+/* 시계 */
+.clock{width:min(13rem,56vw)}
+.clock-opt{padding:.3rem}
+.clock-opt svg{width:min(7rem,34vw)}
+
+/* 낱말 맞추기 */
+.clue{align-self:stretch;background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;padding:.9rem 1rem;font-size:1.25rem;line-height:1.7;font-weight:700}
+.wslots{display:flex;gap:.35rem;justify-content:center}
+.wslots i{font-style:normal;width:3rem;height:3.4rem;border:2px dashed var(--ink);border-radius:.4rem;background:var(--mosi);
+  font-family:var(--display);font-size:2rem;line-height:3.2rem;text-align:center}
+.wslots i.fill{border-style:solid;background:var(--paper)}
+.wslots.bad i{border-color:var(--honghwa);background:var(--miss-bg)}
+.wslots.good i{border-color:var(--good);background:var(--good-bg)}
+.wtiles{display:flex;flex-wrap:wrap;gap:.45rem;justify-content:center}
+.wtile{width:3.3rem;height:3.5rem;border:2px solid var(--ink);border-radius:.4rem;background:var(--paper);font-family:var(--display);font-size:2rem;padding:0}
+.wtile.used{visibility:hidden}
+
+/* 결과·마무리 */
+.result{display:flex;flex-direction:column;gap:1rem;flex:1}
+.result h1{font-size:2.2rem}
+.result .score{font-size:1.25rem;font-weight:700}
+.result .score b{font-family:var(--display);font-weight:400;font-size:1.7rem}
+.sumlist{display:grid;gap:.4rem}
+.sumlist div{display:flex;justify-content:space-between;gap:.8rem;align-items:baseline;background:var(--paper);border-radius:.4rem;padding:.5rem .8rem;border:2px dashed var(--seam)}
+.sumlist b{font-family:var(--display);font-weight:400;font-size:1.15rem}
+.sumlist span{font-weight:700;color:var(--ink-soft);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.spacer{flex:1}
+
+/* 종목 고르기 */
+.menu{display:grid;gap:.9rem}
+.menu h2{font-size:1.25rem;color:var(--ink-soft);margin-top:.4rem}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.game-btn{text-align:left;border:2px solid var(--ink);border-radius:.4rem;background:var(--paper);padding:.6rem .7rem;min-height:4.4rem;
+  display:flex;flex-direction:column;justify-content:space-between;gap:.2rem}
+.game-btn b{font-family:var(--display);font-weight:400;font-size:1.25rem;line-height:1.2}
+.game-btn span{font-weight:700;font-size:.85rem;color:var(--ink-soft)}
+.dom-speed{border-left:.6rem solid var(--honghwa)}
+.dom-mem{border-left:.6rem solid var(--jjok)}
+.dom-focus{border-left:.6rem solid var(--chija)}
+.dom-think{border-left:.6rem solid var(--ssuk)}
+.dom-lang{border-left:.6rem solid var(--jacho)}
+
+/* 기록·안내 */
+.page{display:flex;flex-direction:column;gap:1.1rem}
+.page-top{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.page-top h1{font-size:2rem}
+.back{width:auto;min-height:2.8rem;font-size:1.05rem;padding:.3rem .9rem}
+.page h2{font-size:1.4rem;margin-top:.6rem;padding-top:.8rem;border-top:2px dashed var(--seam)}
+.page h3{font-size:1.15rem}
+.page p,.page li{line-height:1.8}
+.page ul{margin:0;padding-left:1.2rem;display:grid;gap:.4rem}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.fact{background:var(--paper);border:2px solid var(--ink);border-radius:.4rem;padding:.5rem .7rem}
+.fact b{display:block;font-family:var(--display);font-weight:400;font-size:1.9rem;line-height:1.15;font-variant-numeric:tabular-nums}
+.fact span{font-weight:700;font-size:.9rem;color:var(--ink-soft)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.25rem;font-variant-numeric:tabular-nums}
+.cal div{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;border-radius:.3rem;font-family:var(--display);font-size:1.05rem;color:var(--ink-soft)}
+.cal .hd{aspect-ratio:auto;font-family:var(--body);font-weight:700;font-size:.85rem}
+.cal .d{background:var(--paper)}
+.cal .on{background:var(--jjok);color:#fff}
+.cal .now{box-shadow:inset 0 0 0 2px var(--chija)}
+.meters{display:grid;gap:.55rem}
+.meter{display:grid;grid-template-columns:5.4rem 1fr 5.4rem;gap:.5rem;align-items:center}
+.meter b{font-family:var(--display);font-weight:400;font-size:1.15rem}
+.meter .segs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.18rem}
+.meter .segs i{height:1rem;border-radius:.15rem;background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--seam)}
+.meter .segs i.on{background:var(--jjok);box-shadow:none}
+.meter span{font-weight:700;font-size:.9rem;color:var(--ink-soft);text-align:right;font-variant-numeric:tabular-nums}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:.4rem .5rem;border-bottom:1px dashed var(--seam);text-align:center;white-space:nowrap}
+th{font-size:.85rem;color:var(--ink-soft)}
+td:first-child,th:first-child{text-align:left}
+td{font-weight:700}
+.evi{display:grid;gap:.6rem}
+.evi>div{background:var(--paper);border-radius:.4rem;padding:.7rem .85rem;border-left:.6rem solid var(--jjok)}
+.evi b{font-weight:700;font-size:1.08rem;display:block;line-height:1.45}
+.evi em{font-style:normal;font-weight:700;color:var(--ink-soft);display:block;font-size:.92rem;margin:.1rem 0 .25rem}
+.evi p{font-size:.95rem;line-height:1.7}
+.src{font-size:.88rem;display:grid;gap:.35rem;padding-left:1.2rem;margin:0}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:.3rem}
+.seg button{min-height:2.9rem;border:2px solid var(--ink);border-radius:.5rem;background:var(--paper);font-family:var(--display);font-size:1.05rem}
+.seg button.on{background:var(--jjok);border-color:var(--jjok);color:#fff}
+.set{display:grid;gap:.35rem}
+.set>label,.set>span{font-weight:700}
+textarea{width:100%;min-height:5rem;font:inherit;font-size:.8rem;border:2px solid var(--ink);border-radius:.4rem;padding:.5rem;background:var(--paper);color:var(--ink)}
+
+/* 묻는 창 */
+.modal{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(22,35,63,.55);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:10}
+.modal-card{background:var(--paper);border:2px solid var(--ink);border-radius:var(--r);padding:1.2rem;max-width:26rem;width:100%;display:grid;gap:.9rem}
+.modal-card h2{font-size:1.5rem}
+.modal-btns{display:grid;gap:.5rem}
+
+@keyframes shake{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-56%,-50%)}75%{transform:translate(-44%,-50%)}}
+.node.oops{animation:shake .3s}
+@media (min-width:44rem){#app{padding-top:2rem}}
+@media (max-height:700px){
+  .play{gap:.5rem}
+  .prompt{min-height:2.4rem}
+  .prompt-main{font-size:1.28rem}
+  .opt{min-height:3.1rem;font-size:1.2rem}
+  .btn-main{min-height:3.4rem;font-size:1.35rem}
+  .person svg{width:min(8.5rem,38vw)}
+  .person.study svg{width:min(7rem,32vw)}
+  .tile{min-height:4.2rem}
+  .emo{font-size:2.6rem}
+  .wtile{width:3rem;height:3.1rem;font-size:1.8rem}
+  .wslots i{width:2.8rem;height:3rem;line-height:2.8rem;font-size:1.8rem}
+  .clue{padding:.6rem .8rem;font-size:1.15rem;line-height:1.55}
+  .card{font-size:1.25rem;padding:.4rem .6rem}
+  .card .emo{font-size:2.3rem}
+  .arena{min-height:6rem}
+  .home{gap:.75rem}
+  .greet{font-size:1.05rem}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition:none !important}}
+
+/* 덧붙임 */
+.node.hint{box-shadow:0 0 0 5px var(--chija)}
+.opt.quiet{grid-column:1/-1}
+html.fs2 .pick-grid.cols-3,html.fs3 .pick-grid.cols-3{grid-template-columns:1fr 1fr}
+html.fs3 .answers.cols-2 .opt{font-size:1.1rem}
+.home .row.c3 .btn{font-size:1.05rem;padding:.5rem .3rem}
+.result .quilt{align-self:stretch}
+
+.foot{position:sticky;bottom:0;background:var(--mosi);display:grid;gap:.5rem;padding:.3rem 0 .2rem;z-index:2}
+.foot::before{content:"";position:absolute;left:0;right:0;top:-.7rem;height:.7rem;background:linear-gradient(to top,var(--mosi),rgba(237,239,230,0));pointer-events:none}
+.btn.mini{min-height:2.7rem;font-size:1.05rem;padding:.3rem .6rem}
+.play.top .arena{justify-content:flex-start}
+.play.top .prompt{min-height:4.4rem}
+.prompt-main.how{font-size:1.18rem;line-height:1.55}
+.deck.c5{grid-template-columns:repeat(5,1fr);gap:.3rem}
+.deck.c5 .flip{font-size:.72rem}
+.deck.c5 .flip .emo{font-size:1.6rem}
+.result>.btn-main:last-child{position:sticky;bottom:.6rem}
+.person.study svg{width:min(9rem,38vw)}
+
+.install{background:var(--paper);border:3px solid var(--jjok);border-radius:var(--r);padding:.9rem 1rem;display:grid;gap:.6rem}
+.install h2{font-size:1.45rem;color:var(--jjok)}
+.install ol{margin:0;padding-left:1.3rem;display:grid;gap:.45rem;font-weight:700;line-height:1.6}
+.install .small{font-size:.92rem;color:var(--ink-soft);font-weight:700}
+.install a.btn{text-decoration:none}
+.install .btn-quiet{justify-self:start;padding-left:0}
+.install.done{border-color:var(--good);background:var(--good-bg)}
+.install.done h2{color:var(--good)}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<noscript><p style="padding:1rem">이 두뇌 운동은 자바스크립트를 켜야 쓸 수 있어요.</p></noscript>
+<script>
+window.__PWA = true;
+'use strict';
+/* ===== 도우미 ===== */
+const TEST = !!window.__TEST;
+const W = ms => (TEST ? Math.min(ms, window.__TEST_WAIT || 12) : ms);
+function h(tag, attrs) {
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs) {
+    const v = attrs[k];
+    if (v == null || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k === 'style') Object.assign(e.style, v);
+    else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for (let i = 2; i < arguments.length; i++) add(e, arguments[i]);
+  return e;
+}
+function add(e, kid) {
+  if (kid == null || kid === false || kid === '') return;
+  if (Array.isArray(kid)) { kid.forEach(k => add(e, k)); return; }
+  e.appendChild(kid.nodeType ? kid : document.createTextNode(String(kid)));
+}
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+const sample = (a, n) => shuffle(a).slice(0, n);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const uniq = a => a.filter((v, i) => a.indexOf(v) === i);
+function mulberry(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+/* 날짜 */
+const pad2 = n => String(n).padStart(2, '0');
+function dkey(d) { d = d || new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function parseKey(k) { const p = k.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+const YOIL = ['일', '월', '화', '수', '목', '금', '토'];
+function daysBetween(a, b) { return Math.round((parseKey(b) - parseKey(a)) / 864e5); }
+function weekKeys(d) {
+  d = d || new Date();
+  const base = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  base.setDate(base.getDate() - ((base.getDay() + 6) % 7));
+  const out = [];
+  for (let i = 0; i < 7; i++) { const x = new Date(base); x.setDate(base.getDate() + i); out.push(dkey(x)); }
+  return out;
+}
+/* 조사: J('사과','을/를') → 사과를 */
+function hasJong(w) {
+  const c = w.charCodeAt(w.length - 1);
+  if (c >= 0xAC00 && c <= 0xD7A3) return (c - 0xAC00) % 28 !== 0;
+  return '013678'.indexOf(w[w.length - 1]) >= 0;
+}
+function J(w, pair) {
+  const p = pair.split('/');
+  if (pair === '으로/로') {
+    const c = w.charCodeAt(w.length - 1), j = (c >= 0xAC00 && c <= 0xD7A3) ? (c - 0xAC00) % 28 : (hasJong(w) ? 1 : 0);
+    return w + (j === 0 || j === 8 ? '로' : '으로');
+  }
+  return w + (hasJong(w) ? p[0] : p[1]);
+}
+const won = n => n.toLocaleString('ko-KR') + '원';
+const sec = ms => String(Number((ms / 1000).toFixed(2))) + '초';
+
+/* ===== 저장 ===== */
+const KEY = 'jogakbo.v1';
+const QUILT_N = 24;
+function blank() {
+  return { v: 1, opts: { fs: 1, sound: true, voice: false, goal: 4 }, lv: {}, plays: {}, last: {}, hist: [], days: {},
+    patches: [], quilts: 0, seed: (Date.now() % 90000) + 7, speed: { stage: 1, di: {} }, cur: null, lastWords: null, seen: {} };
+}
+let S = blank();
+let storeOK = true;
+function adopt(o) {
+  const b = blank();
+  S = Object.assign(b, o);
+  S.opts = Object.assign(blank().opts, o.opts || {});
+  S.speed = Object.assign(blank().speed, o.speed || {});
+  if (!S.speed.di) S.speed.di = {};
+}
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) { const o = JSON.parse(raw); if (o && o.v === 1) adopt(o); } else localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch (e) { storeOK = false; }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { storeOK = false; } }
+function applyFont() { document.documentElement.className = S.opts.fs === 2 ? 'fs2' : S.opts.fs === 3 ? 'fs3' : ''; }
+
+/* ===== 소리 ===== */
+let AC = null;
+function wakeAudio() {
+  try {
+    if (!AC) { const C = window.AudioContext || window.webkitAudioContext; if (C) AC = new C(); }
+    if (AC && AC.state === 'suspended') AC.resume();
+  } catch (e) {}
+}
+document.addEventListener('click', wakeAudio, true);
+function tone(seq) {
+  if (!S.opts.sound || !AC || TEST) return;
+  try {
+    let t = AC.currentTime + 0.01;
+    seq.forEach(function (n) {
+      const o = AC.createOscillator(), v = AC.createGain(), d = n[1], g = n[2] || 0.11;
+      o.type = 'sine'; o.frequency.value = n[0];
+      v.gain.setValueAtTime(0.0001, t); v.gain.linearRampToValueAtTime(g, t + 0.02); v.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(v); v.connect(AC.destination); o.start(t); o.stop(t + d + 0.03); t += d * 0.8;
+    });
+  } catch (e) {}
+}
+const SFX = {
+  ok: () => tone([[660, .12], [880, .2]]),
+  no: () => tone([[294, .26, .07]]),
+  tap: () => tone([[520, .05, .04]]),
+  done: () => tone([[523, .14], [659, .14], [784, .14], [1047, .34]])
+};
+const canSpeak = () => 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+function speak(text, force) {
+  try {
+    if (!canSpeak() || (!force && !S.opts.voice)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; u.rate = 0.92;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+function hush() { try { if (canSpeak()) speechSynthesis.cancel(); } catch (e) {} }
+
+/* ===== 화면 ===== */
+const app = document.getElementById('app');
+let current = null;
+function mount(node) { app.replaceChildren(node); try { window.scrollTo(0, 0); } catch (e) {} }
+const ICON = {
+  check: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2C6E3F"/><path d="M6.5 12.5l3.6 3.6 7.4-8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  dot: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#B07A00"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.6" fill="#fff"/></svg>'
+};
+const PRAISE = ['맞았어요!', '좋아요!', '잘하셨어요!', '정확해요!', '그렇지요!'];
+function dialog(o) {
+  return new Promise(function (res) {
+    const ov = h('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true' },
+      h('div', { class: 'modal-card' }, h('h2', null, o.title), o.text && h('p', null, o.text),
+        h('div', { class: 'modal-btns' }, o.buttons.map(function (b) {
+          const el = h('button', { class: 'btn ' + (b.cls || ''), type: 'button', onclick: function () { ov.remove(); res(b.value); } }, b.label);
+          if (TEST && b.ok) el.dataset.ok = '1';
+          return el;
+        }))));
+    document.body.appendChild(ov);
+    const f = ov.querySelector('button'); if (f) f.focus();
+  });
+}
+
+/* ===== 운동 한 판을 이끄는 틀 ===== */
+function Abort() {}
+function makeCtx(game, level, o) {
+  o = o || {};
+  const ctx = { game: game, level: level, alive: true, quit: false, session: !!o.session };
+  const rejs = new Set(), timers = new Set();
+  ctx.wait = function (ms) {
+    return new Promise(function (res, rej) {
+      if (!ctx.alive) return rej(new Abort());
+      const box = {};
+      box.t = setTimeout(function () { timers.delete(box); rejs.delete(rej); res(); }, W(ms));
+      timers.add(box); rejs.add(rej);
+    });
+  };
+  ctx.until = function (setup) {
+    return new Promise(function (res, rej) {
+      if (!ctx.alive) return rej(new Abort());
+      rejs.add(rej);
+      setup(function (v) { rejs.delete(rej); res(v); });
+    });
+  };
+  ctx.kill = function () {
+    if (!ctx.alive) return;
+    ctx.alive = false;
+    timers.forEach(function (b) { clearTimeout(b.t); }); timers.clear();
+    const r = Array.from(rejs); rejs.clear();
+    r.forEach(function (f) { f(new Abort()); });
+    hush();
+  };
+  ctx.askQuit = function () {
+    dialog({ title: '운동을 그만할까요?', text: ctx.session ? '여기까지 한 것은 저장돼요. 나중에 이어서 할 수 있어요.' : '',
+      buttons: [{ label: '계속하기', value: false, cls: 'btn-main' }, { label: '그만하기', value: true }] })
+      .then(function (v) { if (v && ctx.alive) { ctx.quit = true; ctx.kill(); } });
+  };
+  ctx.count = h('div', { class: 'bar-count' });
+  ctx.promptEl = h('div', { class: 'prompt', role: 'status', 'aria-live': 'polite' });
+  ctx.arena = h('div', { class: 'arena' });
+  ctx.fb = h('div', { class: 'fbwrap', 'aria-live': 'polite' });
+  ctx.answers = h('div', { class: 'answers' });
+  ctx.root = h('div', { class: 'play' },
+    h('header', { class: 'bar' },
+      h('button', { class: 'btn-quiet bar-quit', type: 'button', onclick: ctx.askQuit }, '그만하기'),
+      h('div', { class: 'bar-title' }, game.name), ctx.count),
+    o.steps ? h('div', { class: 'steps', 'aria-label': '오늘의 운동 ' + o.steps[1] + '걸음 가운데 ' + o.steps[0] + '걸음째' },
+      Array.from({ length: o.steps[1] }, function (_, i) { return h('i', { class: i < o.steps[0] ? 'on' : '' }); })) : null,
+    ctx.promptEl, ctx.arena, h('div', { class: 'foot' }, ctx.fb, ctx.answers));
+
+  ctx.say = function (text, sub) {
+    ctx.promptEl.replaceChildren();
+    add(ctx.promptEl, [h('div', { class: 'prompt-main' }, text), sub ? h('div', { class: 'prompt-sub' }, sub) : null]);
+  };
+  ctx.setCount = function (i, n) { ctx.count.textContent = n ? i + ' / ' + n : ''; };
+  ctx.show = function () { ctx.arena.replaceChildren(); for (let i = 0; i < arguments.length; i++) add(ctx.arena, arguments[i]); };
+  ctx.clear = function () { ctx.arena.replaceChildren(); ctx.answers.replaceChildren(); ctx.answers.className = 'answers'; ctx.fb.replaceChildren(); };
+
+  // 큰 단추 하나
+  ctx.go = function (label, opt) {
+    opt = opt || {};
+    return ctx.until(function (done) {
+      const b = h('button', { class: 'btn btn-main', type: 'button' }, label);
+      if (TEST) b.dataset.ok = '1';
+      b.addEventListener('click', function () { if (b.disabled) return; b.disabled = true; SFX.tap(); done(); });
+      ctx.answers.className = 'answers'; ctx.answers.replaceChildren(b);
+      if (opt.delay) { b.disabled = true; setTimeout(function () { b.disabled = false; }, W(opt.delay)); }
+    });
+  };
+  // 여럿 가운데 하나 고르기. items: [{label|node, ok, text, cls}]
+  ctx.choose = function (items, opt) {
+    opt = opt || {};
+    return ctx.until(function (done) {
+      let fin = false, to = null;
+      const els = items.map(function (it) {
+        const b = h('button', { class: 'opt' + (it.cls ? ' ' + it.cls : ''), type: 'button' }, it.node || it.label);
+        if (TEST && (it.ok || it.any)) b.dataset.ok = '1';
+        it.el = b;
+        b.addEventListener('click', function () {
+          if (fin) return; fin = true; if (to) clearTimeout(to);
+          els.forEach(function (x) { x.disabled = true; }); done(it);
+        });
+        return b;
+      });
+      ctx.answers.className = 'answers cols-' + (opt.cols || 1);
+      ctx.answers.replaceChildren.apply(ctx.answers, els);
+      if (opt.limit && !TEST) {
+        ctx.fb.replaceChildren(h('div', { class: 'timebar' }, h('i', { style: { animationDuration: opt.limit + 'ms' } })));
+        to = setTimeout(function () { if (fin || !ctx.alive) return; fin = true; els.forEach(function (x) { x.disabled = true; }); done(null); }, opt.limit);
+      }
+    });
+  };
+  ctx.reveal = function (items, chosen) {
+    items.forEach(function (it) {
+      if (!it.el) return;
+      if (it.ok) it.el.classList.add('is-right'); else if (it === chosen) it.el.classList.add('is-wrong'); else it.el.classList.add('is-dim');
+    });
+  };
+  // 맞고 틀림을 알리기. 틀렸을 때는 스스로 넘길 때까지 기다린다.
+  ctx.mark = async function (ok, msg, opt) {
+    opt = opt || {};
+    (ok ? SFX.ok : SFX.no)();
+    const box = h('div', { class: 'fb ' + (ok ? 'ok' : 'no') }, h('span', { class: 'fb-ico', html: ok ? ICON.check : ICON.dot }),
+      h('span', null, msg || (ok ? pick(PRAISE) : '아쉬워요.')));
+    ctx.fb.replaceChildren(box);
+    if (ok || opt.auto) await ctx.wait(opt.ms || (ok ? 900 : 2000));
+    else {
+      await ctx.until(function (done) {
+        const b = h('button', { class: 'btn', type: 'button' }, '알겠어요');
+        if (TEST) b.dataset.ok = '1';
+        b.addEventListener('click', function () { b.disabled = true; done(); });
+        ctx.fb.appendChild(b);
+      });
+    }
+    ctx.fb.replaceChildren();
+  };
+  // 물음 하나: 고르고, 보여 주고, 알린다
+  ctx.quiz = async function (q) {
+    ctx.say(q.prompt, q.sub);
+    if (q.body !== undefined) ctx.show(q.body);
+    const a = await ctx.choose(q.options, { cols: q.cols, limit: q.limit });
+    const ok = !!(a && a.ok);
+    ctx.reveal(q.options, a);
+    const right = q.options.filter(function (x) { return x.ok; })[0];
+    const rt = right ? (right.text || right.label) : '';
+    let msg;
+    if (ok) msg = q.why ? pick(PRAISE) + ' ' + q.why : null;
+    else msg = (a ? '아쉬워요. ' : '시간이 다 됐어요. ') + (rt ? '정답은 「' + rt + '」' + (hasJong(rt) ? '이에요.' : '예요.') : '') + (q.why ? ' ' + q.why : '');
+    await ctx.mark(ok, msg, { auto: q.auto, ms: ok ? q.okMs : q.ms });
+    return ok;
+  };
+  // 여럿 가운데 n개 고르기. items: [{label, emoji, ok}]
+  ctx.pickMany = function (items, n, opt) {
+    opt = opt || {};
+    return ctx.until(function (done) {
+      const sel = new Set();
+      const grid = h('div', { class: 'pick-grid cols-' + (opt.cols || 3) });
+      const btn = h('button', { class: 'btn btn-main', type: 'button', disabled: true }, n + '개를 골라 주세요');
+      items.forEach(function (it, i) {
+        const b = h('button', { class: 'pick', type: 'button', 'aria-pressed': 'false' },
+          it.emoji ? h('span', { class: 'pick-emo' }, it.emoji) : null, h('span', null, it.label));
+        if (TEST && it.ok) b.dataset.ok = '1';
+        it.el = b;
+        b.addEventListener('click', function () {
+          if (sel.has(i)) { sel.delete(i); b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
+          else { if (sel.size >= n) return; sel.add(i); b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); }
+          SFX.tap();
+          btn.disabled = sel.size !== n;
+          btn.textContent = sel.size === n ? '다 골랐어요' : n + '개 가운데 ' + sel.size + '개 골랐어요';
+        });
+        grid.appendChild(b);
+      });
+      btn.addEventListener('click', function () {
+        if (btn.disabled) return; btn.disabled = true;
+        grid.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+        const chosen = items.filter(function (_, i) { return sel.has(i); });
+        items.forEach(function (it) {
+          if (it.ok) it.el.classList.add('is-right'); else if (chosen.indexOf(it) >= 0) it.el.classList.add('is-wrong');
+        });
+        done(chosen);
+      });
+      ctx.show(grid); ctx.answers.className = 'answers'; ctx.answers.replaceChildren(btn);
+      if (opt.hint) {
+        const hb = h('button', { class: 'btn-quiet', type: 'button', style: { justifySelf: 'start' } }, '힌트 보기');
+        hb.addEventListener('click', function () { ctx.fb.replaceChildren(h('div', { class: 'tip' }, opt.hint)); });
+        ctx.fb.replaceChildren(hb);
+      }
+    });
+  };
+  // 사이에 끼우는 딴 문제(기억을 잠깐 비우기)
+  ctx.filler = async function (n) {
+    for (let i = 0; i < n; i++) {
+      let a = 11 + rnd(88), b = 11 + rnd(88); if (a === b) b += 1;
+      ctx.clear(); ctx.setCount();
+      ctx.say('잠깐 쉬어 가는 문제예요.', '둘 가운데 더 큰 수를 눌러 주세요.');
+      await ctx.choose([{ label: String(a), ok: a > b }, { label: String(b), ok: b > a }], { cols: 2 });
+    }
+    ctx.clear();
+  };
+  return ctx;
+}
+const GAMES = {};
+const levelOf = id => (GAMES[id].getLevel ? GAMES[id].getLevel() : (S.lv[id] || GAMES[id].start || 1));
+
+async function intro(ctx) {
+  const g = ctx.game;
+  const how = typeof g.how === 'function' ? g.how(ctx.level) : g.how;
+  ctx.clear(); ctx.setCount();
+  ctx.say(how);
+  ctx.promptEl.firstChild.classList.add('how');
+  ctx.show(g.demo ? g.demo(ctx.level) : null,
+    h('div', { class: 'tip' }, h('div', { class: 'tip-h' }, '요령'), g.tip),
+    h('div', { class: 'row', style: { gridAutoFlow: 'column', justifyContent: 'start', alignItems: 'center' } },
+      h('span', { class: 'lv-chip' }, ctx.level + '단계'),
+      canSpeak() ? h('button', { class: 'btn btn-speak', type: 'button', onclick: function () { speak(how + ' ' + g.tip, true); } }, '소리로 듣기') : null));
+  speak(how);
+  await ctx.go('시작');
+  S.seen[g.id] = (S.seen[g.id] || 0) + 1;
+}
+function record(g, ctx, r) {
+  const total = Math.max(1, r.total), pct = r.pct != null ? r.pct : clamp(r.right / total, 0, 1), from = ctx.level;
+  let to = from;
+  if (r.lvTo != null) to = r.lvTo;
+  else {
+    let d = r.delta != null ? r.delta : (pct >= 0.85 ? 1 : pct < 0.5 ? -1 : 0);
+    if ((S.plays[g.id] || 0) < 3) { if (d > 0 && pct === 1) d = 2; else if (d < 0 && pct < 0.3) d = -2; }
+    to = clamp(from + d, 1, g.max || 10);
+    S.lv[g.id] = to;
+  }
+  S.plays[g.id] = (S.plays[g.id] || 0) + 1;
+  S.last[g.id] = Date.now();
+  S.hist.push({ d: dkey(), g: g.id, lv: from, r: r.right, t: r.total, p: Math.round(pct * 100) });
+  if (S.hist.length > 900) S.hist = S.hist.slice(-800);
+  save();
+  return { id: g.id, name: g.name, right: r.right, total: r.total, pct: pct, from: from, to: to, line: r.line, note: r.note };
+}
+async function runGame(id, o) {
+  const g = GAMES[id];
+  const ctx = makeCtx(g, levelOf(id), o);
+  current = ctx; mount(ctx.root);
+  try {
+    await intro(ctx);
+    const r = await g.play(ctx);
+    current = null;
+    return record(g, ctx, r);
+  } catch (e) {
+    current = null;
+    if (e instanceof Abort) return { aborted: true, byUser: ctx.quit };
+    throw e;
+  }
+}
+function resultScreen(sum, o) {
+  o = o || {};
+  return new Promise(function (res) {
+    const head = sum.pct >= 0.85 ? '아주 잘하셨어요' : sum.pct >= 0.6 ? '잘하셨어요' : '수고하셨어요';
+    const lv = sum.to > sum.from ? '다음에는 ' + sum.to + '단계로 올려서 해 볼게요.' : sum.to < sum.from ? '다음에는 조금 쉽게 해 볼게요.' : '다음에도 같은 단계로 해 볼게요.';
+    const btn = function (label, v, cls) { const b = h('button', { class: 'btn ' + (cls || ''), type: 'button', onclick: function () { res(v); } }, label); if (TEST && cls) b.dataset.ok = '1'; return b; };
+    SFX.done();
+    mount(h('div', { class: 'result' },
+      h('div', { class: 'note', style: { textAlign: 'left' } }, sum.name),
+      h('h1', null, head),
+      h('p', { class: 'score' }, sum.line || (sum.total + '문제 가운데 ' + sum.right + '문제를 맞혔어요.')),
+      sum.note ? h('p', { class: 'score' }, sum.note) : null,
+      sum.pct < 0.6 ? h('p', null, '이 운동은 원래 어려워요. 틀리면서 느는 것이니 걱정하지 마세요.') : null,
+      h('div', { class: 'tip' }, lv),
+      h('div', { class: 'spacer' }),
+      o.session ? h('div', { class: 'row' }, btn('다음으로', 'next', 'btn-main'), h('button', { class: 'btn-quiet', type: 'button', style: { justifySelf: 'center' }, onclick: function () { res('stop'); } }, '오늘은 여기까지 하기'))
+        : h('div', { class: 'row' }, btn('한 번 더 하기', 'again', 'btn-main'), btn('다른 운동 고르기', 'games'), btn('처음 화면으로', 'home'))));
+  });
+}
+
+/* ===== 자료 ===== */
+// 그림 낱말: 오늘의 낱말, 짝 맞추기
+const WORDS = {
+  '동물':[['🐶','강아지'],['🐱','고양이'],['🐯','호랑이'],['🐰','토끼'],['🐷','돼지'],['🐮','젖소'],['🐔','닭'],['🦆','오리'],['🐻','곰'],['🐘','코끼리'],['🐒','원숭이'],['🦊','여우'],['🐢','거북이'],['🐸','개구리'],['🦉','부엉이'],['🐧','펭귄'],['🐑','양']],
+  '과일':[['🍎','사과'],['🍊','귤'],['🍇','포도'],['🍉','수박'],['🍓','딸기'],['🍑','복숭아'],['🍌','바나나'],['🍋','레몬'],['🍒','체리'],['🍍','파인애플'],['🥝','키위'],['🍈','멜론']],
+  '물건':[['☂️','우산'],['🔑','열쇠'],['👓','안경'],['⏰','시계'],['📚','책'],['✂️','가위'],['🕯️','양초'],['🎈','풍선'],['📷','사진기'],['☎️','전화기'],['💡','전구'],['🔨','망치'],['👞','구두'],['🎩','모자'],['👜','가방'],['🧦','양말'],['🧤','장갑'],['🔔','종']],
+  '자연':[['🌙','달'],['⭐','별'],['☀️','해'],['🌈','무지개'],['⛰️','산'],['🌊','파도'],['🌳','나무'],['🌷','튤립'],['☁️','구름'],['⛄','눈사람'],['🔥','모닥불'],['🌵','선인장'],['🍁','단풍잎'],['🌻','해바라기']],
+  '탈것':[['🚗','자동차'],['🚌','버스'],['🚂','기차'],['✈️','비행기'],['🚲','자전거'],['🚀','로켓'],['🚁','헬리콥터'],['🚜','트랙터'],['⛵','돛단배'],['🚑','구급차'],['🚒','소방차'],['🚕','택시']],
+  '먹을거리':[['🍚','밥'],['🍜','국수'],['🍞','식빵'],['🥚','달걀'],['🧀','치즈'],['🍰','케이크'],['🍪','과자'],['🍬','사탕'],['🍯','꿀'],['🥛','우유'],['☕','커피'],['🌽','옥수수'],['🥕','당근'],['🍄','버섯'],['🌰','밤'],['🥜','땅콩']],
+  '놀이와 악기':[['🥁','북'],['🎹','피아노'],['🎸','기타'],['🎺','나팔'],['⚽','축구공'],['🎲','주사위'],['🎻','바이올린'],['🎤','마이크'],['🎣','낚싯대'],['🏀','농구공'],['🎯','과녁'],['🎳','볼링']]
+};
+
+// 장보기 기억
+const SHOP = {
+  '과일':['사과','배','귤','포도','수박','딸기','복숭아','바나나','참외','감','자두','키위'],
+  '채소':['배추','무','대파','양파','마늘','당근','오이','호박','가지','시금치','상추','콩나물','감자','고구마','버섯','고추'],
+  '생선과 해물':['고등어','갈치','조기','오징어','새우','꽃게','바지락','멸치','미역','김'],
+  '고기와 달걀':['소고기','돼지고기','닭고기','달걀','오리고기','햄','갈비','삼겹살'],
+  '양념':['소금','설탕','간장','된장','고추장','참기름','식초','고춧가루','들기름','깨'],
+  '곡식과 가공식품':['쌀','보리','콩','밀가루','국수','라면','두부','식빵','떡','어묵'],
+  '마실 것과 간식':['우유','요구르트','주스','커피','녹차','과자','사탕','초콜릿','아이스크림','두유'],
+  '생활용품':['휴지','비누','치약','칫솔','샴푸','세제','수세미','고무장갑','건전지','전구','물티슈','쓰레기봉투']
+};
+
+// 물건 자리
+const PLACES = ['신발장','식탁','소파','침대 머리맡','화장대','책장','옷장','냉장고 위','텔레비전 옆','현관 서랍','부엌 찬장','창가'];
+const THINGS = [['🔑','열쇠'],['👓','안경'],['👛','지갑'],['📱','휴대폰'],['💊','약 봉지'],['☂️','우산'],['⌚','손목시계'],['🧤','장갑'],['✂️','가위'],['📒','수첩'],['💍','반지'],['🔦','손전등'],['🧣','목도리'],['📷','사진기'],['👒','모자'],['🔍','돋보기']];
+const REASONS = ['나갈 때 챙기려고','자주 쓰는 자리라서','눈에 잘 띄어서','잃어버리지 않으려고','쓰고 나서 바로 두려고','손이 잘 닿아서'];
+
+// 얼굴과 이름
+const SURN = ['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황','안','송','홍'];
+const GIVEN_F = ['영자','순자','정숙','영숙','미숙','경숙','옥순','정희','영희','순희','미경','명숙','정순','춘자','혜숙','은숙','미자','복순','경애','말순'];
+const GIVEN_M = ['영수','철수','영호','정호','성수','상철','종수','병철','영식','정식','광수','동수','재호','기철','만수','용식','태식','창호','진수','경수'];
+const JOBS = ['꽃집 사장님','떡집 사장님','약사','우체부','버스 기사','한의사','미용사','서점 주인','과일 가게 사장님','수영 강사','노래 교실 선생님','세탁소 사장님','빵집 사장님','택시 기사','은행원','간호사','요리사','화가','사진사','농부','어부','목수','영어 선생님','헬스 트레이너','동네 이장님','시계 수리공'];
+
+// 낱말 맞추기: [낱말, 뜻풀이]
+const CLUES = [
+  ['사과','빨갛고 둥근 과일. 아침에 먹으면 보약이라고 하지요.'],['우산','비 오는 날 쓰고 나가는 것.'],['안경','눈이 잘 안 보일 때 쓰는 것.'],
+  ['시계','지금 몇 시인지 알려 주는 물건.'],['김치','배추를 절여 고춧가루로 버무린 우리 반찬.'],['바다','파도가 치고 갈매기가 나는 넓은 물.'],
+  ['거울','내 얼굴을 비춰 보는 물건.'],['이불','잘 때 덮는 것.'],['달력','날짜와 요일이 적혀 있는 것.'],['열쇠','잠긴 문을 여는 물건.'],
+  ['구름','하늘에 떠 있는 하얀 솜 같은 것.'],['나비','꽃밭을 팔랑팔랑 날아다니는 곤충.'],['편지','소식을 적어 봉투에 넣어 보내는 글.'],
+  ['감자','땅속에서 캐는 둥근 작물. 쪄 먹으면 포슬포슬해요.'],['기차','철길 위를 달리는 긴 탈것.'],['된장','메주로 담가 찌개를 끓이는 장.'],
+  ['수박','여름에 먹는, 겉은 초록이고 속은 빨간 큰 과일.'],['국수','잔칫날 먹는 가늘고 긴 음식.'],['병원','아플 때 의사를 만나러 가는 곳.'],
+  ['시장','물건을 사고파는 사람들로 북적이는 곳.'],['신문','날마다 새 소식을 실어 나오는 종이.'],['가위','종이나 천을 자르는 물건.'],
+  ['단풍','가을에 산을 울긋불긋 물들이는 잎.'],['송편','추석에 빚어 먹는 반달 모양 떡.'],['장갑','추운 날 손에 끼는 것.'],
+  ['약국','약을 사는 곳.'],['설날','떡국을 먹고 세배하는 새해 첫 명절.'],['고향','태어나서 자란 곳.'],['친구','오래 사귀어 가깝게 지내는 사람.'],
+  ['손주','아들딸이 낳은 아이. 할머니 할아버지의 보물.'],['냄비','찌개나 라면을 끓이는 그릇.'],['수건','세수하고 얼굴을 닦는 천.'],
+  ['베개','잘 때 머리에 베는 것.'],['양말','발에 신는 것. 신발보다 먼저 신어요.'],['치약','칫솔에 짜서 이를 닦는 것.'],
+  ['버스','정류장에서 기다렸다가 여럿이 함께 타는 큰 차.'],['택시','손을 들어 잡고 요금을 내고 타는 차.'],['전화','멀리 있는 사람과 목소리로 이야기하는 것.'],
+  ['사진','추억을 한 장에 담아 두는 것.'],['노래','가락에 맞춰 목소리로 부르는 것.'],
+  ['무지개','비 갠 뒤 하늘에 뜨는 일곱 빛깔 다리.'],['냉장고','음식을 차갑게 넣어 두는 가전제품.'],['세탁기','빨래를 돌려 주는 가전제품.'],
+  ['도서관','책을 빌려 읽는 곳.'],['우체국','편지와 소포를 부치는 곳.'],['미역국','생일날 아침에 끓여 먹는 국.'],['고구마','겨울에 구워 먹는 달콤한 작물.'],
+  ['코끼리','코가 길고 몸집이 큰 동물.'],['소나무','사철 푸른 바늘잎나무.'],['자전거','두 바퀴를 발로 굴려 타는 것.'],['비행기','하늘을 날아 멀리 가는 탈것.'],
+  ['떡볶이','가래떡을 고추장에 볶은 간식.'],['불고기','양념한 소고기를 구운 음식.'],['비빔밥','여러 나물과 고추장을 넣고 비벼 먹는 밥.'],
+  ['지하철','땅속 굴을 달리는 전철.'],['청소기','먼지를 빨아들이는 가전제품.'],['손수건','주머니에 넣고 다니며 땀을 닦는 작은 천.'],
+  ['목도리','겨울에 목에 두르는 것.'],['운동화','걷거나 뛸 때 신는 편한 신발.'],['돋보기','작은 글씨를 크게 보여 주는 것.'],
+  ['주전자','물을 끓여 따르는 그릇.'],['도시락','밖에서 먹으려고 싸 가는 밥.'],['할머니','아버지나 어머니의 어머니.'],
+  ['개나리','봄에 노랗게 피는 울타리 꽃.'],['진달래','봄 산을 분홍빛으로 물들이는 꽃.'],['눈사람','눈을 굴려 만드는 사람 모양.'],
+  ['보름달','음력 열닷샛날 뜨는 둥근 달.'],['아리랑','우리나라를 대표하는 민요.'],['윷놀이','설날에 윷가락 네 개를 던지며 노는 놀이.'],
+  ['태극기','우리나라 국기.'],['무궁화','우리나라 꽃.'],['한라산','제주도 한가운데 솟은 산.'],['제주도','돌과 바람과 귤로 이름난, 우리나라에서 가장 큰 섬.'],
+  ['고등어','등이 푸른 생선. 구이나 조림으로 먹어요.'],['참기름','깨를 볶아 짠 고소한 기름.'],['삼계탕','복날에 먹는, 닭에 인삼을 넣어 끓인 음식.'],
+  ['한가위','추석을 달리 부르는 우리말.'],['거북선','이순신 장군이 왜적을 물리칠 때 쓴 배.'],['세탁소','옷을 맡겨 깨끗이 빨고 다리는 가게.'],
+  ['미용실','머리를 자르고 파마하는 곳.'],['목욕탕','뜨거운 물에 몸을 담그는 곳.'],['경로당','동네 어르신들이 모여 쉬는 곳.'],['놀이터','그네와 미끄럼틀이 있는 곳.'],
+  ['해바라기','해를 따라 고개를 돌리는 크고 노란 꽃.'],['고속도로','차들이 빠르게 달리는 큰 길.'],['김치찌개','익은 김치에 돼지고기를 넣고 끓인 찌개.'],
+  ['된장찌개','된장을 풀고 두부와 호박을 넣어 끓인 찌개.'],['미끄럼틀','놀이터에서 위에서 아래로 타고 내려오는 것.'],['숨바꼭질','술래가 숨은 아이들을 찾는 놀이.'],
+  ['할아버지','아버지나 어머니의 아버지.'],['어린이날','5월 5일, 아이들을 위한 날.'],['어버이날','5월 8일, 부모님께 카네이션을 달아 드리는 날.'],
+  ['코스모스','가을 길가에 하늘하늘 피는 꽃.'],['횡단보도','길을 건너는 곳. 흰 줄이 그어져 있어요.'],['주민센터','등본을 떼러 가는 동네 관청.'],
+  ['동그라미','둥글게 그린 모양.'],['소꿉놀이','아이들이 살림살이 흉내를 내며 노는 놀이.'],['사물놀이','꽹과리, 징, 장구, 북으로 하는 놀이.'],
+  ['강강술래','한가위 달밤에 손잡고 둥글게 도는 놀이.'],['해수욕장','여름에 바닷물에 들어가 노는 곳.'],['대한민국','우리나라의 정식 이름.'],
+  ['세종대왕','한글을 만든 임금.'],['오토바이','두 바퀴로 달리는, 엔진 달린 탈것.'],['헬리콥터','날개를 빙빙 돌려 하늘에 뜨는 탈것.'],['스마트폰','전화도 하고 사진도 찍는 손안의 기계.'],
+  ['텔레비전','연속극과 뉴스를 보는 가전제품.'],['전자레인지','음식을 넣고 돌려 데우는 가전제품.'],['아이스크림','차갑고 달콤한 여름 간식.'],
+  ['크리스마스','12월 25일, 성탄절.'],['엘리베이터','건물에서 위아래로 오르내리는 탈것.'],['고추잠자리','가을 하늘을 나는 빨간 잠자리.'],['김치냉장고','김치를 따로 넣어 두는 냉장고.'],
+  ['주민등록증','이름과 주소가 적힌, 나라에서 내주는 신분증.'],['가위바위보','손을 내밀어 승부를 가리는 놀이. 주먹은 가위를 이겨요.'],['청국장찌개','콩을 띄워 만든 장으로 끓인, 냄새가 구수한 찌개.'],
+  ['김치볶음밥','잘 익은 김치를 썰어 밥과 함께 볶은 음식.'],['오케스트라','여러 악기가 함께 연주하는 큰 악단.'],['가스레인지','부엌에서 불을 켜 음식을 끓이는 기구.'],
+  ['식기세척기','그릇을 넣으면 알아서 씻어 주는 기계.'],['공기청정기','방 안의 먼지를 걸러 주는 기계.'],['운전면허증','차를 몰아도 된다고 나라에서 내주는 증명.'],['버스정류장','버스를 기다렸다가 타는 곳.'],
+  ['어린이집','어린아이들을 낮 동안 돌봐 주는 곳.'],['놀이공원','회전목마와 청룡열차가 있는 곳.'],['카네이션','어버이날 부모님 가슴에 달아 드리는 꽃.'],['고슴도치','등에 뾰족한 가시가 돋은 작은 동물.'],
+  ['딱따구리','부리로 나무를 쪼아 구멍을 내는 새.'],['무당벌레','빨간 등에 까만 점이 있는 작은 벌레.'],['반딧불이','여름밤에 꽁무니에서 빛을 내는 벌레.'],['손톱깎이','손톱을 자르는 작은 도구.'],
+  ['샌드위치','빵 사이에 햄과 채소를 끼운 음식.'],['하모니카','입에 대고 불어서 소리 내는 작은 악기.'],['크레파스','아이들이 그림을 색칠할 때 쓰는 막대 모양 도구.'],
+  ['신호등','빨간불과 초록불로 길 건널 때를 알려 주는 것.'],['동물원','호랑이, 코끼리, 원숭이를 구경하는 곳.'],['수영장','물속에서 헤엄치는 곳.'],['유치원','초등학교에 들어가기 전 아이들이 다니는 곳.']
+];
+
+// 속담: [앞, 뒤, 뜻(없으면 null), 빈칸(없으면 null) = [빈칸 낱말, 오답 셋]]
+const PROVERBS = [
+  ['가는 말이 고와야','오는 말이 곱다','내가 남에게 잘해야 남도 나에게 잘한다',null],
+  ['낮말은 새가 듣고','밤말은 쥐가 듣는다','아무도 없는 데서도 말은 조심해야 한다',['쥐','개','소','여우']],
+  ['소 잃고','외양간 고친다','일이 잘못된 뒤에는 손써도 소용없다',['외양간','대문','지붕','담장']],
+  ['백지장도','맞들면 낫다','쉬운 일도 힘을 합치면 더 쉽다',null],
+  ['세 살 버릇','여든까지 간다','어릴 때 든 버릇은 고치기 어렵다',['여든','일흔','아흔','예순']],
+  ['원숭이도','나무에서 떨어진다','아무리 잘하는 사람도 실수할 때가 있다',['원숭이','다람쥐','호랑이','고양이']],
+  ['티끌 모아','태산','작은 것도 모으면 크게 된다',['태산','동산','바다','보물']],
+  ['천 리 길도','한 걸음부터','큰일도 작은 시작에서 출발한다',null],
+  ['호랑이도 제 말 하면','온다','남 이야기를 하면 마침 그 사람이 나타난다',null],
+  ['고래 싸움에','새우 등 터진다','힘센 이들 싸움에 약한 사람이 피해를 본다',['새우','멸치','조개','오징어']],
+  ['콩 심은 데 콩 나고','팥 심은 데 팥 난다','모든 일은 원인에 따라 결과가 생긴다',null],
+  ['발 없는 말이','천 리 간다','말은 금방 멀리 퍼지니 조심해야 한다',null],
+  ['돌다리도','두들겨 보고 건너라','잘 아는 일도 조심해서 해야 한다',null],
+  ['윗물이 맑아야','아랫물이 맑다','윗사람이 잘해야 아랫사람도 잘한다',null],
+  ['가랑비에','옷 젖는 줄 모른다',null,null],
+  ['등잔 밑이','어둡다','가까이 있는 것을 오히려 잘 모른다',['등잔','촛불','아궁이','달빛']],
+  ['누워서','떡 먹기','아주 하기 쉬운 일이다',null],
+  ['금강산도','식후경','아무리 좋은 구경도 배가 불러야 즐겁다',null],
+  ['개구리 올챙이 적','생각 못 한다','형편이 나아지면 어렵던 때를 잊는다',null],
+  ['아니 땐 굴뚝에','연기 날까','소문에는 그럴 만한 까닭이 있다',null],
+  ['구슬이 서 말이라도','꿰어야 보배','아무리 좋은 것도 쓸모 있게 다듬어야 값지다',null],
+  ['열 번 찍어','안 넘어가는 나무 없다','꾸준히 노력하면 이루지 못할 일이 없다',null],
+  ['하늘이 무너져도','솟아날 구멍이 있다','아무리 어려워도 헤쳐 나갈 길은 있다',null],
+  ['바늘 도둑이','소도둑 된다','작은 잘못도 버릇되면 큰 잘못을 저지른다',['바늘','단추','가위','호미']],
+  ['꿩 먹고','알 먹기','한 가지 일로 두 가지 이익을 본다',null],
+  ['우물 안','개구리','넓은 세상을 모르고 좁게 생각하는 사람',['개구리','올챙이','두꺼비','미꾸라지']],
+  ['빈 수레가','요란하다','실속 없는 사람이 더 떠든다',['수레','항아리','주머니','지게']],
+  ['벼는 익을수록','고개를 숙인다','훌륭한 사람일수록 겸손하다',['벼','보리','수수','조']],
+  ['사공이 많으면','배가 산으로 간다','나서는 사람이 많으면 일이 엉뚱하게 된다',['산','강','섬','숲']],
+  ['쇠뿔도','단김에 빼라','하려던 일은 망설이지 말고 바로 해야 한다',null],
+  ['고생 끝에','낙이 온다','어려운 일을 견디면 좋은 날이 온다',null],
+  ['뛰는 놈 위에','나는 놈 있다','잘하는 사람 위에 더 잘하는 사람이 있다',null],
+  ['말 한마디로','천 냥 빚을 갚는다','말을 잘하면 어려운 일도 풀린다',null],
+  ['믿는 도끼에','발등 찍힌다','믿었던 사람에게 배신을 당한다',['도끼','망치','호미','낫']],
+  ['수박','겉 핥기','속 내용은 모르고 겉만 건드린다',null],
+  ['싼 게','비지떡','값이 싼 물건은 품질도 나쁘기 마련이다',null],
+  ['지렁이도 밟으면','꿈틀한다','순한 사람도 업신여기면 가만있지 않는다',null],
+  ['작은 고추가','맵다','몸집이 작아도 야무지고 재주가 있다',['고추','양파','후추','겨자']],
+  ['열 길 물속은 알아도','한 길 사람 속은 모른다','사람의 마음은 알기 어렵다',null],
+  ['까마귀 날자','배 떨어진다','상관없는 일이 공교롭게 겹쳐 의심을 받는다',['까마귀','까치','참새','비둘기']],
+  ['가는 날이','장날','뜻하지 않은 일을 공교롭게 만난다',null],
+  ['공든 탑이','무너지랴','정성을 다한 일은 헛되지 않는다',null],
+  ['그림의','떡','마음에 들어도 가질 수 없는 것',null],
+  ['꼬리가 길면','밟힌다','나쁜 일을 오래 하면 결국 들킨다',null],
+  ['닭 쫓던 개','지붕 쳐다본다','애쓰던 일이 틀어져 어쩔 도리가 없다',['지붕','하늘','담장','마당']],
+  ['도둑이','제 발 저리다','잘못한 사람은 스스로 마음이 조마조마하다',null],
+  ['떡 줄 사람은 생각도 않는데','김칫국부터 마신다','해 줄 사람은 생각도 없는데 미리 기대한다',null],
+  ['마른하늘에','날벼락','뜻밖에 당하는 불행',null],
+  ['무소식이','희소식','소식이 없는 것은 잘 지낸다는 뜻이다',null],
+  ['배보다','배꼽이 더 크다','딸린 것이 본래 것보다 더 크다',null],
+  ['병 주고','약 준다','해를 입히고 나서 도와주는 척한다',null],
+  ['보기 좋은 떡이','먹기도 좋다','겉모양이 좋으면 내용도 좋다',null],
+  ['불난 집에','부채질한다','남의 불행을 더 커지게 만든다',null],
+  ['서당 개 삼 년이면','풍월을 읊는다','모르는 사람도 오래 보고 들으면 알게 된다',['서당','절간','장터','부엌']],
+  ['소문난 잔치에','먹을 것 없다','떠들썩한 소문에 비해 실속이 없다',null],
+  ['시작이','반이다','일은 시작하기가 어렵지, 시작하면 끝내기 쉽다',null],
+  ['아는 길도','물어 가라',null,null],
+  ['오르지 못할 나무는','쳐다보지도 마라','될 수 없는 일은 처음부터 바라지 마라',null],
+  ['울며','겨자 먹기','싫은 일을 억지로 한다',null],
+  ['자라 보고 놀란 가슴','솥뚜껑 보고 놀란다','한번 크게 놀라면 비슷한 것만 봐도 겁을 낸다',['솥뚜껑','바가지','맷돌','냄비']],
+  ['제 눈에','안경','남이 뭐라 해도 제 마음에 들면 좋게 보인다',null],
+  ['짚신도','제짝이 있다','누구에게나 어울리는 짝이 있다',['짚신','고무신','버선','나막신']],
+  ['팔은','안으로 굽는다','사람은 가까운 이의 편을 들게 된다',null],
+  ['하나를 보면','열을 안다','한 가지만 봐도 나머지를 미루어 알 수 있다',null],
+  ['하룻강아지','범 무서운 줄 모른다','철없는 사람이 겁 없이 덤빈다',['범','곰','늑대','뱀']],
+  ['호랑이 굴에 가야','호랑이 새끼를 잡는다','뜻한 것을 얻으려면 그만한 위험을 무릅써야 한다',null],
+  ['가재는','게 편',null,null],
+  ['개천에서','용 난다','어려운 형편에서 훌륭한 사람이 나온다',['용','학','범','봉황']],
+  ['갈수록','태산','갈수록 더 어려운 일이 닥친다',null],
+  ['남의 떡이','더 커 보인다','남의 것이 내 것보다 좋아 보인다',['떡','밥','감','집']],
+  ['내 코가','석 자','내 사정이 급해 남을 돌볼 겨를이 없다',null],
+  ['달면 삼키고','쓰면 뱉는다','제게 이로우면 가까이하고 아니면 멀리한다',null],
+  ['될성부른 나무는','떡잎부터 알아본다','잘될 사람은 어릴 때부터 남다르다',null],
+  ['목마른 사람이','우물 판다','급하고 아쉬운 사람이 먼저 나서게 된다',null],
+  ['급할수록','돌아가라','급한 일일수록 차분히 해야 한다',null],
+  ['뿌린 대로','거둔다',null,null],
+  ['사촌이 땅을 사면','배가 아프다','남이 잘되면 샘이 난다',['배','머리','허리','이']],
+  ['웃는 낯에','침 못 뱉는다','좋게 대하는 사람에게는 나쁘게 굴기 어렵다',null],
+  ['식은 죽','먹기',null,null],
+  ['길고 짧은 것은','대어 보아야 안다','무엇이 나은지는 직접 견주어 봐야 안다',null],
+  ['옷깃만 스쳐도','인연','사소한 만남도 소중한 인연이다',null],
+  ['미운 아이','떡 하나 더 준다','미운 사람일수록 더 잘 대해 주어야 한다',null]
+];
+
+// 오늘의 약속(운동이 끝나면 할 일)
+const PROMISES = ['물 한 잔 마시기','기지개 켜기','창문 열어 환기하기','가족에게 안부 문자 보내기','달력에 오늘 날짜 표시하기','어깨 열 번 돌리기','손 씻기','화분에 물 주기'];
+
+// 생활로 옮기기
+const CARRY = {
+  shop:'다음에 장 보러 갈 때, 살 것을 종류끼리 묶어 외워 보세요.',
+  face:'새로 만난 분의 이름을 들으면, 얼굴에서 눈에 띄는 곳과 함께 속으로 두 번 불러 보세요.',
+  place:'열쇠나 안경을 내려놓을 때 「나갈 때 쓰니까 신발장」 하고 소리 내어 말해 보세요.',
+  story:'오늘 본 뉴스 하나를 누가, 언제, 어디서, 무엇을 했는지 가족에게 이야기해 보세요.'
+};
+const LIFE = [
+  '숨이 조금 찰 만큼 걷는 것이 뇌에도 가장 좋은 운동이에요.',
+  '사람을 만나 이야기하는 것만 한 두뇌 운동이 없어요. 오늘 누구에게 전화해 볼까요?',
+  '혈압과 혈당을 잘 지키는 것이 기억을 지키는 길이에요.',
+  '잘 들리지 않으면 뇌가 쉽게 지쳐요. 귀가 어두워졌다 싶으면 검사를 받아 보세요.',
+  '잠을 잘 자는 동안 그날 배운 것이 기억으로 자리 잡아요.',
+  '채소, 생선, 견과류를 자주 드세요.',
+  '새로운 것을 배우는 일이 뇌를 가장 바쁘게 해요.'
+];
+
+/* ===== 꽃과 나비: 보는 속도와 넓게 보기 ===== */
+const DUR = [2000, 1600, 1300, 1000, 800, 650, 500, 400, 320, 250, 200, 160, 130, 100, 80, 64, 50];
+const POSN = ['위', '오른쪽 위', '오른쪽', '오른쪽 아래', '아래', '왼쪽 아래', '왼쪽', '왼쪽 위'];
+function flowerSVG(kind) {
+  const red = '#C4405A', yel = '#EEB238';
+  let p = '';
+  if (kind === 'rr') {
+    for (let i = 0; i < 5; i++) {
+      const a = (i * 72 - 90) * Math.PI / 180;
+      p += '<circle cx="' + (50 + 22 * Math.cos(a)).toFixed(1) + '" cy="' + (50 + 22 * Math.sin(a)).toFixed(1) + '" r="17" fill="' + red + '"/>';
+    }
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' + p + '<circle cx="50" cy="50" r="12" fill="' + yel + '"/></svg>';
+  }
+  const col = kind === 'sy' ? yel : red, mid = kind === 'sy' ? '#6B4226' : yel;
+  for (let i = 0; i < 10; i++) p += '<ellipse cx="50" cy="23" rx="7.5" ry="20" fill="' + col + '" transform="rotate(' + i * 36 + ' 50 50)"/>';
+  return '<svg viewBox="0 0 100 100" aria-hidden="true">' + p + '<circle cx="50" cy="50" r="13" fill="' + mid + '"/></svg>';
+}
+function butterflySVG() {
+  return '<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="29" cy="36" rx="25" ry="21" fill="#1F3B73"/><ellipse cx="71" cy="36" rx="25" ry="21" fill="#1F3B73"/>' +
+    '<ellipse cx="33" cy="69" rx="18" ry="15" fill="#6C4A80"/><ellipse cx="67" cy="69" rx="18" ry="15" fill="#6C4A80"/>' +
+    '<circle cx="29" cy="36" r="7" fill="#EEB238"/><circle cx="71" cy="36" r="7" fill="#EEB238"/><rect x="45.5" y="20" width="9" height="62" rx="4.5" fill="#16233F"/></svg>';
+}
+function leafSVG(rot) {
+  return '<svg viewBox="0 0 100 100" aria-hidden="true"><g transform="rotate(' + rot + ' 50 50)"><path d="M50 8 C84 30 84 70 50 92 C16 70 16 30 50 8 Z" fill="#437A4E"/><path d="M50 16 L50 86" stroke="#DCEBD9" stroke-width="4"/></g></svg>';
+}
+function stim(svg, x, y, size) {
+  const d = h('div', { class: 'stim', html: svg });
+  d.style.left = x + '%'; d.style.top = y + '%'; d.style.width = size + '%';
+  return d;
+}
+function ringXY(i, R) { const a = (i * 45 - 90) * Math.PI / 180; return [50 + R * Math.cos(a), 50 + R * Math.sin(a)]; }
+function sceneNodes(stage, fl, pos) {
+  const out = [stim(flowerSVG(fl), 50, 50, 24)];
+  if (stage >= 2) {
+    const R = stage === 2 ? 30 : 40, xy = ringXY(pos, R);
+    out.push(stim(butterflySVG(), xy[0], xy[1], 15));
+    if (stage >= 4) for (let i = 0; i < 8; i++) if (i !== pos) { const p = ringXY(i, R); out.push(stim(leafSVG(rnd(360)), p[0], p[1], 12)); }
+    if (stage >= 5) for (let i = 0; i < 8; i++) { const a = (i * 45 - 67.5) * Math.PI / 180; out.push(stim(leafSVG(rnd(360)), 50 + 23 * Math.cos(a), 50 + 23 * Math.sin(a), 9)); }
+  }
+  return out;
+}
+function maskEl() {
+  const m = h('div', { class: 'mask' }), cols = ['#1F3B73', '#C4405A', '#EEB238', '#437A4E', '#6C4A80', '#B9D8CC', '#EDEFE6'];
+  for (let i = 0; i < 64; i++) m.appendChild(h('i', { style: { background: pick(cols) } }));
+  return m;
+}
+function askSpot(ctx, st, R, pos) {
+  return ctx.until(function (done) {
+    st.replaceChildren();
+    const els = [];
+    for (let i = 0; i < 8; i++) {
+      const xy = ringXY(i, R), b = h('button', { class: 'spot', type: 'button', 'aria-label': POSN[i] });
+      b.style.left = xy[0] + '%'; b.style.top = xy[1] + '%';
+      if (TEST && i === pos) b.dataset.ok = '1';
+      b.addEventListener('click', function () {
+        els.forEach(function (x) { x.disabled = true; });
+        b.classList.add(i === pos ? 'is-right' : 'is-wrong');
+        done(i);
+      });
+      els.push(b); st.appendChild(b);
+    }
+  });
+}
+GAMES.speed = {
+  id: 'speed', name: '꽃과 나비', dom: 'speed', max: 6,
+  how: function (lv) {
+    return lv <= 1 ? '꽃 한 송이가 잠깐 나타났다 사라져요. 어떤 꽃이었는지 맞혀 주세요.'
+      : '꽃과 나비가 잠깐 나타났다 사라져요. 가운데 꽃이 무엇이었는지, 나비가 어디 있었는지 맞혀 주세요.';
+  },
+  tip: '눈은 가운데에 두고 나비는 곁눈으로 보세요. 맞히면 조금씩 빨라지고, 틀리면 다시 느려져요.',
+  getLevel: function () { return S.speed.stage; },
+  demo: function (lv) {
+    const st = h('div', { class: 'stage', style: { width: 'min(100%, 9rem)' } });
+    sceneNodes(Math.min(lv, 4), lv >= 6 ? 'sr' : 'sy', 1).forEach(function (n) { st.appendChild(n); });
+    return st;
+  },
+  play: async function (ctx) {
+    const stage = ctx.level, pair = stage >= 6 ? ['rr', 'sr'] : ['rr', 'sy'];
+    const names = stage >= 6 ? { rr: '둥근 꽃', sr: '뾰족한 꽃' } : { rr: '빨간 꽃', sy: '노란 꽃' };
+    const R = stage === 2 ? 30 : 40, N = TEST ? 5 : 18;
+    let di = S.speed.di[stage] != null ? S.speed.di[stage] : 3, streak = 0, right = 0, quick = true;
+    const st = h('div', { class: 'stage' });
+    ctx.root.classList.add('top');
+    for (let t = 0; t < N; t++) {
+      const fl = pick(pair), pos = rnd(8);
+      ctx.clear(); ctx.setCount(t + 1, N);
+      ctx.say('가운데를 보세요.');
+      st.replaceChildren(h('div', { class: 'fix' }, '+'));
+      ctx.show(st);
+      await ctx.wait(900);
+      st.replaceChildren.apply(st, sceneNodes(stage, fl, pos));
+      await ctx.wait(DUR[di]);
+      st.replaceChildren(maskEl());
+      await ctx.wait(240);
+      st.replaceChildren();
+      ctx.say('가운데 꽃은 무엇이었나요?');
+      const opts = pair.map(function (k) { return { node: [h('span', { html: flowerSVG(k) }), names[k]], cls: 'flower-opt', ok: k === fl }; });
+      const a = await ctx.choose(opts, { cols: 2 });
+      let ok = !!a.ok;
+      if (stage >= 2) {
+        ctx.answers.replaceChildren();
+        ctx.say('나비는 어디에 있었나요?');
+        const spot = await askSpot(ctx, st, R, pos);
+        ok = ok && spot === pos;
+      }
+      if (ok) {
+        right++; streak++;
+        await ctx.mark(true, null, { ms: 600 });
+        if (streak >= (quick ? 2 : 3)) { di = Math.min(DUR.length - 1, di + 1); streak = 0; }
+      } else {
+        streak = 0; quick = false;
+        ctx.answers.replaceChildren();
+        st.replaceChildren.apply(st, sceneNodes(stage, fl, pos));
+        await ctx.mark(false, '가운데는 ' + names[fl] + (stage >= 2 ? ', 나비는 ' + POSN[pos] + '에 있었어요.' : '이었어요.'), { auto: true, ms: 2300 });
+        di = Math.max(0, di - 1);
+      }
+    }
+    S.speed.di[stage] = di;
+    const acc = right / N;
+    let to = stage;
+    if (di >= 9 && acc >= 0.7 && stage < 6) { to = stage + 1; if (S.speed.di[to] == null) S.speed.di[to] = Math.max(2, di - 5); }
+    else if (di <= 1 && acc < 0.5 && stage > 1) to = stage - 1;
+    S.speed.stage = to;
+    return { right: right, total: N, lvTo: to, line: N + '번 가운데 ' + right + '번 맞혔어요.', note: '지금 보는 속도는 ' + sec(DUR[di]) + '예요.' };
+  }
+};
+
+/* ===== 장보기 기억: 종류끼리 묶어 외우기 ===== */
+const SHOP_LV = [null, { n: 3, c: 2 }, { n: 4, c: 2 }, { n: 5, c: 2 }, { n: 6, c: 2 }, { n: 6, c: 3 }, { n: 8, c: 3 }, { n: 9, c: 3 }, { n: 10, c: 4 }, { n: 12, c: 4 }, { n: 12, c: 4, free: true }];
+function cardsEl(items) {
+  return h('div', { class: 'cards' }, items.map(function (x) {
+    return h('div', { class: 'card' + (x.c != null ? ' c' + (x.c % 5) : '') }, x.e ? h('span', { class: 'emo' }, x.e) : null, x.t);
+  }));
+}
+const colsFor = items => (items.some(function (x) { return x.label.length >= 5; }) ? 2 : 3);
+GAMES.shop = {
+  id: 'shop', name: '장보기 기억', dom: 'mem', start: 3,
+  how: '장 볼 물건을 보여 드려요. 종류끼리 묶어서 외운 다음, 무엇이 있었는지 골라 주세요.',
+  tip: '과일은 과일끼리, 채소는 채소끼리 묶으세요. 「과일 둘, 채소 셋」 하고 개수까지 외우면 더 잘 떠올라요.',
+  play: async function (ctx) {
+    const sp = SHOP_LV[ctx.level], rounds = ctx.level <= 6 ? 2 : 1;
+    let right = 0, total = 0;
+    for (let r = 0; r < rounds; r++) {
+      const cats = sample(Object.keys(SHOP), sp.c);
+      const per = cats.map(function (_, i) { return Math.floor(sp.n / sp.c) + (i < sp.n % sp.c ? 1 : 0); });
+      let list = [];
+      cats.forEach(function (c, i) { sample(SHOP[c], per[i]).forEach(function (w) { list.push({ w: w, cat: c, ci: i }); }); });
+      // 읽기
+      ctx.clear(); ctx.setCount(r + 1, rounds);
+      ctx.say('오늘 장 볼 물건이에요.', '하나씩 소리 내어 읽어 보세요.');
+      ctx.show(cardsEl(shuffle(list).map(function (x) { return { t: x.w }; })));
+      await ctx.go('다 읽었어요', { delay: 1500 });
+      // 묶기
+      if (!sp.free) {
+        const order = shuffle(list);
+        for (let i = 0; i < order.length; i++) {
+          const it = order[i];
+          ctx.clear(); ctx.setCount(r + 1, rounds);
+          ctx.say('종류끼리 묶어 볼까요?', '이 물건은 어느 쪽인가요?');
+          ctx.show(h('div', { class: 'big' }, it.w));
+          const opts = cats.map(function (c) { return { label: c, ok: c === it.cat, cls: 'small' }; });
+          const a = await ctx.choose(opts, { cols: 2 });
+          ctx.reveal(opts, a);
+          if (a.ok) await ctx.wait(380);
+          else await ctx.mark(false, J(it.w, '은/는') + ' ' + it.cat + ' 쪽이에요.', { auto: true, ms: 1600 });
+        }
+      }
+      // 묶음째 외우기
+      ctx.clear(); ctx.setCount(r + 1, rounds);
+      if (sp.free) {
+        ctx.say('이번에는 스스로 묶어서 외워 보세요.', '종류가 몇 가지인지, 종류마다 몇 개인지 세어 보세요.');
+        ctx.show(cardsEl(shuffle(list).map(function (x) { return { t: x.w }; })));
+      } else {
+        ctx.say('묶음째로 외워 보세요.', cats.map(function (c, i) { return c + ' ' + per[i] + '개'; }).join(', '));
+        ctx.show(cats.map(function (c, i) {
+          return h('div', { class: 'group' }, h('h3', null, c + ' ' + per[i] + '개'),
+            cardsEl(list.filter(function (x) { return x.ci === i; }).map(function (x) { return { t: x.w, c: i }; })));
+        }));
+      }
+      await ctx.go('다 외웠어요', { delay: 2500 });
+      await ctx.filler(ctx.level <= 2 ? 1 : ctx.level <= 6 ? 3 : 5);
+      // 떠올리기
+      if (sp.free) {
+        let lures = [];
+        cats.forEach(function (c) { lures = lures.concat(sample(SHOP[c].filter(function (w) { return !list.some(function (x) { return x.w === w; }); }), 2)); });
+        const items = shuffle(list.map(function (x) { return { label: x.w, ok: true }; }).concat(lures.map(function (w) { return { label: w, ok: false }; })));
+        ctx.clear(); ctx.say('사려던 물건 ' + list.length + '개를 모두 골라 주세요.', '종류별로 하나씩 떠올려 보세요.');
+        const chosen = await ctx.pickMany(items, list.length, { cols: colsFor(items) });
+        const hit = chosen.filter(function (x) { return x.ok; }).length;
+        right += hit; total += list.length;
+        await ctx.mark(hit === list.length, hit === list.length ? null : '초록색으로 표시된 것이 사려던 물건이에요.');
+      } else {
+        for (let i = 0; i < cats.length; i++) {
+          const c = cats[i], targets = list.filter(function (x) { return x.ci === i; }).map(function (x) { return x.w; });
+          const rest = SHOP[c].filter(function (w) { return targets.indexOf(w) < 0; });
+          const lures = sample(rest, Math.min(rest.length, targets.length <= 2 ? 4 : 5));
+          const items = shuffle(targets.map(function (w) { return { label: w, ok: true }; }).concat(lures.map(function (w) { return { label: w, ok: false }; })));
+          ctx.clear(); ctx.setCount(r + 1, rounds);
+          ctx.say(c + ' 가운데 무엇을 사려고 했지요?', targets.length + '개였어요.');
+          const chosen = await ctx.pickMany(items, targets.length, { cols: colsFor(items) });
+          const hit = chosen.filter(function (x) { return x.ok; }).length;
+          right += hit; total += targets.length;
+          await ctx.mark(hit === targets.length, hit === targets.length ? null : '초록색으로 표시된 것이 사려던 물건이에요.');
+        }
+      }
+    }
+    return { right: right, total: total, line: '물건 ' + total + '개 가운데 ' + right + '개를 기억하셨어요.' };
+  }
+};
+
+/* ===== 얼굴과 이름: 눈에 띄는 곳과 이름을 묶기 ===== */
+const FEATS = [
+  { k: 'gr', s: '빨간 안경', t: '빨간 안경을 쓴', g: 'fm' }, { k: 'gs', s: '네모난 안경', t: '네모난 안경을 쓴', g: 'fm' },
+  { k: 'hs', s: '챙 넓은 모자', t: '챙 넓은 모자를 쓴', g: 'f' }, { k: 'hb', s: '빨간 털모자', t: '빨간 털모자를 쓴', g: 'fm' },
+  { k: 'hc', s: '야구 모자', t: '야구 모자를 쓴', g: 'm' }, { k: 'mu', s: '콧수염', t: '콧수염이 있는', g: 'm' },
+  { k: 'be', s: '턱수염', t: '턱수염이 있는', g: 'm' }, { k: 'mo', s: '볼에 있는 점', t: '볼에 점이 있는', g: 'fm' },
+  { k: 'ea', s: '큰 귀걸이', t: '큰 귀걸이를 한', g: 'f' }, { k: 'sc', s: '목도리', t: '목도리를 두른', g: 'fm' },
+  { k: 'bt', s: '나비넥타이', t: '나비넥타이를 맨', g: 'm' }, { k: 'hp', s: '머리핀', t: '머리핀을 꽂은', g: 'f' },
+  { k: 'ba', s: '적은 머리숱', t: '머리숱이 적은', g: 'm' }, { k: 'wh', s: '하얗게 센 머리', t: '머리가 하얗게 센', g: 'fm' },
+  { k: 'pe', s: '뽀글뽀글한 머리', t: '머리가 뽀글뽀글한', g: 'f' }, { k: 'bu', s: '올려 묶은 머리', t: '머리를 올려 묶은', g: 'f' }
+];
+const HAIR_T = { bob: ['단발머리', '단발머리를 한'], long: ['긴 머리', '머리가 긴'], short: ['짧은 머리', '머리가 짧은'], side: ['옆 가르마', '옆 가르마를 탄'], crew: ['짧게 깎은 머리', '머리를 짧게 깎은'] };
+const CLOTH = [['#1F3B73', '남색 옷', '남색 옷을 입은'], ['#C4405A', '붉은 옷', '붉은 옷을 입은'], ['#D99A1E', '노란 옷', '노란 옷을 입은'], ['#437A4E', '초록 옷', '초록 옷을 입은'], ['#6C4A80', '보라색 옷', '보라색 옷을 입은'], ['#6FB1A0', '옥색 옷', '옥색 옷을 입은']];
+function genPeople(n) {
+  const feats = shuffle(FEATS), cloths = shuffle(CLOTH), surn = sample(SURN, n), jobs = sample(JOBS, n), out = [];
+  for (let i = 0; i < n; i++) {
+    const f = feats[i], sex = f.g === 'fm' ? (Math.random() < 0.55 ? 'f' : 'm') : f.g;
+    const p = { sex: sex, name: surn[i] + pick(sex === 'f' ? GIVEN_F : GIVEN_M), feat: f, job: jobs[i], cloth: cloths[i % cloths.length],
+      skin: pick(['#F6D7B8', '#EFC8A2', '#E8BC93']), fw: 54 + rnd(8), fh: 64 + rnd(8), smile: rnd(2),
+      hairColor: pick(['#1E1B1A', '#1E1B1A', '#4A3526', '#777777']) };
+    p.hair = sex === 'f' ? pick(['bob', 'long', 'short']) : pick(['short', 'side', 'crew']);
+    if (f.k === 'pe') p.hair = 'perm'; if (f.k === 'bu') p.hair = 'bun'; if (f.k === 'ba') p.hair = 'bald';
+    if (f.k === 'wh') { p.hairColor = '#E4E2DC'; p.hair = sex === 'f' ? pick(['bob', 'short']) : pick(['short', 'side']); }
+    out.push(p);
+  }
+  return out;
+}
+function faceSVG(p) {
+  const cx = 100, cy = 106, fw = p.fw, fh = p.fh, L = cx - fw - 2, Rr = cx + fw + 2, T = cy - fh, sk = p.skin, hc = p.hairColor, k = p.feat.k;
+  const white = hc === '#E4E2DC', hs = white ? ' stroke="#9A968E" stroke-width="2"' : '';
+  const hat = k === 'hs' || k === 'hb' || k === 'hc';
+  let s = '<svg viewBox="0 0 200 232" role="img" aria-label="얼굴 그림">';
+  // 뒷머리
+  if (p.hair === 'long') s += '<path d="M' + (L - 6) + ' ' + (cy + 4) + ' Q' + (L - 8) + ' ' + (T - 8) + ' 100 ' + (T - 10) + ' Q' + (Rr + 8) + ' ' + (T - 8) + ' ' + (Rr + 6) + ' ' + (cy + 4) + ' L' + (Rr + 10) + ' 196 Q100 212 ' + (L - 10) + ' 196 Z" fill="' + hc + '"' + hs + '/>';
+  if (p.hair === 'bob') s += '<path d="M' + (L - 6) + ' ' + (cy + 4) + ' Q' + (L - 8) + ' ' + (T - 8) + ' 100 ' + (T - 10) + ' Q' + (Rr + 8) + ' ' + (T - 8) + ' ' + (Rr + 6) + ' ' + (cy + 4) + ' L' + (Rr + 8) + ' ' + (cy + 46) + ' Q100 ' + (cy + 64) + ' ' + (L - 8) + ' ' + (cy + 46) + ' Z" fill="' + hc + '"' + hs + '/>';
+  if (p.hair === 'perm') for (let a = 162; a <= 378; a += 18) { const r = a * Math.PI / 180; s += '<circle cx="' + (cx + (fw + 5) * Math.cos(r)).toFixed(1) + '" cy="' + (cy - 10 + (fh - 2) * Math.sin(r)).toFixed(1) + '" r="17" fill="' + hc + '"' + hs + '/>'; }
+  if (p.hair === 'bun') s += '<circle cx="100" cy="' + (T - 10) + '" r="18" fill="' + hc + '"' + hs + '/>';
+  // 옷, 목
+  s += '<path d="M20 232 Q22 192 78 184 L122 184 Q178 192 180 232 Z" fill="' + p.cloth[0] + '"/>';
+  s += '<rect x="84" y="' + (cy + 52) + '" width="32" height="36" rx="8" fill="' + sk + '"/>';
+  if (k === 'sc') { const c = p.cloth[0] === '#D99A1E' ? '#C4405A' : '#EEB238'; s += '<path d="M62 ' + (cy + 70) + ' Q100 ' + (cy + 86) + ' 138 ' + (cy + 70) + ' L140 ' + (cy + 90) + ' Q100 ' + (cy + 108) + ' 60 ' + (cy + 90) + ' Z" fill="' + c + '"/><rect x="116" y="' + (cy + 88) + '" width="17" height="36" rx="4" fill="' + c + '"/>'; }
+  if (k === 'bt') s += '<path d="M100 198 L78 185 L78 211 Z M100 198 L122 185 L122 211 Z" fill="#C4405A"/><circle cx="100" cy="198" r="5.5" fill="#8E2A3E"/>';
+  // 귀, 얼굴
+  s += '<ellipse cx="' + (cx - fw) + '" cy="' + (cy + 2) + '" rx="8" ry="12" fill="' + sk + '"/><ellipse cx="' + (cx + fw) + '" cy="' + (cy + 2) + '" rx="8" ry="12" fill="' + sk + '"/>';
+  if (k === 'ea') s += '<g fill="none" stroke="#D99A1E" stroke-width="5"><circle cx="' + (cx - fw - 1) + '" cy="' + (cy + 25) + '" r="10"/><circle cx="' + (cx + fw + 1) + '" cy="' + (cy + 25) + '" r="10"/></g>';
+  s += '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + fw + '" ry="' + fh + '" fill="' + sk + '"/>';
+  // 앞머리
+  if (p.hair === 'bald') {
+    s += '<path d="M' + (L - 1) + ' ' + (cy - 2) + ' Q' + (L - 6) + ' ' + (cy - 36) + ' ' + (L + 12) + ' ' + (cy - 46) + ' Q' + (L + 5) + ' ' + (cy - 24) + ' ' + (L + 6) + ' ' + (cy - 2) + ' Z" fill="' + hc + '"' + hs + '/>';
+    s += '<path d="M' + (Rr + 1) + ' ' + (cy - 2) + ' Q' + (Rr + 6) + ' ' + (cy - 36) + ' ' + (Rr - 12) + ' ' + (cy - 46) + ' Q' + (Rr - 5) + ' ' + (cy - 24) + ' ' + (Rr - 6) + ' ' + (cy - 2) + ' Z" fill="' + hc + '"' + hs + '/>';
+  } else if (p.hair === 'crew') {
+    s += '<path d="M' + (L + 2) + ' ' + (cy - 22) + ' Q' + L + ' ' + (T - 4) + ' 100 ' + (T - 6) + ' Q' + Rr + ' ' + (T - 4) + ' ' + (Rr - 2) + ' ' + (cy - 22) + ' Q' + (Rr - 12) + ' ' + (cy - 46) + ' 100 ' + (cy - 52) + ' Q' + (L + 12) + ' ' + (cy - 46) + ' ' + (L + 2) + ' ' + (cy - 22) + ' Z" fill="' + hc + '"' + hs + '/>';
+  } else if (p.hair === 'side') {
+    s += '<path d="M' + L + ' ' + (cy - 6) + ' Q' + (L - 2) + ' ' + (T - 6) + ' 100 ' + (T - 8) + ' Q' + (Rr + 2) + ' ' + (T - 6) + ' ' + Rr + ' ' + (cy - 6) + ' Q' + (Rr - 8) + ' ' + (cy - 36) + ' 128 ' + (cy - 46) + ' Q92 ' + (cy - 60) + ' ' + (L + 5) + ' ' + (cy - 26) + ' Z" fill="' + hc + '"' + hs + '/>';
+  } else if (p.hair === 'perm') {
+    for (let x = L + 12; x <= Rr - 11.9; x += (Rr - L - 24) / 4) s += '<circle cx="' + x.toFixed(1) + '" cy="' + (cy - 44 - 6 * Math.sin((x - L) / (Rr - L) * Math.PI)).toFixed(1) + '" r="14" fill="' + hc + '"' + hs + '/>';
+  } else if (p.hair === 'bun') {
+    s += '<path d="M' + L + ' ' + (cy - 8) + ' Q' + (L - 2) + ' ' + (T - 6) + ' 100 ' + (T - 8) + ' Q' + (Rr + 2) + ' ' + (T - 6) + ' ' + Rr + ' ' + (cy - 8) + ' Q' + (Rr - 10) + ' ' + (cy - 42) + ' 100 ' + (cy - 52) + ' Q' + (L + 10) + ' ' + (cy - 42) + ' ' + L + ' ' + (cy - 8) + ' Z" fill="' + hc + '"' + hs + '/>';
+  } else {
+    s += '<path d="M' + L + ' ' + (cy - 6) + ' Q' + (L - 2) + ' ' + (T - 6) + ' 100 ' + (T - 8) + ' Q' + (Rr + 2) + ' ' + (T - 6) + ' ' + Rr + ' ' + (cy - 6) + ' Q' + (Rr - 10) + ' ' + (cy - 34) + ' 118 ' + (cy - 40) + ' Q100 ' + (cy - 46) + ' 82 ' + (cy - 40) + ' Q' + (L + 10) + ' ' + (cy - 34) + ' ' + L + ' ' + (cy - 6) + ' Z" fill="' + hc + '"' + hs + '/>';
+  }
+  // 모자
+  if (k === 'hs') {
+    s += '<path d="M' + (L + 6) + ' ' + (cy - 36) + ' Q' + (L + 4) + ' ' + (T - 24) + ' 100 ' + (T - 26) + ' Q' + (Rr - 4) + ' ' + (T - 24) + ' ' + (Rr - 6) + ' ' + (cy - 36) + ' Z" fill="#E8D8A4"/>';
+    s += '<ellipse cx="100" cy="' + (cy - 36) + '" rx="' + (fw + 38) + '" ry="13" fill="#DCC685"/><path d="M' + (L + 6) + ' ' + (cy - 40) + ' Q100 ' + (cy - 52) + ' ' + (Rr - 6) + ' ' + (cy - 40) + '" fill="none" stroke="#C4405A" stroke-width="7"/>';
+  }
+  if (k === 'hb') {
+    s += '<path d="M' + (L - 1) + ' ' + (cy - 32) + ' Q' + (L - 4) + ' ' + (T - 24) + ' 100 ' + (T - 26) + ' Q' + (Rr + 4) + ' ' + (T - 24) + ' ' + (Rr + 1) + ' ' + (cy - 32) + ' Z" fill="#C4405A"/>';
+    s += '<rect x="' + (L - 3) + '" y="' + (cy - 44) + '" width="' + (Rr - L + 6) + '" height="15" rx="7" fill="#9E2F45"/><circle cx="100" cy="' + (T - 28) + '" r="10" fill="#F4F1E8" stroke="#B5B1A6" stroke-width="1.5"/>';
+  }
+  if (k === 'hc') {
+    s += '<path d="M' + L + ' ' + (cy - 34) + ' Q' + (L - 2) + ' ' + (T - 20) + ' 100 ' + (T - 22) + ' Q' + (Rr + 2) + ' ' + (T - 20) + ' ' + Rr + ' ' + (cy - 34) + ' Z" fill="#1F3B73"/>';
+    s += '<path d="M' + L + ' ' + (cy - 38) + ' Q100 ' + (cy - 52) + ' ' + (Rr + 30) + ' ' + (cy - 30) + ' Q' + (Rr + 10) + ' ' + (cy - 24) + ' ' + Rr + ' ' + (cy - 30) + ' Q100 ' + (cy - 44) + ' ' + L + ' ' + (cy - 30) + ' Z" fill="#14274B"/>';
+  }
+  // 눈썹, 눈, 코, 입
+  const bc = white ? '#8E8A80' : hc === '#777777' ? '#5B5B5B' : hc;
+  s += '<path d="M70 ' + (cy - 18) + ' Q79 ' + (cy - 23) + ' 88 ' + (cy - 18) + ' M112 ' + (cy - 18) + ' Q121 ' + (cy - 23) + ' 130 ' + (cy - 18) + '" fill="none" stroke="' + bc + '" stroke-width="3.6" stroke-linecap="round"/>';
+  if (p.smile) s += '<path d="M71 ' + (cy - 3) + ' Q79 ' + (cy - 11) + ' 87 ' + (cy - 3) + ' M113 ' + (cy - 3) + ' Q121 ' + (cy - 11) + ' 129 ' + (cy - 3) + '" fill="none" stroke="#2B2B2B" stroke-width="3.6" stroke-linecap="round"/>';
+  else s += '<ellipse cx="79" cy="' + (cy - 6) + '" rx="4.6" ry="5.6" fill="#2B2B2B"/><ellipse cx="121" cy="' + (cy - 6) + '" rx="4.6" ry="5.6" fill="#2B2B2B"/>';
+  s += '<path d="M100 ' + (cy + 2) + ' Q95 ' + (cy + 16) + ' 102 ' + (cy + 18) + '" fill="none" stroke="#A9744F" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>';
+  if (p.sex === 'f') s += '<circle cx="68" cy="' + (cy + 20) + '" r="9" fill="#E88F8F" fill-opacity=".35"/><circle cx="132" cy="' + (cy + 20) + '" r="9" fill="#E88F8F" fill-opacity=".35"/>';
+  if (k === 'be') s += '<path d="M' + (cx - fw + 8) + ' ' + (cy + 20) + ' Q' + (cx - fw + 6) + ' ' + (cy + fh + 6) + ' 100 ' + (cy + fh + 8) + ' Q' + (cx + fw - 6) + ' ' + (cy + fh + 6) + ' ' + (cx + fw - 8) + ' ' + (cy + 20) + ' Q126 ' + (cy + 52) + ' 100 ' + (cy + 55) + ' Q74 ' + (cy + 52) + ' ' + (cx - fw + 8) + ' ' + (cy + 20) + ' Z" fill="' + (white ? '#D9D6CE' : hc) + '"/>';
+  s += '<path d="M85 ' + (cy + 34) + ' Q100 ' + (cy + 46) + ' 115 ' + (cy + 34) + '" fill="none" stroke="' + (p.sex === 'f' ? '#C4405A' : '#A44848') + '" stroke-width="4" stroke-linecap="round"/>';
+  if (k === 'mu') s += '<path d="M78 ' + (cy + 27) + ' Q89 ' + (cy + 17) + ' 100 ' + (cy + 24) + ' Q111 ' + (cy + 17) + ' 122 ' + (cy + 27) + ' Q111 ' + (cy + 31) + ' 100 ' + (cy + 28) + ' Q89 ' + (cy + 31) + ' 78 ' + (cy + 27) + ' Z" fill="' + (white ? '#8E8A80' : hc) + '"/>';
+  if (k === 'mo') s += '<circle cx="129" cy="' + (cy + 27) + '" r="5.2" fill="#3B2A22"/>';
+  // 안경
+  if (k === 'gr') s += '<g fill="#fff" fill-opacity=".3" stroke="#C4405A" stroke-width="4.5"><circle cx="79" cy="' + (cy - 5) + '" r="16"/><circle cx="121" cy="' + (cy - 5) + '" r="16"/></g><path d="M95 ' + (cy - 6) + ' L105 ' + (cy - 6) + ' M63 ' + (cy - 7) + ' L' + (cx - fw) + ' ' + (cy - 10) + ' M137 ' + (cy - 7) + ' L' + (cx + fw) + ' ' + (cy - 10) + '" stroke="#C4405A" stroke-width="4"/>';
+  if (k === 'gs') s += '<g fill="#fff" fill-opacity=".3" stroke="#16233F" stroke-width="4.5"><rect x="61" y="' + (cy - 18) + '" width="34" height="25" rx="5"/><rect x="105" y="' + (cy - 18) + '" width="34" height="25" rx="5"/></g><path d="M95 ' + (cy - 7) + ' L105 ' + (cy - 7) + ' M61 ' + (cy - 9) + ' L' + (cx - fw) + ' ' + (cy - 11) + ' M139 ' + (cy - 9) + ' L' + (cx + fw) + ' ' + (cy - 11) + '" stroke="#16233F" stroke-width="4"/>';
+  if (k === 'hp' && !hat) s += '<rect x="126" y="' + (cy - 50) + '" width="24" height="9" rx="4.5" fill="#EEB238" stroke="#16233F" stroke-width="1.5" transform="rotate(28 138 ' + (cy - 46) + ')"/>';
+  return s + '</svg>';
+}
+function personEl(p, withName, withJob, small) {
+  return h('div', { class: 'person' + (withName || small ? ' study' : '') }, h('div', { html: faceSVG(p) }),
+    withName ? h('div', { class: 'person-name' }, p.name + ' 씨') : null,
+    withName && withJob ? h('div', { class: 'person-job' }, p.job) : null);
+}
+function featChips(p) {
+  const k = p.feat.k, out = [[p.feat.s, p.feat.t]];
+  const hairFeat = k === 'pe' || k === 'bu' || k === 'ba' || k === 'hs' || k === 'hb' || k === 'hc';
+  if (!hairFeat && HAIR_T[p.hair]) out.push(HAIR_T[p.hair]);
+  out.push([p.cloth[1], p.cloth[2]]);
+  return out;
+}
+const FACE_N = [0, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6];
+GAMES.face = {
+  id: 'face', name: '얼굴과 이름', dom: 'mem', start: 2,
+  how: '처음 뵙는 분들을 소개해 드려요. 나중에 얼굴만 보고 성함을 맞혀 주세요.',
+  tip: '얼굴에서 눈에 띄는 곳을 하나 정하고, 「빨간 안경을 쓴 김영자 씨」처럼 이름과 묶어서 소리 내어 말해 보세요.',
+  play: async function (ctx) {
+    const n = FACE_N[ctx.level], askJob = ctx.level >= 3, ps = genPeople(n);
+    const extra = [];
+    while (extra.length < 3) { const nm = pick(SURN) + pick(Math.random() < 0.5 ? GIVEN_F : GIVEN_M); if (extra.indexOf(nm) < 0 && !ps.some(function (p) { return p.name === nm; })) extra.push(nm); }
+    const study = async function (p, again) {
+      ctx.clear(); ctx.setCount();
+      ctx.say(again ? '한 번 더 뵐게요.' : '처음 뵙는 분이에요.', '눈에 띄는 곳을 하나 골라 보세요.');
+      ctx.show(personEl(p, true, askJob));
+      const chips = featChips(p).map(function (c) { return { label: c[0], t: c[1], cls: 'small', any: true }; });
+      const a = await ctx.choose(chips, { cols: 2 });
+      p.link = a.t;
+      ctx.clear();
+      ctx.say('이렇게 묶어서 기억해 보세요.', '소리 내어 두 번 말해 보세요.');
+      ctx.show(personEl(p, false, false, true), h('div', { class: 'linkline' }, '「' + p.link + ' ' + p.name + ' 씨」', askJob ? h('div', { class: 'person-job' }, p.job) : null));
+      await ctx.go('두 번 말했어요', { delay: 1200 });
+    };
+    const test = async function (p) {
+      ctx.clear();
+      ctx.say('이분 성함이 무엇이었지요?');
+      ctx.show(personEl(p, false));
+      const names = uniq([p.name].concat(shuffle(ps.filter(function (x) { return x !== p; }).map(function (x) { return x.name; })), extra)).slice(0, 4);
+      const opts = shuffle(names).map(function (nm) { return { label: nm + ' 씨', ok: nm === p.name }; });
+      opts.push({ label: '잘 모르겠어요', cls: 'quiet', ok: false });
+      const a = await ctx.choose(opts, { cols: 2 });
+      ctx.reveal(opts, a);
+      const okName = !!a.ok;
+      await ctx.mark(okName, okName ? null : '이분은 「' + (p.link ? p.link + ' ' : '') + p.name + ' 씨」예요.');
+      let okJob = false;
+      if (askJob) {
+        const js = shuffle([p.job].concat(sample(JOBS.filter(function (j) { return j !== p.job; }), 3)));
+        okJob = await ctx.quiz({ prompt: p.name + ' 씨는 무슨 일을 하시는 분이었지요?', body: personEl(p, false),
+          options: js.map(function (j) { return { label: j, ok: j === p.job, cls: 'small' }; }), cols: 2 });
+      }
+      return { name: okName, job: okJob };
+    };
+    for (let i = 0; i < n; i++) {
+      ctx.setCount(i + 1, n);
+      await study(ps[i]);
+      if (i >= 1) { const r = await test(ps[i - 1]); if (!r.name) await study(ps[i - 1], true); }
+    }
+    await ctx.filler(1);
+    { const r = await test(ps[n - 1]); if (!r.name) await study(ps[n - 1], true); }
+    await ctx.filler(ctx.level >= 5 ? 3 : 2);
+    let right = 0, total = 0, nameRight = 0;
+    const order = shuffle(ps);
+    for (let i = 0; i < n; i++) {
+      const r = await test(order[i]);
+      total += askJob ? 2 : 1;
+      if (r.name) { right++; nameRight++; }
+      if (askJob && r.job) right++;
+    }
+    return { right: right, total: total, line: n + '분 가운데 ' + nameRight + '분의 성함을 기억하셨어요.' };
+  }
+};
+
+/* ===== 물건 자리: 둔 곳에 이유 붙이기 ===== */
+const PLACE_LV = [null, [2, 4], [3, 4], [3, 6], [4, 6], [4, 6], [5, 9], [5, 9], [6, 9], [6, 9], [7, 9]];
+function houseEl(places, held, onTap, okIdx) {
+  const g = h('div', { class: 'house p' + places.length });
+  places.forEach(function (p, i) {
+    const has = held && held[i];
+    const t = h('button', { class: 'tile' + (has ? ' has' : ''), type: 'button', disabled: !onTap },
+      has ? h('span', { class: 'emo' }, has[0]) : null, h('span', null, p), has ? h('small', null, has[1]) : null);
+    if (onTap) t.addEventListener('click', function () { onTap(i, t, g); });
+    if (TEST && onTap && i === okIdx) t.dataset.ok = '1';
+    g.appendChild(t);
+  });
+  return g;
+}
+GAMES.place = {
+  id: 'place', name: '물건 자리', dom: 'mem', start: 2,
+  how: '물건을 집 안 어디에 두었는지 보여 드려요. 나중에 그 자리를 찾아 주세요.',
+  tip: '「열쇠는 나갈 때 쓰니까 신발장」 하고 이유를 붙이면 잘 잊히지 않아요.',
+  play: async function (ctx) {
+    const sp = PLACE_LV[ctx.level], rounds = ctx.level <= 4 ? 2 : 1;
+    let right = 0, total = 0;
+    for (let r = 0; r < rounds; r++) {
+      const places = sample(PLACES, sp[1]), objs = sample(THINGS, sp[0]), at = sample(places.map(function (_, i) { return i; }), sp[0]);
+      for (let i = 0; i < objs.length; i++) {
+        const o = objs[i], held = {}; held[at[i]] = o;
+        ctx.clear(); ctx.setCount(i + 1, objs.length);
+        ctx.say(J(o[1], '은/는') + ' ' + places[at[i]] + '에 두었어요.', '왜 거기 두었을지 이유를 골라 보세요.');
+        ctx.show(houseEl(places, held));
+        const a = await ctx.choose(sample(REASONS, 2).map(function (x) { return { label: x, cls: 'small', any: true }; }), { cols: 2 });
+        ctx.answers.replaceChildren();
+        ctx.say('「' + a.label + ' ' + places[at[i]] + '에 둔 ' + o[1] + '」', '그 모습을 머릿속에 그려 보세요.');
+        await ctx.go('그려 봤어요', { delay: 1200 });
+      }
+      await ctx.filler(ctx.level <= 2 ? 2 : 3);
+      const ask = async function (i) {
+        const o = objs[i];
+        ctx.clear();
+        ctx.say(J(o[1], '은/는') + ' 어디에 두었지요?');
+        const hit = await ctx.until(function (done) {
+          ctx.show(h('div', { class: 'emo' }, o[0]), houseEl(places, null, function (pi, el, g) {
+            g.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+            const good = pi === at[i];
+            el.classList.add(good ? 'is-right' : 'is-wrong');
+            if (!good) g.children[at[i]].classList.add('is-right');
+            done(good);
+          }, at[i]));
+        });
+        await ctx.mark(hit, hit ? null : J(o[1], '은/는') + ' ' + places[at[i]] + '에 있어요.');
+        return hit;
+      };
+      const order = shuffle(objs.map(function (_, i) { return i; })), missed = [];
+      for (let j = 0; j < order.length; j++) {
+        ctx.setCount(j + 1, order.length);
+        const ok = await ask(order[j]);
+        total++; if (ok) right++; else missed.push(order[j]);
+      }
+      for (let j = 0; j < missed.length; j++) { ctx.setCount(); await ask(missed[j]); }
+    }
+    return { right: right, total: total, line: '물건 ' + total + '개 가운데 ' + right + '개의 자리를 기억하셨어요.' };
+  }
+};
+
+/* ===== 이야기 기억: 누가, 언제, 어디서, 무엇을 ===== */
+const ST = {
+  names: ['영자', '순자', '정숙', '미숙', '영희', '정희', '경숙', '옥순', '영수', '철수', '정호', '상철', '동수', '재호'],
+  days: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+  parts: ['아침', '점심때', '저녁'],
+  times: ['아침 9시', '오전 10시', '오전 11시', '오후 2시', '오후 3시', '오후 4시', '저녁 6시', '저녁 7시'],
+  shops: ['시장', '마트', '동네 슈퍼', '농협 매장'],
+  goods: [{ n: '고등어', c: '마리' }, { n: '갈치', c: '마리' }, { n: '두부', c: '모' }, { n: '사과', c: '개' }, { n: '무', c: '개' }, { n: '배추', c: '포기' }, { n: '대파', c: '단' }, { n: '시금치', c: '단' }, { n: '달걀', c: '판' }, { n: '우유', c: '통' }, { n: '오이', c: '개' }, { n: '양파', c: '망' }, { n: '감자', c: '봉지' }, { n: '귤', c: '봉지' }],
+  counts: ['한', '두', '세', '네'],
+  stops: [{ p: '약국', d: '파스를 샀습니다' }, { p: '은행', d: '통장 정리를 했습니다' }, { p: '우체국', d: '소포를 부쳤습니다' }, { p: '세탁소', d: '맡긴 옷을 찾았습니다' }, { p: '빵집', d: '식빵을 샀습니다' }, { p: '꽃집', d: '화분을 하나 샀습니다' }, { p: '철물점', d: '전구를 샀습니다' }, { p: '미용실', d: '머리를 다듬었습니다' }],
+  fams: ['큰딸', '작은딸', '큰아들', '막내아들', '며느리', '사위', '동생', '친구', '손녀', '조카'],
+  clinics: ['안과', '치과', '내과', '정형외과', '한의원', '이비인후과', '피부과'],
+  bring: ['신분증', '약 수첩', '검사 결과지', '안경', '보청기', '진료 의뢰서'],
+  foods: ['칼국수', '추어탕', '비빔밥', '냉면', '순두부찌개', '설렁탕'],
+  buses: ['5', '33', '127', '401', '708', '1002'],
+  guests: ['큰딸네', '작은아들네', '막내네', '손주들', '조카네', '사돈'],
+  dishes: [{ n: '잡채', a: '당면', b: '시금치' }, { n: '갈비찜', a: '갈비', b: '밤' }, { n: '미역국', a: '미역', b: '소고기' }, { n: '김밥', a: '김', b: '단무지' }, { n: '된장찌개', a: '두부', b: '애호박' }, { n: '불고기', a: '소고기', b: '양파' }, { n: '호박전', a: '애호박', b: '밀가루' }, { n: '수정과', a: '계피', b: '곶감' }],
+  gifts: ['귤 한 상자', '케이크', '홍삼', '꽃다발', '떡', '한과', '수박 한 통'],
+  groups: ['동창들', '계 모임 친구들', '교회 식구들', '등산 모임 사람들', '형제들', '옛 직장 동료들'],
+  towns: ['경주', '강릉', '여수', '전주', '부산', '제주도', '속초', '통영', '안동'],
+  rides: ['기차', '고속버스', '관광버스', '비행기'],
+  durs: ['한 시간', '두 시간', '세 시간', '네 시간'],
+  sights: ['바다', '오래된 절', '한옥 마을', '전통 시장', '꽃 축제', '단풍'],
+  buys: ['김', '오징어', '한과', '젓갈', '떡', '멸치'],
+  lodges: ['호텔', '펜션', '민박집', '친척 집'],
+  clubs: ['노래 교실', '서예 교실', '수영 교실', '영어 교실', '요가 교실', '걷기 모임', '독서 모임'],
+  rooms: ['주민센터', '복지관', '문화센터', '도서관', '체육관', '마을 회관'],
+  snacks: ['떡', '귤', '삶은 달걀', '식혜', '군고구마', '과자'],
+  afters: [{ t: '칼국수를 먹으러 갑니다', k: '칼국수 먹으러 가기' }, { t: '차를 마시러 갑니다', k: '차 마시러 가기' }, { t: '공원을 한 바퀴 돕니다', k: '공원 한 바퀴 돌기' }, { t: '노래방에 갑니다', k: '노래방 가기' }, { t: '시장 구경을 갑니다', k: '시장 구경 가기' }],
+  fees: ['오천 원', '만 원', '이만 원', '삼만 원'],
+  sends: ['김치', '밑반찬', '가족사진', '영양제', '겨울 이불', '고춧가루'],
+  thanks: ['참기름', '들깨', '곶감', '떡', '손편지', '용돈'],
+  memos: ['달력', '수첩', '냉장고 메모지', '휴대폰']
+};
+const jo = (w, pair) => J(w, pair).slice(w.length);
+const STORIES = [
+  function (K) { // 장보기
+    const nm = pick(ST.names), day = pick(ST.days), shop = pick(ST.shops), g = sample(ST.goods, 2), c1 = pick(ST.counts), c2 = pick(ST.counts), stop = pick(ST.stops), fam = pick(ST.fams);
+    return {
+      s: [nm + ' 씨는 ' + K(day) + ' ' + pick(ST.parts) + '에 ' + K(shop) + '에 갔습니다.',
+        '거기서 ' + K(g[0].n + ' ' + c1 + ' ' + g[0].c) + jo(g[0].c, '과/와') + ' ' + K(g[1].n + ' ' + c2 + ' ' + g[1].c) + jo(g[1].c, '을/를') + ' 샀습니다.',
+        '돌아오는 길에는 ' + K(stop.p) + '에 들러 ' + stop.d + '.',
+        '집에 와서는 ' + K(fam) + '에게 전화를 걸어 안부를 물었습니다.'],
+      q: [[0, nm + ' 씨는 무슨 요일에 장을 보러 갔나요?', day, ST.days], [0, '어디에서 장을 봤나요?', shop, ST.shops],
+        [1, J(g[0].n, '을/를') + ' 얼마나 샀나요?', c1 + ' ' + g[0].c, ST.counts.map(function (c) { return c + ' ' + g[0].c; })],
+        [1, J(g[0].n, '과/와') + ' 함께 산 것은 무엇인가요?', g[1].n, ST.goods.map(function (x) { return x.n; }).filter(function (x) { return x !== g[0].n; })],
+        [2, '돌아오는 길에 어디에 들렀나요?', stop.p, ST.stops.map(function (x) { return x.p; })],
+        [3, '집에 와서 누구에게 전화를 걸었나요?', fam, ST.fams]]
+    };
+  },
+  function (K) { // 병원 예약
+    const nm = pick(ST.names), day = pick(ST.days), time = pick(ST.times), cl = pick(ST.clinics), item = pick(ST.bring), who = pick(ST.fams), food = pick(ST.foods), bus = pick(ST.buses);
+    return {
+      s: [nm + ' 씨는 ' + K(day) + ' ' + K(time) + '에 ' + K(cl) + ' 예약이 되어 있습니다.',
+        '가기 전에 ' + K(item) + jo(item, '을/를') + ' 꼭 챙겨야 합니다.',
+        '진료가 끝나면 ' + K(who) + jo(who, '과/와') + ' ' + K(food) + jo(food, '을/를') + ' 먹기로 했습니다.',
+        cl + '까지는 ' + K(bus + '번 버스') + '를 타고 갑니다.'],
+      q: [[0, '무슨 요일에 예약이 되어 있나요?', day, ST.days], [0, '몇 시 예약인가요?', time, ST.times], [0, '어느 병원에 가나요?', cl, ST.clinics],
+        [1, '가기 전에 무엇을 챙겨야 하나요?', item, ST.bring], [2, '진료가 끝나면 누구와 밥을 먹기로 했나요?', who, ST.fams],
+        [2, '진료가 끝나면 무엇을 먹기로 했나요?', food, ST.foods], [3, '몇 번 버스를 타고 가나요?', bus + '번', ST.buses.map(function (b) { return b + '번'; })]]
+    };
+  },
+  function (K) { // 손님맞이
+    const nm = pick(ST.names), day = pick(ST.days), gu = pick(ST.guests), dish = pick(ST.dishes), gift = pick(ST.gifts), time = pick(ST.times);
+    return {
+      s: ['이번 ' + K(day) + '에 ' + K(gu) + jo(gu, '이/가') + ' 집에 옵니다.',
+        nm + ' 씨는 ' + K(dish.n) + jo(dish.n, '을/를') + ' 해 주려고 ' + K(dish.a) + jo(dish.a, '과/와') + ' ' + dish.b + jo(dish.b, '을/를') + ' 사 두었습니다.',
+        gu + jo(gu, '은/는') + ' 올 때 ' + K(gift) + jo(gift, '을/를') + ' 사 오겠다고 했습니다.',
+        K(time) + '쯤 도착한다고 합니다.'],
+      q: [[0, '무슨 요일에 손님이 오나요?', day, ST.days], [0, '누가 집에 오나요?', gu, ST.guests],
+        [1, '무슨 음식을 해 주려고 하나요?', dish.n, ST.dishes.map(function (d) { return d.n; })],
+        [1, J(dish.n, '을/를') + ' 하려고 사 둔 것은 무엇인가요?', dish.a, uniq(ST.dishes.map(function (d) { return d.a; })).filter(function (x) { return x !== dish.a && x !== dish.b; })],
+        [2, '올 때 무엇을 사 오겠다고 했나요?', gift, ST.gifts], [3, '몇 시쯤 도착하나요?', time, ST.times]]
+    };
+  },
+  function (K) { // 여행
+    const nm = pick(ST.names), grp = pick(ST.groups), town = pick(ST.towns), ride = pick(ST.rides), dur = pick(ST.durs), sight = pick(ST.sights), buy = pick(ST.buys), lodge = pick(ST.lodges);
+    return {
+      s: [nm + ' 씨는 다음 달에 ' + K(grp) + jo(grp, '과/와') + ' ' + K(town) + jo(town, '으로/로') + ' 여행을 갑니다.',
+        K(ride) + jo(ride, '을/를') + ' 타고 가는데 ' + K(dur) + ' 걸립니다.',
+        '가서는 ' + K(sight) + jo(sight, '을/를') + ' 구경하고 ' + K(buy) + jo(buy, '을/를') + ' 사 올 생각입니다.',
+        '잠은 ' + K(lodge) + '에서 자기로 했습니다.'],
+      q: [[0, '누구와 여행을 가나요?', grp, ST.groups], [0, '어디로 여행을 가나요?', town, ST.towns], [1, '무엇을 타고 가나요?', ride, ST.rides],
+        [1, '가는 데 얼마나 걸리나요?', dur, ST.durs], [2, '가서 무엇을 구경하나요?', sight, ST.sights], [2, '무엇을 사 올 생각인가요?', buy, ST.buys],
+        [3, '잠은 어디에서 자나요?', lodge, ST.lodges]]
+    };
+  },
+  function (K) { // 모임
+    const nm = pick(ST.names), club = pick(ST.clubs), day = pick(ST.days), time = pick(ST.times), room = pick(ST.rooms), snack = pick(ST.snacks), aft = pick(ST.afters), fee = pick(ST.fees);
+    return {
+      s: [K(club) + jo(club, '은/는') + ' 매주 ' + K(day) + ' ' + K(time) + '에 ' + K(room) + '에서 열립니다.',
+        '이번 주에는 ' + nm + ' 씨가 ' + K(snack) + jo(snack, '을/를') + ' 가져가기로 했습니다.',
+        '끝나면 다 같이 ' + K(aft.t) + '.',
+        '다음 달 회비는 ' + K(fee) + '입니다.'],
+      q: [[0, '무슨 모임 이야기인가요?', club, ST.clubs], [0, '무슨 요일에 열리나요?', day, ST.days], [0, '몇 시에 열리나요?', time, ST.times],
+        [0, '어디에서 열리나요?', room, ST.rooms], [1, '이번 주에 무엇을 가져가기로 했나요?', snack, ST.snacks],
+        [2, '끝나면 다 같이 무엇을 하나요?', aft.k, ST.afters.map(function (a) { return a.k; })], [3, '다음 달 회비는 얼마인가요?', fee, ST.fees]]
+    };
+  },
+  function (K) { // 전화
+    const nm = pick(ST.names), time = pick(ST.times), who = pick(ST.fams), day = pick(ST.days), thing = pick(ST.sends), ret = pick(ST.thanks), memo = pick(ST.memos);
+    return {
+      s: [K(time) + '쯤 ' + K(who) + '에게서 전화가 왔습니다.',
+        K(day) + '까지 ' + K(thing) + jo(thing, '을/를') + ' 보내 주겠다고 했습니다.',
+        nm + ' 씨는 고맙다는 뜻으로 ' + K(ret) + jo(ret, '을/를') + ' 보내기로 했습니다.',
+        '잊지 않으려고 ' + K(memo) + '에 적어 두었습니다.'],
+      q: [[0, '몇 시쯤 전화가 왔나요?', time, ST.times], [0, '누구에게서 전화가 왔나요?', who, ST.fams], [1, '언제까지 보내 주겠다고 했나요?', day, ST.days],
+        [1, '무엇을 보내 주겠다고 했나요?', thing, ST.sends], [2, '고맙다는 뜻으로 무엇을 보내기로 했나요?', ret, ST.thanks],
+        [3, '잊지 않으려고 어디에 적어 두었나요?', memo, ST.memos]]
+    };
+  }
+];
+GAMES.story = {
+  id: 'story', name: '이야기 기억', dom: 'mem', start: 2,
+  how: '짧은 이야기를 읽고, 이어지는 물음에 답해 주세요.',
+  tip: '누가, 언제, 어디서, 무엇을 했는지 네 가지를 챙기며 읽어 보세요.',
+  play: async function (ctx) {
+    const lv = ctx.level, ns = lv <= 2 ? 2 : lv <= 5 ? 3 : 4, nq = lv <= 2 ? 2 : lv <= 4 ? 3 : lv <= 7 ? 4 : 5, hl = lv <= 3;
+    const K = function (t) { return hl ? '<mark>' + t + '</mark>' : t; };
+    const tpls = sample(STORIES, 2);
+    let right = 0, total = 0;
+    for (let k = 0; k < 2; k++) {
+      const st = tpls[k](K), html = st.s.slice(0, ns).join(' '), plain = html.replace(/<\/?mark>/g, '');
+      const qs = sample(st.q.filter(function (x) { return x[0] < ns; }), nq).sort(function (a, b) { return a[0] - b[0]; });
+      ctx.clear(); ctx.setCount(k + 1, 2);
+      ctx.say('이야기를 읽어 보세요.', '누가, 언제, 어디서, 무엇을 했는지 챙겨 보세요.');
+      ctx.show(h('div', { class: 'story', html: html }),
+        canSpeak() ? h('button', { class: 'btn btn-speak', type: 'button', onclick: function () { speak(plain, true); } }, '소리로 듣기') : null);
+      speak(plain);
+      await ctx.go('다 읽었어요', { delay: 2500 });
+      hush();
+      if (lv >= 8) await ctx.filler(2);
+      for (let i = 0; i < qs.length; i++) {
+        const q = qs[i], ans = q[2];
+        const texts = shuffle([ans].concat(sample(q[3].filter(function (x) { return x !== ans; }), 3)));
+        const long = texts.some(function (t) { return t.length > 5; });
+        ctx.clear(); ctx.setCount(k + 1, 2);
+        const ok = await ctx.quiz({ prompt: q[1], body: null, cols: long ? 1 : 2,
+          options: texts.map(function (t) { return { label: t, ok: t === ans, cls: long ? 'small' : '' }; }) });
+        total++; if (ok) right++;
+      }
+    }
+    return { right: right, total: total };
+  }
+};
+
+/* ===== 숫자 기억 ===== */
+function chunkDigits(ds) {
+  const s = ds.join('');
+  if (s.length <= 4) return s;
+  return s.slice(0, 3) + ' ' + s.slice(3);
+}
+function keypad(ctx, len, target, back) {
+  return ctx.until(function (done) {
+    const typed = [], slots = h('div', { class: 'slots' }), pad = h('div', { class: 'keypad' }), keys = {};
+    for (let i = 0; i < len; i++) slots.appendChild(h('i', null, ''));
+    const refresh = function () {
+      for (let i = 0; i < len; i++) slots.children[i].textContent = typed[i] != null ? typed[i] : '';
+      keys.ok.disabled = typed.length !== len;
+      keys.del.disabled = typed.length === 0;
+      if (TEST) {
+        Object.keys(keys).forEach(function (k) { delete keys[k].dataset.ok; });
+        if (typed.length < len) keys[target[typed.length]].dataset.ok = '1'; else keys.ok.dataset.ok = '1';
+      }
+    };
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok'].forEach(function (k) {
+      const b = h('button', { class: 'key' + (k === 'del' ? ' fn' : k === 'ok' ? ' go' : ''), type: 'button' }, k === 'del' ? '지우기' : k === 'ok' ? '확인' : k);
+      b.addEventListener('click', function () {
+        if (k === 'del') typed.pop();
+        else if (k === 'ok') { if (typed.length === len) { pad.querySelectorAll('button').forEach(function (x) { x.disabled = true; }); done(typed.slice()); } return; }
+        else if (typed.length < len) { typed.push(Number(k)); SFX.tap(); }
+        refresh();
+      });
+      keys[k] = b; pad.appendChild(b);
+    });
+    ctx.say(back ? '거꾸로, 끝에서부터 눌러 주세요.' : '같은 순서로 눌러 주세요.');
+    ctx.show(slots);
+    ctx.answers.className = 'answers'; ctx.answers.replaceChildren(pad);
+    refresh();
+  });
+}
+GAMES.digits = {
+  id: 'digits', name: '숫자 기억', dom: 'focus', start: 3,
+  how: function (lv) {
+    return lv >= 6 ? '숫자를 잠깐 보여 드려요. 사라지면 거꾸로, 끝에서부터 눌러 주세요. 3 7 2를 보았다면 2 7 3을 누르는 거예요.'
+      : '숫자를 잠깐 보여 드려요. 사라지면 같은 순서로 눌러 주세요.';
+  },
+  tip: '전화번호처럼 두세 자리씩 끊어서 외워 보세요. 372 다음에 58, 이렇게요.',
+  play: async function (ctx) {
+    const back = ctx.level >= 6, len = back ? ctx.level - 3 : ctx.level + 2, N = 4;
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const ds = [];
+      while (ds.length < len) { const d = rnd(10); if (ds.length && ds[ds.length - 1] === d) continue; ds.push(d); }
+      const target = back ? ds.slice().reverse() : ds, showMs = 900 * len + 600;
+      ctx.clear(); ctx.setCount(t + 1, N);
+      ctx.say('숫자를 외워 보세요.');
+      ctx.show(h('div', { class: 'digits' }, chunkDigits(ds)),
+        h('div', { class: 'timebar', style: { alignSelf: 'stretch' } }, h('i', { style: { animationDuration: W(showMs) + 'ms' } })));
+      await ctx.wait(showMs);
+      const typed = await keypad(ctx, len, target, back);
+      const ok = typed.join('') === target.join('');
+      if (ok) right++;
+      await ctx.mark(ok, ok ? null : '아쉬워요. 정답은 「' + target.join(' ') + '」입니다.');
+    }
+    return { right: right, total: N, delta: right >= 3 ? 1 : right <= 1 ? -1 : 0, line: N + '번 가운데 ' + right + '번 맞혔어요.' };
+  }
+};
+
+/* ===== 순서 잇기 ===== */
+const TRAIL_LV = [null, [6, 0], [8, 0], [10, 0], [12, 0], [8, 1], [10, 1], [12, 1], [14, 1], [16, 1], [16, 1]];
+const GANADA = ['가', '나', '다', '라', '마', '바', '사', '아'];
+function trailLabels(n, alt) {
+  const out = [];
+  for (let i = 0; i < n; i++) out.push(alt ? (i % 2 === 0 ? String(i / 2 + 1) : GANADA[(i - 1) / 2]) : String(i + 1));
+  return out;
+}
+function trailBoard(ctx, labels) {
+  return ctx.until(function (done) {
+    const n = labels.length, G = n <= 12 ? 4 : 5, jit = G === 4 ? 3.5 : 2;
+    const cells = sample(Array.from({ length: G * G }, function (_, i) { return i; }), n);
+    const board = h('div', { class: 'board' + (G === 5 ? ' g5' : '') });
+    const NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('aria-hidden', 'true');
+    board.appendChild(svg);
+    let next = 0, errs = 0, run = 0, prev = null;
+    const nodes = [];
+    labels.forEach(function (lab, i) {
+      const c = cells[i], x = ((c % G) + 0.5) * 100 / G + (Math.random() * 2 - 1) * jit, y = (Math.floor(c / G) + 0.5) * 100 / G + (Math.random() * 2 - 1) * jit;
+      const b = h('button', { class: 'node', type: 'button' }, lab);
+      b.style.left = x + '%'; b.style.top = y + '%';
+      b.addEventListener('click', function () {
+        if (b.classList.contains('hit')) return;
+        if (i === next) {
+          b.classList.add('hit'); b.classList.remove('hint'); SFX.tap(); run = 0;
+          if (prev) {
+            const ln = document.createElementNS(NS, 'line');
+            ln.setAttribute('x1', prev[0]); ln.setAttribute('y1', prev[1]); ln.setAttribute('x2', x); ln.setAttribute('y2', y);
+            ln.setAttribute('stroke', '#1F3B73'); ln.setAttribute('stroke-width', '1.2'); ln.setAttribute('stroke-dasharray', '2.4 1.8'); ln.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(ln);
+          }
+          prev = [x, y]; next++;
+          if (TEST) { nodes.forEach(function (nd) { delete nd.dataset.ok; }); if (nodes[next]) nodes[next].dataset.ok = '1'; }
+          if (next === n) done(errs);
+        } else {
+          errs++; run++; SFX.no();
+          b.classList.remove('oops'); void b.offsetWidth; b.classList.add('oops');
+          setTimeout(function () { b.classList.remove('oops'); }, 420);
+          if (run >= 2 && nodes[next]) nodes[next].classList.add('hint');
+        }
+      });
+      nodes.push(b); board.appendChild(b);
+    });
+    if (TEST) nodes[0].dataset.ok = '1';
+    ctx.show(board);
+  });
+}
+GAMES.trail = {
+  id: 'trail', name: '순서 잇기', dom: 'focus', start: 3,
+  how: function (lv) {
+    return TRAIL_LV[lv][1] ? '숫자와 글자를 번갈아 눌러 주세요. 1-가-2-나-3-다 순서예요.' : '흩어진 숫자를 1부터 차례대로 눌러 주세요.';
+  },
+  tip: '서두르지 않아도 돼요. 지금 것을 누르기 전에 다음 것이 어디 있는지 눈으로 먼저 찾아 두세요.',
+  play: async function (ctx) {
+    const sp = TRAIL_LV[ctx.level], n = sp[0], alt = sp[1], labels = trailLabels(n, alt);
+    let errs = 0, ms = 0;
+    for (let b = 0; b < 2; b++) {
+      ctx.clear(); ctx.setCount(b + 1, 2);
+      ctx.say(alt ? '1-가-2-나 순서로 번갈아 눌러 주세요.' : '1부터 차례대로 눌러 주세요.');
+      const t0 = Date.now();
+      errs += await trailBoard(ctx, labels);
+      ms += Date.now() - t0;
+      await ctx.mark(true, '끝까지 이었어요!', { ms: 800 });
+    }
+    const total = n * 2;
+    return { right: Math.max(0, total - errs), total: total, delta: errs <= 1 ? 1 : errs > total * 0.4 ? -1 : 0,
+      line: errs === 0 ? '한 번도 틀리지 않고 끝까지 이었어요.' : '끝까지 이었어요. 잘못 누른 것은 ' + errs + '번이에요.',
+      note: '두 판에 ' + Math.round(ms / 1000) + '초 걸렸어요.' };
+  }
+};
+
+/* ===== 색깔 글자 ===== */
+const INKS = [['빨강', '#D32F2F'], ['파랑', '#1857C4'], ['초록', '#1E8E3E'], ['검정', '#111111']];
+const STROOP_LV = [null, { n: 8, inc: .25 }, { n: 8, inc: .5 }, { n: 10, inc: .75 }, { n: 10, inc: 1 }, { n: 12, inc: 1, lim: 5000 }, { n: 12, inc: 1, lim: 4000 },
+  { n: 12, inc: 1, lim: 3600, sw: .25 }, { n: 14, inc: 1, lim: 3200, sw: .3 }, { n: 14, inc: 1, lim: 2800, sw: .4 }, { n: 16, inc: 1, lim: 2400, sw: .5 }];
+GAMES.stroop = {
+  id: 'stroop', name: '색깔 글자', dom: 'focus', start: 2,
+  how: function (lv) {
+    return STROOP_LV[lv].sw ? '글자의 색깔을 골라 주세요. 다만 「뜻」이라는 표시가 나오면 그때는 글자의 뜻을 골라 주세요.'
+      : '글자가 무슨 뜻인지는 접어 두고, 글자의 색깔을 골라 주세요.';
+  },
+  tip: '글자를 읽고 싶은 마음을 꾹 참는 것이 이 운동이에요. 천천히 해도 괜찮아요.',
+  demo: function () { return h('div', { class: 'ink-word', style: { color: INKS[1][1] } }, '빨강'); },
+  play: async function (ctx) {
+    const sp = STROOP_LV[ctx.level];
+    let right = 0;
+    for (let t = 0; t < sp.n; t++) {
+      const wi = rnd(4), ci = Math.random() < sp.inc ? (wi + 1 + rnd(3)) % 4 : wi, byWord = !!sp.sw && Math.random() < sp.sw, ans = byWord ? wi : ci;
+      ctx.clear(); ctx.setCount(t + 1, sp.n);
+      const opts = INKS.map(function (k, i) { return { node: [h('span', { class: 'swatch', style: { background: k[1] } }), k[0]], text: k[0], ok: i === ans }; });
+      const ok = await ctx.quiz({ prompt: byWord ? '이번에는 글자의 뜻을 골라 주세요.' : '글자의 색깔을 골라 주세요.',
+        body: [sp.sw ? h('div', { class: 'rule' + (byWord ? ' word' : '') }, byWord ? '뜻' : '색깔') : null,
+          h('div', { class: 'ink-word', style: { color: INKS[ci][1] } }, INKS[wi][0])],
+        options: opts, cols: 2, limit: sp.lim, auto: true, ms: 1600, okMs: 450 });
+      if (ok) right++;
+    }
+    return { right: right, total: sp.n };
+  }
+};
+
+/* ===== 짝 맞추기 ===== */
+const PAIRS_LV = [null, [3, 3500], [4, 4000], [5, 4500], [6, 5000], [8, 6000], [8, 3000], [10, 5000], [10, 0], [12, 5000], [12, 0]];
+const ALL_WORDS = Object.keys(WORDS).reduce(function (a, k) { return a.concat(WORDS[k]); }, []);
+GAMES.pairs = {
+  id: 'pairs', name: '짝 맞추기', dom: 'mem', start: 3,
+  how: '카드를 두 장씩 뒤집어 같은 그림을 찾아 주세요.',
+  tip: '뒤집어 본 카드는 「왼쪽 위에 사과」 하고 자리를 말로 외워 두세요.',
+  play: async function (ctx) {
+    const sp = PAIRS_LV[ctx.level], np = sp[0], picks = sample(ALL_WORDS, np);
+    const cards = shuffle(picks.concat(picks));
+    const deck = h('div', { class: 'deck' + (cards.length <= 6 ? ' c3' : cards.length >= 20 ? ' c5' : '') });
+    let handler = null;
+    const els = cards.map(function (w, i) {
+      const b = h('button', { class: 'flip', type: 'button', 'aria-label': '뒤집힌 카드' }, h('span', { class: 'emo' }, w[0]), h('span', null, w[1]));
+      b.addEventListener('click', function () { if (handler) handler(i); });
+      deck.appendChild(b); return b;
+    });
+    const face = function (i, cls) { els[i].classList.add(cls); els[i].setAttribute('aria-label', cards[i][1]); };
+    const hide = function (i) { els[i].classList.remove('up'); els[i].setAttribute('aria-label', '뒤집힌 카드'); };
+    const tap = function () {
+      return ctx.until(function (done) {
+        handler = function (i) { if (els[i].classList.contains('got') || els[i].classList.contains('up')) return; handler = null; done(i); };
+      });
+    };
+    const hint = function (open) {
+      if (!TEST) return;
+      els.forEach(function (e) { delete e.dataset.ok; });
+      for (let i = 0; i < els.length; i++) {
+        if (els[i].classList.contains('got') || i === open) continue;
+        if (open == null || cards[i] === cards[open]) { els[i].dataset.ok = '1'; break; }
+      }
+    };
+    ctx.clear(); ctx.setCount(0, np);
+    ctx.show(deck);
+    if (sp[1]) {
+      ctx.say('카드 자리를 잘 봐 두세요.', '조금 있으면 뒤집어져요.');
+      els.forEach(function (_, i) { face(i, 'up'); });
+      await ctx.wait(sp[1]);
+      els.forEach(function (_, i) { hide(i); });
+    }
+    ctx.say('같은 그림 두 장을 찾아 주세요.');
+    let found = 0, tries = 0;
+    while (found < np) {
+      hint(null);
+      const a = await tap(); face(a, 'up'); SFX.tap();
+      hint(a);
+      const b = await tap(); face(b, 'up'); tries++;
+      if (cards[a] === cards[b]) {
+        els[a].classList.remove('up'); els[b].classList.remove('up'); face(a, 'got'); face(b, 'got');
+        found++; SFX.ok(); ctx.setCount(found, np);
+        await ctx.wait(300);
+      } else {
+        await ctx.wait(1200);
+        hide(a); hide(b);
+      }
+    }
+    await ctx.mark(true, '모두 찾았어요!', { ms: 800 });
+    const up = tries <= Math.ceil(np * 1.6) + 1, down = tries >= np * 3.2;
+    return { right: np, total: tries, pct: up ? 0.9 : down ? 0.4 : 0.7, delta: up ? 1 : down ? -1 : 0, line: np + '쌍을 ' + tries + '번 만에 모두 찾았어요.' };
+  }
+};
+
+/* ===== 규칙 찾기 ===== */
+const SHAPES = ['●', '▲', '■', '◆', '★', '♥'];
+function numOpts(ans, cands) {
+  const out = [ans];
+  shuffle(cands).forEach(function (c) { if (out.length < 4 && c > 0 && out.indexOf(c) < 0) out.push(c); });
+  let k = 1;
+  while (out.length < 4) { const c = ans + k; if (out.indexOf(c) < 0) out.push(c); k++; }
+  return shuffle(out);
+}
+const hm = t => { const hh = Math.floor(t / 60) % 12 || 12, mm = t % 60; return hh + '시' + (mm ? ' ' + mm + '분' : ''); };
+const PAT = {
+  ab: function () { const s = sample(SHAPES, 2); return shapePat([s[0], s[1]], 6, s, '두 모양이 번갈아 나와요.'); },
+  abc: function () { const s = sample(SHAPES, 3); return shapePat(s, 7, s, '세 모양이 차례로 되풀이돼요.'); },
+  aab: function () { const s = sample(SHAPES, 2); return shapePat([s[0], s[0], s[1]], 7, s, '같은 모양 둘 다음에 다른 모양 하나가 와요.'); },
+  aabb: function () { const s = sample(SHAPES, 2); return shapePat([s[0], s[0], s[1], s[1]], 7, s, '두 개씩 짝지어 되풀이돼요.'); },
+  add1: function () { return addPat(1 + rnd(9), pick([1, 2])); },
+  add2: function () { const d = pick([5, 10, -1, -2]); return addPat(d > 0 ? 5 * (1 + rnd(4)) : 12 + rnd(18), d); },
+  add3: function () { const d = pick([3, 4, 6, -3, -4]); return addPat(d > 0 ? 1 + rnd(12) : 30 + rnd(20), d); },
+  time: function () {
+    const step = pick([15, 20, 30, 40]), t0 = (6 + rnd(10)) * 60 + pick([0, 10, 20, 30]);
+    const seq = [0, 1, 2, 3].map(function (i) { return hm(t0 + i * step); }), ans = t0 + 4 * step;
+    return { prompt: '버스가 오는 시각이에요. 다음 버스는 언제 올까요?', seq: seq, ans: hm(ans),
+      opts: shuffle(uniq([ans, ans + 5, ans - 10, ans + step, ans + 10].map(hm)).slice(0, 4)), why: step + '분마다 한 대씩 와요.' };
+  },
+  inter: function () {
+    const a = 1 + rnd(5), b = 10 * (1 + rnd(4)), seq = [a, b, a + 1, b + 10, a + 2], ans = b + 20;
+    return { seq: seq.map(String), ans: String(ans), opts: numOpts(ans, [a + 3, b + 10, b + 30, ans + 1]).map(String), why: '하나 건너 하나씩 보세요. 두 줄이 섞여 있어요.' };
+  },
+  mul: function () { const a = pick([1, 2, 3, 5]), seq = [a, a * 2, a * 4, a * 8], ans = a * 16; return { seq: seq.map(String), ans: String(ans), opts: numOpts(ans, [a * 12, a * 10, ans + a, a * 14]).map(String), why: '두 배씩 커져요.' }; },
+  grow: function () { const a = 1 + rnd(5), seq = [a, a + 1, a + 3, a + 6, a + 10], ans = a + 15; return { seq: seq.map(String), ans: String(ans), opts: numOpts(ans, [ans - 1, ans + 1, a + 14, a + 13]).map(String), why: '더하는 수가 1, 2, 3, 4로 하나씩 커져요.' }; },
+  altop: function () {
+    const p = 2 + rnd(4), m = 1 + rnd(p - 1), a = 3 + rnd(8), seq = [a, a + p, a + p - m, a + 2 * p - m, a + 2 * p - 2 * m], ans = a + 3 * p - 2 * m;
+    return { seq: seq.map(String), ans: String(ans), opts: numOpts(ans, [ans - 1, ans + 1, ans - m, ans + p]).map(String), why: J(String(p), '을/를') + ' 더하고 ' + J(String(m), '을/를') + ' 빼기를 되풀이해요.' };
+  },
+  skip: function () {
+    const sets = [[['가', '나', '다', '라', '마', '바', '사', '아', '자', '차', '카', '타', '파', '하'], '한 글자씩 건너뛰어요.'],
+      [['월', '화', '수', '목', '금', '토', '일', '월', '화', '수', '목', '금', '토', '일'], '요일을 하루씩 건너뛰어요.'],
+      [['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월', '1월', '2월'], '달을 하나씩 건너뛰어요.']];
+    const st = pick(sets), arr = st[0], s0 = rnd(4), seq = [0, 1, 2, 3].map(function (i) { return arr[s0 + i * 2]; }), ans = arr[s0 + 8];
+    const opts = uniq([ans, arr[s0 + 7], arr[s0 + 9], arr[s0 + 5], arr[(s0 + 10) % arr.length]]).slice(0, 4);
+    return { seq: seq, ans: ans, opts: shuffle(opts), why: st[1] };
+  }
+};
+function shapePat(unit, len, used, why) {
+  const seq = [];
+  for (let i = 0; i < len; i++) seq.push(unit[i % unit.length]);
+  const ans = unit[len % unit.length];
+  const opts = uniq([ans].concat(used, shuffle(SHAPES))).slice(0, 4);
+  return { seq: seq, ans: ans, opts: shuffle(opts), why: why };
+}
+function addPat(a, d) {
+  const seq = [0, 1, 2, 3, 4].map(function (i) { return a + i * d; }), ans = a + 5 * d;
+  return { seq: seq.map(String), ans: String(ans), opts: numOpts(ans, [ans + d, ans - d, ans + 1, ans - 1, ans + 2]).map(String), why: Math.abs(d) + '씩 ' + (d > 0 ? '커져요.' : '작아져요.') };
+}
+const PAT_LV = [null, ['ab'], ['ab', 'abc', 'aab'], ['add1', 'abc', 'aabb'], ['add2', 'add1', 'aabb'], ['add3', 'add2', 'time'], ['time', 'inter', 'add3'],
+  ['mul', 'grow', 'inter'], ['altop', 'grow', 'mul'], ['skip', 'altop', 'time'], ['altop', 'grow', 'inter', 'skip', 'mul']];
+GAMES.pattern = {
+  id: 'pattern', name: '규칙 찾기', dom: 'think', start: 3,
+  how: '늘어선 것들 사이의 규칙을 찾아서, 물음표 자리에 올 것을 골라 주세요.',
+  tip: '앞에서부터 「얼마씩 달라지나」 하고 소리 내어 따져 보세요.',
+  play: async function (ctx) {
+    const kinds = PAT_LV[ctx.level], N = 6;
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const q = PAT[kinds[t % kinds.length]]();
+      ctx.clear(); ctx.setCount(t + 1, N);
+      const small = q.seq.some(function (x) { return x.length > 3; });
+      const body = h('div', { class: 'seq' }, q.seq.map(function (x) { return h('span', small ? { style: { fontSize: '1.2rem' } } : null, x); }), h('span', { class: 'q' }, '?'));
+      const ok = await ctx.quiz({ prompt: q.prompt || '물음표 자리에 무엇이 올까요?', body: body, cols: 2,
+        options: q.opts.map(function (o) { return { label: o, ok: o === q.ans, cls: o.length > 4 ? 'small' : '' }; }), why: q.why });
+      if (ok) right++;
+    }
+    return { right: right, total: N };
+  }
+};
+
+/* ===== 시장 계산 ===== */
+const GOODS = Object.keys(SHOP).reduce(function (a, k) { return a.concat(SHOP[k]); }, []);
+function moneyOpts(ans, unit) {
+  const out = [ans];
+  shuffle([ans + unit, ans - unit, ans + 2 * unit, ans - 2 * unit, ans + 10 * unit, ans - 10 * unit]).forEach(function (c) { if (out.length < 4 && c > 0 && out.indexOf(c) < 0) out.push(c); });
+  let k = 3;
+  while (out.length < 4) { const c = ans + k * unit; if (out.indexOf(c) < 0) out.push(c); k++; }
+  return shuffle(out);
+}
+function billEl(items) {
+  return h('div', { class: 'bill' }, items.map(function (it) { return h('div', null, h('span', null, it[0]), h('b', null, it[2] ? '' : won(it[1]))); }));
+}
+function calcGen(lv) {
+  const price = function (unit, lo, hi) { return unit * (lo + rnd(hi - lo + 1)); };
+  if (lv <= 1) { const a = 1 + rnd(5), b = 1 + rnd(4); return { prompt: a + ' 더하기 ' + J(String(b), '은/는') + ' 얼마일까요?', big: a + ' + ' + b, ans: a + b, opts: numOpts(a + b, [a + b + 1, a + b - 1, a + b + 2]), plain: true }; }
+  if (lv === 2) {
+    if (Math.random() < 0.5) { const a = 4 + rnd(9), b = 3 + rnd(8); return { prompt: a + ' 더하기 ' + J(String(b), '은/는') + ' 얼마일까요?', big: a + ' + ' + b, ans: a + b, opts: numOpts(a + b, [a + b + 1, a + b - 1, a + b + 10, a + b - 2]), plain: true }; }
+    const a = 8 + rnd(11), b = 2 + rnd(6); return { prompt: a + ' 빼기 ' + J(String(b), '은/는') + ' 얼마일까요?', big: a + ' − ' + b, ans: a - b, opts: numOpts(a - b, [a - b + 1, a - b - 1, a - b + 2, a - b + 10]), plain: true };
+  }
+  if (lv === 3) {
+    const a = 15 + rnd(70), b = 3 + rnd(7), plus = Math.random() < 0.5, ans = plus ? a + b : a - b;
+    return { prompt: a + (plus ? ' 더하기 ' : ' 빼기 ') + J(String(b), '은/는') + ' 얼마일까요?', big: a + (plus ? ' + ' : ' − ') + b, ans: ans, opts: numOpts(ans, [ans + 1, ans - 1, ans + 10, ans - 10]), plain: true };
+  }
+  const unit = lv >= 9 ? 100 : lv === 7 || lv === 8 ? 500 : 1000;
+  const names = sample(GOODS, 3);
+  const n = lv === 5 || lv === 8 ? 3 : lv === 6 ? 1 + rnd(2) : 2;
+  const items = [];
+  for (let i = 0; i < n; i++) items.push([names[i], unit === 1000 ? price(1000, 1, lv >= 6 ? 4 : 8) : unit === 500 ? price(500, 2, 11) : price(100, 8, 49)]);
+  if (lv >= 10) { const q = 2 + rnd(3), u = price(500, 2, 8); items[0] = [names[0] + ' ' + won(u) + '짜리 ' + q + '개', u * q, true]; }
+  const sum = items.reduce(function (a, x) { return a + x[1]; }, 0);
+  if (lv === 6 || lv === 8 || lv >= 10) {
+    const pay = sum < 10000 ? 10000 : sum < 20000 ? 20000 : sum < 30000 ? 30000 : 50000, payT = { 10000: '만 원', 20000: '이만 원', 30000: '삼만 원', 50000: '오만 원' }[pay];
+    return { prompt: payT + '을 냈어요. 거스름돈은 얼마일까요?', items: items, ans: pay - sum, opts: moneyOpts(pay - sum, unit) };
+  }
+  return { prompt: '모두 얼마일까요?', items: items, ans: sum, opts: moneyOpts(sum, unit) };
+}
+GAMES.calc = {
+  id: 'calc', name: '시장 계산', dom: 'think', start: 3,
+  how: function (lv) { return lv <= 3 ? '더하기와 빼기를 해 보세요.' : '물건값을 더하고, 거스름돈을 계산해 보세요.'; },
+  tip: '큰 단위부터 먼저 더하고, 남은 것을 나중에 더하면 쉬워요.',
+  play: async function (ctx) {
+    const N = 6;
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const q = calcGen(ctx.level);
+      ctx.clear(); ctx.setCount(t + 1, N);
+      const fmt = function (v) { return q.plain ? String(v) : won(v); };
+      const ok = await ctx.quiz({ prompt: q.prompt, body: q.items ? billEl(q.items) : h('div', { class: 'big' }, q.big), cols: 2,
+        options: q.opts.map(function (o) { return { label: fmt(o), ok: o === q.ans }; }) });
+      if (ok) right++;
+    }
+    return { right: right, total: N };
+  }
+};
+
+/* ===== 시계 보기 ===== */
+function clockSVG(hh, mm) {
+  let s = '<svg viewBox="0 0 200 200" role="img" aria-label="시계"><circle cx="100" cy="100" r="94" fill="#FCFCF8" stroke="#16233F" stroke-width="5"/>';
+  for (let i = 1; i <= 12; i++) {
+    const a = (i * 30 - 90) * Math.PI / 180;
+    s += '<text x="' + (100 + 72 * Math.cos(a)).toFixed(1) + '" y="' + (100 + 72 * Math.sin(a) + 8).toFixed(1) + '" text-anchor="middle" font-size="23" font-family="Do Hyeon, sans-serif" fill="#16233F">' + i + '</text>';
+  }
+  for (let i = 0; i < 60; i++) {
+    const a = (i * 6 - 90) * Math.PI / 180, r1 = i % 5 ? 89 : 86;
+    s += '<line x1="' + (100 + r1 * Math.cos(a)).toFixed(1) + '" y1="' + (100 + r1 * Math.sin(a)).toFixed(1) + '" x2="' + (100 + 92 * Math.cos(a)).toFixed(1) + '" y2="' + (100 + 92 * Math.sin(a)).toFixed(1) + '" stroke="#16233F" stroke-width="' + (i % 5 ? 1 : 2.5) + '"/>';
+  }
+  const ha = ((hh % 12 + mm / 60) * 30 - 90) * Math.PI / 180, ma = (mm * 6 - 90) * Math.PI / 180;
+  s += '<line x1="100" y1="100" x2="' + (100 + 44 * Math.cos(ha)).toFixed(1) + '" y2="' + (100 + 44 * Math.sin(ha)).toFixed(1) + '" stroke="#16233F" stroke-width="8" stroke-linecap="round"/>';
+  s += '<line x1="100" y1="100" x2="' + (100 + 64 * Math.cos(ma)).toFixed(1) + '" y2="' + (100 + 64 * Math.sin(ma)).toFixed(1) + '" stroke="#C4405A" stroke-width="5" stroke-linecap="round"/>';
+  return s + '<circle cx="100" cy="100" r="6" fill="#16233F"/></svg>';
+}
+const norm = t => ((t % 720) + 720) % 720;
+function timeOpts(t, cands) {
+  const out = [norm(t)];
+  shuffle(cands).forEach(function (c) { c = norm(c); if (out.length < 4 && out.indexOf(c) < 0) out.push(c); });
+  let k = 1;
+  while (out.length < 4) { const c = norm(t + k * 60); if (out.indexOf(c) < 0) out.push(c); k++; }
+  return shuffle(out);
+}
+function clockGen(lv) {
+  const hh = 1 + rnd(12);
+  const mm = lv <= 1 ? 0 : lv === 2 || lv === 5 ? pick([0, 30]) : lv === 3 ? pick([0, 15, 30, 45]) : lv >= 9 ? rnd(60) : 5 * rnd(12);
+  const t = norm(hh * 60 + mm), swap = norm((Math.round(mm / 5) || 12) * 60 + (hh % 12) * 5);
+  const step = lv <= 1 ? 60 : lv <= 2 ? 30 : lv === 3 ? 15 : 5;
+  const near = lv <= 1 ? [t + 60, t - 60, t + 120, t - 120, t + 180] : [t + 60, t - 60, t + step, t - step, swap, t + 2 * step, t + 120];
+  if (lv === 5 || lv === 6) return { mode: 'pick', t: t, opts: timeOpts(t, near) };
+  if (lv === 7 || lv === 8 || lv === 10) {
+    const d = lv === 7 ? pick([30, 60, 20]) : lv === 8 ? -pick([20, 40, 90]) : pick([25, -35, 50, -70, 85]);
+    const a = Math.abs(d), txt = (a >= 60 ? Math.floor(a / 60) + '시간' + (a % 60 ? ' ' + a % 60 + '분' : '') : a + '분') + (d > 0 ? ' 뒤' : ' 전');
+    return { mode: 'calc', t: t, ans: norm(t + d), txt: txt, opts: timeOpts(t + d, [t + d + 10, t + d - 10, t + d + 60, t + d - 60, t - d, t + d + 30]) };
+  }
+  return { mode: 'read', t: t, opts: timeOpts(t, near) };
+}
+GAMES.clock = {
+  id: 'clock', name: '시계 보기', dom: 'think', start: 3,
+  how: function (lv) { return lv === 5 || lv === 6 ? '시각을 알려 드리면, 그 시각을 가리키는 시계를 골라 주세요.' : lv >= 7 && lv !== 9 ? '시계를 보고, 조금 뒤나 조금 전의 시각을 계산해 주세요.' : '시계를 보고 몇 시 몇 분인지 골라 주세요.'; },
+  tip: '짧은 바늘로 「시」를 먼저 읽고, 긴 바늘로 「분」을 읽으세요. 긴 바늘이 숫자 하나를 지날 때마다 5분이에요.',
+  play: async function (ctx) {
+    const N = 6;
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const q = clockGen(ctx.level);
+      ctx.clear(); ctx.setCount(t + 1, N);
+      const face = function (v) { return h('div', { class: 'clock', html: clockSVG(Math.floor(v / 60) || 12, v % 60) }); };
+      let ok;
+      if (q.mode === 'pick') {
+        ok = await ctx.quiz({ prompt: J(hm(q.t), '을/를') + ' 가리키는 시계는 어느 것일까요?', body: null, cols: 2,
+          options: q.opts.map(function (o) { return { node: h('span', { html: clockSVG(Math.floor(o / 60) || 12, o % 60) }), cls: 'clock-opt', ok: o === q.t }; }), why: '초록색으로 표시된 시계가 ' + J(hm(q.t), '이에요/예요') + '.' });
+      } else if (q.mode === 'calc') {
+        ok = await ctx.quiz({ prompt: '지금 시계에서 ' + J(q.txt, '은/는') + ' 몇 시 몇 분일까요?', body: face(q.t), cols: 2,
+          options: q.opts.map(function (o) { return { label: hm(o), ok: o === q.ans }; }), why: '지금은 ' + J(hm(q.t), '이에요/예요') + '.' });
+      } else {
+        ok = await ctx.quiz({ prompt: '지금 몇 시 몇 분일까요?', body: face(q.t), cols: 2,
+          options: q.opts.map(function (o) { return { label: hm(o), ok: o === q.t }; }) });
+      }
+      if (ok) right++;
+    }
+    return { right: right, total: N };
+  }
+};
+
+/* ===== 낱말 맞추기 ===== */
+const WORD_LV = [null, [2, 0], [2, 1], [3, 0], [3, 1], [3, 2], [4, 0], [4, 2], [4, 3], [5, 2], [5, 3]];
+GAMES.word = {
+  id: 'word', name: '낱말 맞추기', dom: 'lang', start: 3,
+  how: '뜻풀이를 읽고, 글자 조각을 순서대로 눌러 낱말을 완성해 주세요.',
+  tip: '낱말이 혀끝에서 맴돌면 「첫 글자 보기」를 눌러 보세요. 첫 글자가 나오면 나머지가 따라 나와요.',
+  play: async function (ctx) {
+    const sp = WORD_LV[ctx.level], N = 6, items = sample(CLUES.filter(function (c) { return c[0].length === sp[0]; }), N);
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const word = items[t][0], clue = items[t][1], syl = word.split('');
+      const decoys = [];
+      while (decoys.length < sp[1]) { const s = pick(pick(CLUES)[0].split('')); if (syl.indexOf(s) < 0 && decoys.indexOf(s) < 0) decoys.push(s); }
+      let tiles = shuffle(syl.concat(decoys));
+      if (tiles.slice(0, syl.length).join('') === word) tiles = tiles.reverse();
+      let tries = 0, solved = false, helped = false;
+      ctx.clear(); ctx.setCount(t + 1, N);
+      ctx.say('무슨 낱말일까요?');
+      const slots = h('div', { class: 'wslots' }), rack = h('div', { class: 'wtiles' });
+      for (let i = 0; i < syl.length; i++) slots.appendChild(h('i', null, ''));
+      const used = [];
+      const btns = tiles.map(function (s) { const b = h('button', { class: 'wtile', type: 'button' }, s); rack.appendChild(b); return b; });
+      const draw = function () {
+        for (let i = 0; i < syl.length; i++) { const u = used[i]; slots.children[i].textContent = u != null ? tiles[u] : ''; slots.children[i].className = u != null ? 'fill' : ''; }
+        btns.forEach(function (b, i) { b.classList.toggle('used', used.indexOf(i) >= 0); });
+        if (TEST) {
+          btns.forEach(function (b) { delete b.dataset.ok; });
+          const want = syl[used.length];
+          for (let i = 0; i < btns.length; i++) if (used.indexOf(i) < 0 && tiles[i] === want) { btns[i].dataset.ok = '1'; break; }
+        }
+      };
+      const undo = h('button', { class: 'btn mini', type: 'button' }, '지우기');
+      const hintB = h('button', { class: 'btn mini', type: 'button' }, '첫 글자 보기');
+      ctx.show(h('div', { class: 'clue' }, clue), slots, rack);
+      ctx.answers.className = 'answers cols-2'; ctx.answers.replaceChildren(undo, hintB);
+      while (!solved && tries < 2) {
+        slots.className = 'wslots';
+        draw();
+        const made = await ctx.until(function (done) {
+          const push = function (i) {
+            if (used.indexOf(i) >= 0 || used.length >= syl.length) return;
+            used.push(i); SFX.tap(); draw();
+            if (used.length === syl.length) { off(); done(used.map(function (u) { return tiles[u]; }).join('')); }
+          };
+          const hs = btns.map(function (b, i) { const f = function () { push(i); }; b.addEventListener('click', f); return f; });
+          const fu = function () { if (used.length > (helped ? 1 : 0)) { used.pop(); draw(); } };
+          const fh = function () {
+            helped = true; used.length = 0;
+            for (let i = 0; i < tiles.length; i++) if (tiles[i] === syl[0]) { used.push(i); break; }
+            hintB.disabled = true; draw();
+          };
+          undo.addEventListener('click', fu); hintB.addEventListener('click', fh);
+          function off() { btns.forEach(function (b, i) { b.removeEventListener('click', hs[i]); }); undo.removeEventListener('click', fu); hintB.removeEventListener('click', fh); }
+        });
+        tries++;
+        if (made === word) solved = true;
+        else if (tries < 2) {
+          slots.className = 'wslots bad';
+          await ctx.mark(false, '조금 달라요. 한 번 더 해 볼까요?', { auto: true, ms: 1400 });
+          used.length = 0;
+          if (helped) for (let i = 0; i < tiles.length; i++) if (tiles[i] === syl[0]) { used.push(i); break; }
+        }
+      }
+      undo.disabled = true; hintB.disabled = true;
+      if (solved) { slots.className = 'wslots good'; if (tries === 1 && !helped) right++; await ctx.mark(true, '「' + word + '」 맞아요!'); }
+      else {
+        for (let i = 0; i < syl.length; i++) { slots.children[i].textContent = syl[i]; slots.children[i].className = 'fill'; }
+        slots.className = 'wslots good';
+        await ctx.mark(false, '정답은 「' + word + '」' + (hasJong(word) ? '이에요.' : '예요.'));
+      }
+    }
+    return { right: right, total: N, line: N + '개 가운데 ' + right + '개를 도움 없이 한 번에 맞혔어요.' };
+  }
+};
+
+/* ===== 속담 잇기 ===== */
+GAMES.proverb = {
+  id: 'proverb', name: '속담 잇기', dom: 'lang', start: 2,
+  how: function (lv) { return lv <= 4 ? '속담의 앞부분을 보고, 뒤에 올 말을 골라 주세요.' : lv <= 7 ? '속담에서 빠진 낱말을 골라 주세요.' : '속담을 읽고, 그 뜻을 골라 주세요.'; },
+  tip: '소리 내어 읽으면 뒷말이 저절로 따라 나와요.',
+  play: async function (ctx) {
+    const lv = ctx.level, mode = lv <= 4 ? 'end' : lv <= 7 ? 'blank' : 'mean', N = 6;
+    const pool = mode === 'blank' ? PROVERBS.filter(function (p) { return p[3]; }) : mode === 'mean' ? PROVERBS.filter(function (p) { return p[2]; }) : PROVERBS;
+    const qs = sample(pool, N);
+    let right = 0;
+    for (let t = 0; t < N; t++) {
+      const p = qs[t], full = p[0] + ' ' + p[1];
+      ctx.clear(); ctx.setCount(t + 1, N);
+      let ok;
+      if (mode === 'end') {
+        const others = shuffle(PROVERBS.filter(function (x) { return x !== p && x[1].indexOf(p[1]) < 0 && p[1].indexOf(x[1]) < 0; }).map(function (x) { return x[1]; }));
+        const texts = shuffle(uniq([p[1]].concat(others)).slice(0, 4));
+        ok = await ctx.quiz({ prompt: '뒤에 올 말은 무엇일까요?', body: h('div', { class: 'linkline' }, p[0] + ' …'), cols: 2,
+          options: texts.map(function (x) { return { label: x, ok: x === p[1], cls: 'small' }; }), why: '「' + full + '」' });
+      } else if (mode === 'blank') {
+        const b = p[3], shown = full.replace(b[0], '＿＿');
+        ok = await ctx.quiz({ prompt: '빈칸에 들어갈 말은 무엇일까요?', body: h('div', { class: 'linkline' }, shown), cols: 2,
+          options: shuffle(b).map(function (x) { return { label: x, ok: x === b[0] }; }), why: '「' + full + '」' });
+      } else {
+        const others = shuffle(PROVERBS.filter(function (x) { return x !== p && x[2]; }).map(function (x) { return x[2]; }));
+        const texts = shuffle([p[2]].concat(others.slice(0, 3)));
+        ok = await ctx.quiz({ prompt: '이 속담은 무슨 뜻일까요?', body: h('div', { class: 'linkline' }, full), cols: 1,
+          options: texts.map(function (x) { return { label: x, ok: x === p[2], cls: 'long' }; }) });
+      }
+      if (ok) right++;
+    }
+    return { right: right, total: N };
+  }
+};
+
+/* ===== 조각보 그림 ===== */
+const DYES = ['#1F3B73', '#C4405A', '#EEB238', '#437A4E', '#6C4A80', '#B9D8CC', '#E9A9A3', '#8FB1D6'];
+const LIGHT_DYE = { '#EEB238': 1, '#B9D8CC': 1, '#E9A9A3': 1, '#8FB1D6': 1 };
+function quiltRects(seed) {
+  const R = mulberry(seed);
+  let rs = [{ x: 0, y: 0, w: 100, h: 62 }];
+  while (rs.length < QUILT_N) {
+    rs.sort(function (a, b) { return b.w * b.h - a.w * a.h; });
+    const r = rs.shift(), vert = r.w > r.h * 1.2 ? true : r.h > r.w * 1.2 ? false : R() < 0.5, f = 0.36 + R() * 0.28;
+    if (vert) { const w1 = r.w * f; rs.push({ x: r.x, y: r.y, w: w1, h: r.h }, { x: r.x + w1, y: r.y, w: r.w - w1, h: r.h }); }
+    else { const h1 = r.h * f; rs.push({ x: r.x, y: r.y, w: r.w, h: h1 }, { x: r.x, y: r.y + h1, w: r.w, h: r.h - h1 }); }
+  }
+  rs.sort(function (a, b) { return (a.y + a.x * 0.35) - (b.y + b.x * 0.35); });
+  return rs;
+}
+function quiltSVG(o) {
+  o = o || {};
+  const rs = quiltRects(S.seed), n = Math.min(S.patches.length, QUILT_N), f = function (v) { return v.toFixed(2); };
+  let s = '<svg viewBox="-1 -1 102 64" role="img" aria-label="조각보. 스물네 조각 가운데 ' + n + '조각을 이었어요.">';
+  rs.forEach(function (r, i) {
+    const g = 0.5, x = r.x + g, y = r.y + g, w = r.w - 2 * g, hh = r.h - 2 * g;
+    if (i < n) {
+      const c = DYES[S.patches[i].c % DYES.length];
+      s += '<rect x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(hh) + '" fill="' + c + '"' + (o.fresh && i === n - 1 ? ' class="patch-new"' : '') + '/>';
+      s += '<rect x="' + f(x + 1.1) + '" y="' + f(y + 1.1) + '" width="' + f(w - 2.2) + '" height="' + f(hh - 2.2) + '" fill="none" stroke="' + (LIGHT_DYE[c] ? '#16233F' : '#fff') + '" stroke-opacity="' + (LIGHT_DYE[c] ? '.45' : '.75') + '" stroke-width=".45" stroke-dasharray="1.5 1.2"/>';
+    } else if (o.next && i === n) {
+      s += '<rect class="patch-next" x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(hh) + '" fill="#FBEFC9" stroke="#16233F" stroke-width=".8" stroke-dasharray="1.8 1.3"/>';
+      s += '<text x="' + f(r.x + r.w / 2) + '" y="' + f(r.y + r.h / 2 + 1.6) + '" text-anchor="middle" font-size="4.4" font-family="Do Hyeon, sans-serif" fill="#16233F">오늘</text>';
+    } else {
+      s += '<rect x="' + f(x) + '" y="' + f(y) + '" width="' + f(w) + '" height="' + f(hh) + '" fill="#EDEFE6" stroke="#BFC3B2" stroke-width=".4" stroke-dasharray="1.5 1.2"/>';
+    }
+  });
+  return s + '</svg>';
+}
+
+/* ===== 오늘의 운동 ===== */
+function leastRecent(ids) {
+  return shuffle(ids).sort(function (a, b) { return (S.last[a] || 0) - (S.last[b] || 0); })[0];
+}
+function pickWords() {
+  const n = 2 + clamp(S.lv.words || 1, 1, 3);
+  const prev = S.lastWords ? S.lastWords.w.map(function (x) { return x[1]; }) : [];
+  const cats = sample(Object.keys(WORDS), n);
+  const targets = cats.map(function (c) { return pick(WORDS[c].filter(function (w) { return prev.indexOf(w[1]) < 0; })); });
+  let lures = [];
+  cats.forEach(function (c) { lures = lures.concat(sample(WORDS[c].filter(function (w) { return targets.indexOf(w) < 0; }), 1)); });
+  const G = n === 3 ? 9 : 12;
+  const rest = shuffle(ALL_WORDS.filter(function (w) { return targets.indexOf(w) < 0 && lures.indexOf(w) < 0; }));
+  lures = lures.concat(rest.slice(0, G - n - lures.length));
+  return { t: targets.map(function (w, i) { return [w[0], w[1], cats[i]]; }), l: lures.map(function (w) { return [w[0], w[1]]; }) };
+}
+function newSession(k) {
+  const mem = leastRecent(['shop', 'face', 'place', 'story']), foc = leastRecent(['digits', 'trail', 'stroop', 'pairs']),
+    thk = leastRecent(['pattern', 'calc', 'clock']), lng = leastRecent(['word', 'proverb']);
+  const plan = [{ t: 'orient' }];
+  if (S.lastWords && S.lastWords.d !== k && daysBetween(S.lastWords.d, k) >= 1 && daysBetween(S.lastWords.d, k) <= 7) plan.push({ t: 'yrecall' });
+  plan.push({ t: 'promise' }, { t: 'learn' }, { t: 'game', id: 'speed' }, { t: 'recall', k: 0 }, { t: 'game', id: mem }, { t: 'game', id: foc },
+    { t: 'recall', k: 1 }, { t: 'game', id: thk }, { t: 'game', id: lng }, { t: 'recall', k: 2 }, { t: 'keep' }, { t: 'finish' });
+  return { d: k, i: 0, plan: plan, words: pickWords(), promise: pick(PROMISES), res: [], wr: [], y: null, pm: null, mem: mem };
+}
+async function withCtx(cur, title, fn) {
+  const ctx = makeCtx({ name: title }, 0, { session: true, steps: [cur.i, cur.plan.length] });
+  current = ctx; mount(ctx.root);
+  try { await fn(ctx); current = null; return {}; }
+  catch (e) { current = null; if (e instanceof Abort) return { aborted: true, byUser: ctx.quit }; throw e; }
+}
+const wordItems = (T, L) => shuffle(T.map(function (w) { return { emoji: w[0], label: w[1], ok: true }; }).concat(L.map(function (w) { return { emoji: w[0], label: w[1], ok: false }; })));
+const wordCards = T => cardsEl(T.map(function (w, i) { return { e: w[0], t: w[1], c: i }; }));
+function linkWords(T) {
+  const w = T.map(function (x) { return x[1]; }), last = w[w.length - 1];
+  if (w.length === 3) return w[0] + ' 옆에 ' + w[1] + ', 그 위에 ' + J(last, '이/가') + ' 올라가 있어요.';
+  return w[0] + ' 옆에 ' + w.slice(1, -1).join(', 그 위에 ') + ', 맨 꼭대기에 ' + J(last, '이/가') + ' 있어요.';
+}
+const seasonOf = m => (m >= 3 && m <= 5 ? '봄' : m >= 6 && m <= 8 ? '여름' : m >= 9 && m <= 11 ? '가을' : '겨울');
+const STEP = {
+  orient: function (cur) {
+    return withCtx(cur, '오늘의 운동', async function (ctx) {
+      const now = new Date(), wd = now.getDay(), m = now.getMonth() + 1, d = now.getDate();
+      await ctx.quiz({ prompt: '오늘은 무슨 요일일까요?', sub: '달력을 보기 전에 먼저 떠올려 보세요.', body: null, cols: 2,
+        options: [1, 2, 3, 4, 5, 6, 0].map(function (i) { return { label: YOIL[i] + '요일', ok: i === wd }; }) });
+      ctx.clear();
+      const kind = pick(['month', 'date', 'season']);
+      if (kind === 'month') {
+        const s0 = m - rnd(4), vals = [0, 1, 2, 3].map(function (i) { return ((s0 + i - 1 + 12) % 12) + 1; });
+        await ctx.quiz({ prompt: '지금은 몇 월일까요?', body: null, cols: 2, options: vals.map(function (v) { return { label: v + '월', ok: v === m }; }) });
+      } else if (kind === 'date') {
+        const last = new Date(now.getFullYear(), m, 0).getDate(), s0 = clamp(d - rnd(4), 1, last - 3), vals = [0, 1, 2, 3].map(function (i) { return s0 + i; });
+        await ctx.quiz({ prompt: '오늘은 며칠일까요?', body: null, cols: 2, options: vals.map(function (v) { return { label: v + '일', ok: v === d }; }) });
+      } else {
+        await ctx.quiz({ prompt: '지금은 어느 계절일까요?', body: null, cols: 2, options: ['봄', '여름', '가을', '겨울'].map(function (v) { return { label: v, ok: v === seasonOf(m) }; }) });
+      }
+      ctx.clear();
+      ctx.say('오늘 날짜를 소리 내어 말해 보세요.');
+      ctx.show(h('div', { class: 'big' }, now.getFullYear() + '년 ' + m + '월 ' + d + '일', h('br'), YOIL[wd] + '요일'));
+      await ctx.go('말했어요');
+    });
+  },
+  yrecall: function (cur) {
+    return withCtx(cur, '지난번 낱말', async function (ctx) {
+      const lw = S.lastWords, n = lw.w.length, gap = daysBetween(lw.d, cur.d);
+      ctx.say((gap === 1 ? '어제' : gap + '일 전에') + ' 외운 낱말, 혹시 기억나세요?', '기억나지 않아도 괜찮아요. 하루가 지나면 누구에게나 어려워요.');
+      ctx.show(h('div', { class: 'big' }, '낱말 ' + n + '개'));
+      await ctx.go('떠올려 봤어요', { delay: 1200 });
+      ctx.say('그때 외운 낱말을 골라 주세요.', '모두 ' + n + '개예요.');
+      const chosen = await ctx.pickMany(wordItems(lw.w, lw.l), n, { cols: 3 });
+      const hit = chosen.filter(function (x) { return x.ok; }).length;
+      cur.y = hit;
+      await ctx.mark(hit > 0, hit === n ? '하루가 지났는데도 모두 기억하셨어요. 대단해요!' : hit > 0 ? n + '개 가운데 ' + hit + '개를 기억하셨어요. 초록색이 그때 낱말이에요.' : '괜찮아요. 초록색이 그때 낱말이에요. 오늘 새로 해 봐요.');
+    });
+  },
+  promise: function (cur) {
+    return withCtx(cur, '오늘의 약속', async function (ctx) {
+      ctx.say('약속을 하나 할게요.', '운동이 다 끝나면 잊지 말고 하기로 해요.');
+      ctx.show(h('div', { class: 'linkline' }, '운동이 끝나면', h('br'), cur.promise),
+        h('div', { class: 'tip' }, '「끝나면 ' + cur.promise + '」 하고 소리 내어 말해 두세요. 맨 마지막에 여쭤볼게요.'));
+      await ctx.go('기억해 둘게요', { delay: 1500 });
+    });
+  },
+  learn: function (cur) {
+    return withCtx(cur, '오늘의 낱말', async function (ctx) {
+      const T = cur.words.t, n = T.length;
+      ctx.say('오늘의 낱말 ' + n + '개예요.', '하나씩 소리 내어 읽어 보세요. 운동하는 사이사이에 다시 여쭤볼게요.');
+      ctx.show(wordCards(T));
+      speak('오늘의 낱말이에요. ' + T.map(function (w) { return w[1]; }).join(', '));
+      await ctx.go('다 읽었어요', { delay: 2000 });
+      ctx.say('낱말들을 하나의 그림으로 이어 보세요.', '엉뚱한 그림일수록 기억에 잘 남아요.');
+      ctx.show(wordCards(T), h('div', { class: 'linkline' }, linkWords(T)));
+      await ctx.go('머릿속에 그렸어요', { delay: 2000 });
+      ctx.say('방금 본 낱말 ' + n + '개를 골라 주세요.');
+      const chosen = await ctx.pickMany(wordItems(T, cur.words.l.slice(0, n)), n, { cols: 3 });
+      if (chosen.every(function (x) { return x.ok; })) await ctx.mark(true, '좋아요. 이 낱말들을 꼭 기억해 두세요.');
+      else {
+        await ctx.mark(false, '한 번 더 눈에 담아 둘게요.');
+        ctx.clear(); ctx.say('오늘의 낱말이에요.', '다시 한번 소리 내어 읽어 보세요.');
+        ctx.show(wordCards(T), h('div', { class: 'linkline' }, linkWords(T)));
+        await ctx.go('다시 읽었어요', { delay: 1500 });
+      }
+    });
+  },
+  recall: function (cur, st) {
+    return withCtx(cur, '오늘의 낱말', async function (ctx) {
+      const T = cur.words.t, n = T.length;
+      ctx.say('아까 외운 낱말 ' + n + '개를 떠올려 보세요.', '눈을 감고 떠올린 다음, 몇 개가 생각났는지 눌러 주세요.');
+      ctx.show(h('div', { class: 'cards' }, T.map(function () { return h('div', { class: 'card' }, h('span', { class: 'emo' }, '?')); })));
+      const counts = [];
+      for (let i = n; i >= 1; i--) counts.push({ label: i === n ? i + '개 모두' : i + '개', any: true });
+      counts.push({ label: '하나도 안 떠올라요', cls: 'quiet', any: true });
+      await ctx.choose(counts, { cols: 2 });
+      ctx.say('외운 낱말 ' + n + '개를 골라 주세요.');
+      const chosen = await ctx.pickMany(wordItems(T, cur.words.l), n, { cols: 3, hint: uniq(T.map(function (w) { return w[2]; })).join(', ') + ' 가운데 하나씩이에요.' });
+      const hit = chosen.filter(function (x) { return x.ok; }).length;
+      cur.wr[st.k] = hit;
+      if (hit === n) await ctx.mark(true, n + '개 모두 기억하셨어요!');
+      else {
+        await ctx.mark(false, n + '개 가운데 ' + hit + '개를 기억하셨어요. 초록색이 외운 낱말이에요.');
+        ctx.clear(); ctx.say('한 번 더 눈에 담아 두세요.', '그림으로 이어서 떠올리면 쉬워요.');
+        ctx.show(wordCards(T), h('div', { class: 'linkline' }, linkWords(T)));
+        await ctx.go('다시 외웠어요', { delay: 1500 });
+      }
+    });
+  },
+  game: async function (cur, st) {
+    const sum = await runGame(st.id, { session: true, steps: [cur.i, cur.plan.length] });
+    if (sum.aborted) return sum;
+    cur.res.push({ id: sum.id, name: sum.name, from: sum.from, to: sum.to });
+    cur.i++; save();
+    const v = await resultScreen(sum, { session: true });
+    return v === 'stop' ? { counted: true, aborted: true, byUser: true } : { counted: true };
+  },
+  keep: function (cur) {
+    return withCtx(cur, '오늘의 약속', async function (ctx) {
+      const opts = shuffle([cur.promise].concat(sample(PROMISES.filter(function (p) { return p !== cur.promise; }), 3))).map(function (p) { return { label: p, ok: p === cur.promise, cls: 'small' }; });
+      opts.push({ label: '기억이 안 나요', cls: 'quiet', ok: false });
+      cur.pm = await ctx.quiz({ prompt: '운동을 시작할 때 약속을 하나 했어요.', sub: '끝나면 무엇을 하기로 했지요?', body: null, options: opts, cols: 1 });
+      ctx.clear();
+      ctx.say('이제 약속을 지킬 차례예요.', '약속을 지키는 것까지가 오늘의 운동이에요.');
+      ctx.show(h('div', { class: 'linkline' }, cur.promise));
+      await ctx.go('네, 바로 할게요');
+    });
+  },
+  finish: function (cur) { return finishView(cur); }
+};
+async function runSession() {
+  const k = dkey();
+  if (!S.cur || S.cur.d !== k) { S.cur = newSession(k); save(); }
+  const cur = S.cur;
+  while (cur.i < cur.plan.length) {
+    const st = cur.plan[cur.i];
+    const r = await STEP[st.t](cur, st);
+    if (r && r.aborted) { save(); if (r.byUser) go('home'); return; }
+    if (!(r && r.counted)) cur.i++;
+    save();
+  }
+  go('home');
+}
+function finishView(cur) {
+  const k = cur.d, first = !(S.days[k] && S.days[k].n), day = S.days[k] || { n: 0 }, n = cur.words.t.length;
+  day.n += 1; day.g = cur.res.map(function (r) { return r.id; }); day.wr = cur.wr.slice(); day.wn = n; day.y = cur.y; day.pm = cur.pm;
+  S.days[k] = day;
+  let fresh = false, full = false;
+  if (first) {
+    if (S.patches.length >= QUILT_N) { S.patches = []; S.seed += 101; }
+    const prev = S.patches.length ? S.patches[S.patches.length - 1].c : -1;
+    let c = rnd(DYES.length); if (c === prev) c = (c + 1) % DYES.length;
+    S.patches.push({ d: k, c: c }); fresh = true;
+    if (S.patches.length === QUILT_N) { S.quilts += 1; full = true; }
+  }
+  const last = cur.wr[2];
+  if (last === n) { S.wrun = (S.wrun || 0) + 1; if (S.wrun >= 2) { S.lv.words = clamp((S.lv.words || 1) + 1, 1, 3); S.wrun = 0; } }
+  else { S.wrun = 0; if (last != null && last <= n - 2) S.lv.words = clamp((S.lv.words || 1) - 1, 1, 3); }
+  S.lastWords = { d: k, w: cur.words.t, l: cur.words.l };
+  S.cur = null; save();
+
+  const dt = parseKey(k), wkN = weekKeys(dt).filter(function (x) { return S.days[x] && S.days[x].n; }).length;
+  const wr = cur.wr.filter(function (x) { return x != null; });
+  const text = '[기억 조각보] ' + (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 ' + YOIL[dt.getDay()] + '요일 운동을 마쳤어요.\n' +
+    '이번 주 ' + wkN + '번째이고, 조각보는 ' + QUILT_N + '조각 가운데 ' + S.patches.length + '조각을 이었어요.\n' +
+    '오늘의 낱말: ' + cur.words.t.map(function (w) { return w[1]; }).join(', ') + ' (' + n + '개 가운데 ' + wr.join(', ') + '개 기억)\n' +
+    cur.res.map(function (r) { return r.name + ' ' + r.to + '단계'; }).join(', ');
+  return new Promise(function (res) {
+    SFX.done();
+    const copyBtn = h('button', { class: 'btn', type: 'button' }, '가족에게 알릴 글 복사하기');
+    const box = h('textarea', { readonly: true, id: 'share-text', 'aria-label': '가족에게 알릴 글', style: { display: 'none' } }, text);
+    copyBtn.addEventListener('click', function () {
+      const fail = function () { box.style.display = ''; box.focus(); box.select(); copyBtn.textContent = '아래 글을 길게 눌러 복사해 주세요'; };
+      try { navigator.clipboard.writeText(text).then(function () { copyBtn.textContent = '복사했어요. 카카오톡에 붙여 넣으세요'; }, fail); } catch (e) { fail(); }
+    });
+    const home = h('button', { class: 'btn btn-main', type: 'button', onclick: function () { res({}); } }, '처음 화면으로');
+    if (TEST) home.dataset.ok = '1';
+    mount(h('div', { class: 'result' },
+      h('h1', null, full ? '조각보 한 장을 다 이으셨어요!' : fresh ? '오늘의 조각을 이었어요' : '오늘 운동을 한 번 더 마쳤어요'),
+      h('div', { class: 'quilt', html: quiltSVG({ fresh: fresh }) }),
+      h('p', { class: 'score' }, full ? '스물네 번의 운동이 조각보 한 장이 되었어요. 정말 애쓰셨어요.' : '이번 주 ' + wkN + '번째 운동이에요. 스물네 조각 가운데 ' + S.patches.length + '조각을 이었어요.'),
+      h('div', { class: 'sumlist' },
+        cur.res.map(function (r) { return h('div', null, h('b', null, r.name), h('span', null, r.to > r.from ? r.to + '단계로 올랐어요' : r.to + '단계')); }),
+        wr.length ? h('div', null, h('b', null, '오늘의 낱말'), h('span', null, n + '개 가운데 ' + wr.join(', ') + '개')) : null),
+      CARRY[cur.mem] ? h('div', { class: 'tip' }, h('div', { class: 'tip-h' }, '생활에서 써 보기'), CARRY[cur.mem]) : null,
+      h('p', { class: 'note', style: { textAlign: 'left' } }, LIFE[Object.keys(S.days).length % LIFE.length]),
+      copyBtn, box, home));
+  });
+}
+
+
+/* ===== 바탕화면에 깔기 (따로 올린 앱 판에서만) ===== */
+const PWA = !!window.__PWA;
+let deferredInstall = null, installedNow = false, installHidden = false;
+const UA = navigator.userAgent || '';
+const isIOS = /iPhone|iPad|iPod/.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/.test(UA);
+const isKakao = /KAKAOTALK/i.test(UA);
+const isSamsung = /SamsungBrowser/i.test(UA);
+function isStandalone() {
+  try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; }
+}
+function framed() { try { return window.self !== window.top; } catch (e) { return true; } }
+if (PWA) {
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredInstall = e; if (location.hash === '' || location.hash === '#home') route(); });
+  window.addEventListener('appinstalled', function () { installedNow = true; deferredInstall = null; if (location.hash === '' || location.hash === '#home') route(); });
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !framed()) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+}
+function installCard() {
+  if (!PWA || installHidden || framed() || isStandalone() || !(isIOS || isAndroid)) return null;
+  const later = h('button', { class: 'btn-quiet', type: 'button', onclick: function () { installHidden = true; route(); } }, '나중에 하기');
+  const box = function (title, kids) { return h('div', { class: 'install', role: 'region', 'aria-label': '바탕화면에 깔기' }, h('h2', null, title), kids, later); };
+  if (installedNow) return h('div', { class: 'install done' }, h('h2', null, '바탕화면에 깔았어요'),
+    h('p', null, '이제부터는 바탕화면의 「기억 조각보」 그림을 눌러 들어오세요.'),
+    isAndroid ? h('p', { class: 'small' }, '바탕화면에 안 보이면 앱 목록에서 찾아 길게 눌러 바탕화면으로 옮기세요.') : null);
+  if (isKakao) {
+    const target = location.href.split('#')[0];
+    return box('카카오톡 밖에서 열어 주세요', [
+      h('p', null, '카카오톡 안에서는 기록이 지워질 수 있어요. 아래 단추를 눌러 인터넷 앱으로 연 다음 바탕화면에 깔아 주세요.'),
+      h('a', { class: 'btn btn-main', href: 'kakaotalk://web/openExternal?url=' + encodeURIComponent(target) }, '인터넷 앱으로 열기'),
+      h('p', { class: 'small' }, isIOS ? '안 열리면 화면 아래 공유 단추를 눌러 「Safari로 열기」를 고르세요.' : '안 열리면 오른쪽 아래 ⋮ 를 누르고 「다른 브라우저로 열기」를 고르세요.')]);
+  }
+  if (isAndroid && deferredInstall) {
+    return box('바탕화면에 깔아 두세요', [
+      h('p', null, '한 번 깔아 두면 다음부터 바탕화면 그림만 누르면 바로 시작해요.'),
+      h('button', { class: 'btn btn-main', type: 'button', onclick: function () {
+        const ev = deferredInstall; if (!ev) return;
+        try { ev.prompt(); ev.userChoice.then(function (r) { if (r && r.outcome === 'accepted') { installedNow = true; deferredInstall = null; route(); } }); } catch (e) {}
+      } }, '바탕화면에 깔기')]);
+  }
+  if (isIOS) {
+    return box('바탕화면에 깔아 두세요', [
+      h('ol', null,
+        h('li', null, '화면 아래쪽의 공유 단추를 누르세요. 네모에서 화살표가 위로 나온 모양이에요. 안 보이면 「⋯」를 먼저 누르세요.'),
+        h('li', null, '「홈 화면에 추가」를 누르세요. 안 보이면 목록을 위로 밀어 올려 찾으세요.'),
+        h('li', null, '오른쪽 위 「추가」를 누르세요.')),
+      h('p', { class: 'small' }, '그다음부터는 바탕화면의 「기억 조각보」 그림을 눌러 들어와서 운동하세요.')]);
+  }
+  return box('바탕화면에 깔아 두세요', [
+    isSamsung ? h('ol', null, h('li', null, '오른쪽 아래 ≡ 를 누르세요.'), h('li', null, '「현재 페이지 추가」를 누르세요.'), h('li', null, '「홈 화면」을 고르고 「추가」를 누르세요.'))
+      : h('ol', null, h('li', null, '오른쪽 위 ⋮ 를 누르세요.'), h('li', null, '「홈 화면에 추가」를 누르세요.'), h('li', null, '「설치」나 「추가」를 누르세요.')),
+    h('p', { class: 'small' }, '그다음부터는 바탕화면의 「기억 조각보」 그림을 눌러 들어와서 운동하세요.')]);
+}
+
+/* ===== 화면들 ===== */
+function go(name) { if ((location.hash || '#home') === '#' + name) route(); else location.hash = name; }
+function cycleFont() { S.opts.fs = (S.opts.fs % 3) + 1; applyFont(); save(); }
+function homeView() {
+  const now = new Date(), k = dkey(now);
+  if (S.cur && S.cur.d !== k) { S.cur = null; save(); }
+  const day = S.days[k], done = !!(day && day.n), cur = S.cur && S.cur.i > 0 ? S.cur : null;
+  const wk = weekKeys(now), nWeek = wk.filter(function (x) { return S.days[x] && S.days[x].n; }).length;
+  const hr = now.getHours(), hello = hr < 11 ? '좋은 아침이에요.' : hr < 18 ? '안녕하세요.' : '편안한 저녁이에요.';
+  const full = S.patches.length >= QUILT_N;
+  const line = done && !cur ? (full ? '조각보 한 장을 다 이으셨어요. 다음 운동부터 새 조각보를 시작해요.' : '오늘 몫의 조각을 이으셨어요. 내일 또 만나요.')
+    : cur ? '하던 운동이 남아 있어요. 이어서 해 볼까요?' : '오늘도 한 조각 이어 볼까요?';
+  const startBtn = h('button', { class: 'btn' + (done && !cur ? '' : ' btn-main'), type: 'button', id: 'start', onclick: function () { runSession(); } },
+    cur ? '이어서 하기' : done ? '한 번 더 하기' : '오늘의 운동 시작');
+  mount(h('div', { class: 'home' },
+    h('div', { class: 'home-top' },
+      h('span', { class: 'year' }, now.getFullYear() + '년'),
+      h('button', { class: 'fs-btn', type: 'button', onclick: cycleFont, 'aria-label': '글씨 크기 바꾸기' }, '글씨 크기 ', h('b', null, '가'))),
+    h('h1', { class: 'today' }, (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + YOIL[now.getDay()] + '요일'),
+    h('p', { class: 'greet' }, hello + ' ' + line),
+    installCard(),
+    h('div', { class: 'quilt', html: quiltSVG({ next: !done && !full }) }),
+    h('div', { class: 'quilt-cap' }, h('strong', null, '기억 조각보'), h('span', null, S.patches.length ? QUILT_N + '조각 가운데 ' + Math.min(S.patches.length, QUILT_N) + '조각' : '운동을 마치면 한 조각씩 이어져요')),
+    done && !cur ? h('div', { class: 'done-note' }, '오늘 운동을 마쳤어요') : null,
+    startBtn,
+    !done && !cur ? h('p', { class: 'note' }, '15분쯤 걸려요. 중간에 그만두어도 이어서 할 수 있어요.') : null,
+    h('div', { class: 'week', 'aria-label': '이번 주 운동한 날' }, wk.map(function (x) {
+      const on = S.days[x] && S.days[x].n;
+      return h('div', { class: (on ? 'on' : '') + (x === k ? ' now' : '') }, YOIL[parseKey(x).getDay()]);
+    })),
+    h('p', { class: 'note', style: { textAlign: 'left' } }, '이번 주에 ' + nWeek + '번 했어요. 목표는 ' + S.opts.goal + '번이에요.'),
+    h('div', { class: 'row c3' },
+      h('button', { class: 'btn', type: 'button', onclick: function () { go('games'); } }, '골라서 하기'),
+      h('button', { class: 'btn', type: 'button', onclick: function () { go('records'); } }, '내 기록'),
+      h('button', { class: 'btn', type: 'button', onclick: function () { go('guide'); } }, '가족 안내')),
+    storeOK ? null : h('p', { class: 'note', style: { textAlign: 'left' } }, '이 화면에서는 기록을 저장할 수 없어요. 운동은 그대로 할 수 있어요.')));
+}
+const DOMS = [['speed', '보는 속도', ['speed']], ['mem', '기억', ['shop', 'face', 'place', 'story', 'pairs']], ['focus', '집중', ['digits', 'trail', 'stroop']],
+  ['think', '생각과 계산', ['pattern', 'calc', 'clock']], ['lang', '말과 낱말', ['word', 'proverb']]];
+function pageTop(title) {
+  return h('div', { class: 'page-top' }, h('h1', null, title), h('button', { class: 'btn back', type: 'button', onclick: function () { go('home'); } }, '처음 화면'));
+}
+async function freePlay(id) {
+  for (;;) {
+    const sum = await runGame(id, {});
+    if (sum.aborted) { if (sum.byUser) go('games'); return; }
+    const v = await resultScreen(sum, {});
+    if (v !== 'again') { go(v); return; }
+  }
+}
+function gamesView() {
+  mount(h('div', { class: 'page' }, pageTop('골라서 하기'),
+    h('p', null, '하고 싶은 운동을 골라 주세요. 단계는 실력에 맞춰 저절로 오르내려요.'),
+    h('div', { class: 'menu' }, DOMS.map(function (d) {
+      return [h('h2', null, d[1]), h('div', { class: 'menu-grid' }, d[2].map(function (id) {
+        return h('button', { class: 'game-btn dom-' + d[0], type: 'button', 'data-game': id, onclick: function () { freePlay(id); } },
+          h('b', null, GAMES[id].name), h('span', null, levelOf(id) + '단계' + (S.plays[id] ? ', ' + S.plays[id] + '번 했어요' : '')));
+      }))];
+    }))));
+}
+function recordsView() {
+  const now = new Date(), k = dkey(now), y = now.getFullYear(), m = now.getMonth();
+  const keys = Object.keys(S.days).filter(function (x) { return S.days[x].n; }).sort();
+  const wkN = weekKeys(now).filter(function (x) { return S.days[x] && S.days[x].n; }).length;
+  const firstDow = (new Date(y, m, 1).getDay() + 6) % 7, lastDate = new Date(y, m + 1, 0).getDate();
+  const cal = ['월', '화', '수', '목', '금', '토', '일'].map(function (t) { return h('div', { class: 'hd' }, t); });
+  for (let i = 0; i < firstDow; i++) cal.push(h('div'));
+  for (let d = 1; d <= lastDate; d++) {
+    const dk = y + '-' + pad2(m + 1) + '-' + pad2(d), on = S.days[dk] && S.days[dk].n;
+    cal.push(h('div', { class: 'd' + (on ? ' on' : '') + (dk === k ? ' now' : ''), 'aria-label': d + '일' + (on ? ', 운동한 날' : '') }, d));
+  }
+  const meters = DOMS.map(function (d) {
+    const played = d[2].filter(function (id) { return S.plays[id]; });
+    const max = d[0] === 'speed' ? 6 : 10;
+    const avg = played.length ? played.reduce(function (a, id) { return a + levelOf(id); }, 0) / played.length : 0;
+    const segs = []; for (let i = 0; i < max; i++) segs.push(h('i', { class: i < Math.round(avg) ? 'on' : '' }));
+    return h('div', { class: 'meter' }, h('b', null, d[1]), h('div', { class: 'segs', role: 'img', 'aria-label': d[1] + ' ' + Math.round(avg) + '단계' }, segs),
+      h('span', null, played.length ? (d[0] === 'speed' ? Math.round(avg) + '단계 ' + sec(DUR[S.speed.di[S.speed.stage] != null ? S.speed.di[S.speed.stage] : 3]) : avg.toFixed(1) + '단계') : '아직 전'));
+  });
+  const rows = keys.slice(-8).reverse().map(function (dk) {
+    const d = S.days[dk], idx = keys.indexOf(dk), nx = keys[idx + 1] ? S.days[keys[idx + 1]] : null, wr = d.wr || [];
+    const c = function (v) { return v == null ? '–' : v + '/' + (d.wn || '?'); };
+    return h('tr', null, h('td', null, Number(dk.slice(5, 7)) + '월 ' + Number(dk.slice(8)) + '일'), h('td', null, c(wr[0])), h('td', null, c(wr[1])), h('td', null, c(wr[2])), h('td', null, nx && nx.y != null ? nx.y + '/' + (d.wn || '?') : '–'));
+  });
+  const games = [];
+  DOMS.forEach(function (d) { d[2].forEach(function (id) {
+    if (!S.plays[id]) return;
+    let lastP = null; for (let i = S.hist.length - 1; i >= 0; i--) if (S.hist[i].g === id) { lastP = S.hist[i].p; break; }
+    games.push(h('tr', null, h('td', null, GAMES[id].name), h('td', null, levelOf(id) + '단계'), h('td', null, S.plays[id] + '번'), h('td', null, lastP != null ? lastP + '점' : '–')));
+  }); });
+  mount(h('div', { class: 'page' }, pageTop('내 기록'),
+    h('div', { class: 'facts' },
+      h('div', { class: 'fact' }, h('b', null, keys.length + '일'), h('span', null, '지금까지 운동한 날')),
+      h('div', { class: 'fact' }, h('b', null, wkN + '번'), h('span', null, '이번 주 (목표 ' + S.opts.goal + '번)')),
+      h('div', { class: 'fact' }, h('b', null, Math.min(S.patches.length, QUILT_N) + '조각'), h('span', null, '지금 잇고 있는 조각보')),
+      h('div', { class: 'fact' }, h('b', null, S.quilts + '장'), h('span', null, '다 이은 조각보'))),
+    h('h2', null, (m + 1) + '월 달력'),
+    h('div', { class: 'cal' }, cal),
+    h('h2', null, '운동별 단계'),
+    h('p', null, '단계가 오르면 더 어려운 문제가 나와요. 속도 운동은 6단계까지, 나머지는 10단계까지 있어요.'),
+    h('div', { class: 'meters' }, meters),
+    h('h2', null, '오늘의 낱말 기억'),
+    h('p', null, '외운 낱말 가운데 몇 개를 떠올렸는지 보여 줘요. 다음 날 칸은 그다음 운동을 시작할 때 다시 물어본 결과예요.'),
+    rows.length ? h('div', { class: 'tbl-wrap' }, h('table', null, h('thead', null, h('tr', null, h('th', null, '날짜'), h('th', null, '처음'), h('th', null, '중간'), h('th', null, '끝'), h('th', null, '다음 날'))), h('tbody', null, rows)))
+      : h('p', { class: 'note', style: { textAlign: 'left' } }, '오늘의 운동을 한 번 마치면 여기에 기록이 생겨요.'),
+    games.length ? [h('h2', null, '운동별 기록'), h('div', { class: 'tbl-wrap' }, h('table', null, h('thead', null, h('tr', null, h('th', null, '운동'), h('th', null, '단계'), h('th', null, '횟수'), h('th', null, '최근 점수'))), h('tbody', null, games)))] : null));
+}
+function segCtl(labels, value, onPick) {
+  const wrap = h('div', { class: 'seg', role: 'group' });
+  labels.forEach(function (l) {
+    const b = h('button', { type: 'button', class: l[1] === value ? 'on' : '', 'aria-pressed': l[1] === value ? 'true' : 'false' }, l[0]);
+    b.addEventListener('click', function () {
+      wrap.querySelectorAll('button').forEach(function (x) { x.className = ''; x.setAttribute('aria-pressed', 'false'); });
+      b.className = 'on'; b.setAttribute('aria-pressed', 'true'); onPick(l[1]);
+    });
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+const SOURCES = [
+  ['ACTIVE 20년 추적: 인지훈련과 치매 진단 (Alzheimer’s & Dementia: TRCI, 2026)', 'https://doi.org/10.1002/trc2.70197'],
+  ['ACTIVE 10년 추적 (J Am Geriatr Soc, 2014)', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506'],
+  ['ACTIVE에서 기억 저하가 훈련 효과에 미친 영향 (2007)', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC2733239'],
+  ['Hill 등, 경도인지장애와 치매의 컴퓨터 인지훈련 메타분석 (Am J Psychiatry, 2017)', 'https://psychiatryonline.org/doi/abs/10.1176/appi.ajp.2016.16030360'],
+  ['Belleville 등, 경도인지장애 인지훈련의 5년 효과 (2024)', 'https://doi.org/10.1002/dad2.12626'],
+  ['Hampstead 등, 물건 자리 기억 전략 훈련 (Neuropsychology, 2012)', 'https://pure.psu.edu/en/publications/mnemonic-strategy-training-improves-memory-for-object-location-as/'],
+  ['Simon 등, 얼굴과 이름 기억 전략 훈련 무작위 시험 (2018)', 'https://doi.org/10.3389/fnagi.2018.00342'],
+  ['Han 등, 시간차 회상 훈련 USMART (Alzheimer’s Research & Therapy, 2017)', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5461696'],
+  ['Lampit 등, 건강한 노인의 컴퓨터 인지훈련 메타분석 (PLoS Medicine, 2014)', 'https://doi.org/10.1371/journal.pmed.1001756'],
+  ['Gates 등, 경도인지장애의 컴퓨터 인지훈련 코크란 검토 (2019)', 'https://doi.org/10.1002/14651858.CD012279.pub2'],
+  ['세계보건기구 인지 저하와 치매 위험 감소 지침 개정 발표 (2026)', 'https://www.paho.org/en/news/16-7-2026-new-who-guidelines-45-dementia-risk-could-be-prevented-or-delayed'],
+  ['U.S. POINTER 연구 결과 (알츠하이머협회, 2025)', 'https://alz.org/us-pointer/study-results.asp'],
+  ['코그테라 식약처 허가 보도 (2025)', 'https://bravo.etoday.co.kr/view/atc_view/16335']
+];
+const EVI = [
+  ['꽃과 나비', '보는 속도, 넓게 보기', 'ACTIVE 연구의 처리속도 훈련을 본떴습니다. 화면 가운데와 가장자리를 한꺼번에 보게 하고, 맞히면 보여 주는 시간을 줄입니다. 2026년에 나온 20년 추적 결과에서 이 훈련을 받고 보강 훈련까지 받은 집단은 치매 진단이 대조군보다 25% 적었습니다. 기억 훈련과 추리 훈련에서는 이런 차이가 보이지 않았습니다. 그래서 매번 운동의 첫 종목으로 넣었습니다.'],
+  ['장보기 기억, 이야기 기억', '목록과 이야기 기억', '묶기, 그려 보기, 연결하기 같은 기억 전략을 익히는 훈련입니다. 캐나다 MEMO+ 연구에서는 경도인지장애 어르신이 주 1회 2시간씩 8주 동안 이런 전략을 배웠고, 5년 뒤에도 지연 회상의 저하가 대조군보다 작았습니다.'],
+  ['얼굴과 이름, 물건 자리', '사람 이름, 물건 둔 곳', '미국 Hampstead 연구진의 기억 전략 훈련을 본떴습니다. 눈에 띄는 특징을 고르고, 이유를 붙이고, 머릿속에 그리는 세 걸음입니다. 기억성 경도인지장애 환자에서 같은 횟수만큼 되풀이해 보기만 한 경우보다 성적이 좋았고, 한 달 뒤에도 유지되었습니다.'],
+  ['오늘의 낱말', '시간이 지난 뒤 떠올리기', '간격을 점점 벌리며 다시 떠올리는 시간차 회상 훈련입니다. 분당서울대병원의 USMART 연구에서는 경도인지장애 어르신이 태블릿으로 30분씩 주 2회, 4주 동안 훈련한 뒤 단어 회상 점수가 올랐습니다. 이 게임은 운동 사이사이에 세 번, 다음 운동을 시작할 때 한 번 더 묻습니다.'],
+  ['규칙 찾기', '추리', 'ACTIVE 연구의 추리 훈련처럼 숫자와 모양이 늘어선 규칙을 찾습니다. 추리 훈련과 속도 훈련의 효과는 10년 뒤에도 남아 있었고, 기억력이 떨어져 있던 참가자에게도 통했습니다.'],
+  ['숫자 기억, 순서 잇기, 색깔 글자, 짝 맞추기', '집중과 작업 기억', '경도인지장애 어르신을 대상으로 한 컴퓨터 인지훈련 연구 17편을 묶은 분석에서 주의력, 작업 기억, 학습, 기억에 작거나 중간 크기의 효과가 확인되었습니다.'],
+  ['시장 계산, 시계 보기, 낱말 맞추기, 속담 잇기', '계산, 시공간, 낱말 찾기', '익숙한 지식을 꺼내 쓰는 인지 자극 활동입니다. 세계보건기구는 2026년 지침에서 인지 훈련과 인지 자극, 사회 활동을 정상 인지와 경도인지장애 성인 모두에게 권고했습니다.']
+];
+function guideView() {
+  const code = h('textarea', { id: 'backup-code', 'aria-label': '기록 옮기기 글', spellcheck: 'false' });
+  const msg = h('p', { class: 'note', style: { textAlign: 'left' }, role: 'status' });
+  const enc = function () { try { return btoa(unescape(encodeURIComponent(JSON.stringify(S)))); } catch (e) { return ''; } };
+  mount(h('div', { class: 'page' }, pageTop('가족 안내'),
+    h('p', null, '기억 조각보는 하루 15분쯤 하는 두뇌 운동입니다. 운동을 한 번 마치면 조각 하나가 이어지고, 스물네 조각이 모이면 조각보 한 장이 됩니다. 병원 치료나 인지 수업을 대신하지는 못합니다. 수업이 없는 날 집에서 이어 가는 연습으로 써 주세요.'),
+    h('h2', null, '이렇게 쓰면 좋습니다'),
+    h('ul', null,
+      h('li', null, '한 번에 15분에서 20분, 일주일에 서너 번이면 됩니다. 미국 U.S. POINTER 연구는 30분씩 주 3회, 국내 처방용 프로그램 코그테라는 15분씩 하루 2회로 짜여 있습니다. 건강한 어르신을 대상으로 한 분석에서는 주 3회를 넘겨도 효과가 더 커지지 않았습니다.'),
+      h('li', null, '혼자보다 함께 하는 편이 낫습니다. 같은 분석에서 지도자와 함께 한 훈련은 효과가 있었고, 집에서 혼자 한 훈련은 효과가 뚜렷하지 않았습니다. 옆에서 같이 풀거나, 끝난 뒤 전화로 오늘의 낱말을 물어봐 주세요.'),
+      h('li', null, '요령을 생활에서 써 보게 도와주세요. 묶어서 외우기, 둔 자리에 이유 붙이기, 얼굴 특징과 이름 잇기가 장보기와 약속 기억으로 옮겨 가야 쓸모가 있습니다.'),
+      h('li', null, '틀리는 것은 정상입니다. 난이도는 조금 어렵다 싶은 수준에 머물도록 저절로 오르내립니다.')),
+    h('h2', null, '운동 종목과 바탕이 된 연구'),
+    h('div', { class: 'evi' }, EVI.map(function (e) { return h('div', null, h('b', null, e[0]), h('em', null, e[1]), h('p', null, e[2])); })),
+    h('h2', null, '알아 두실 한계'),
+    h('ul', null,
+      h('li', null, '이 게임으로 임상시험을 한 것은 아닙니다. 연구에서 확인된 훈련 방식을 본떠 만들었습니다.'),
+      h('li', null, '인지훈련의 근거는 아직 탄탄하지 않습니다. 2019년 코크란 검토는 12주 이상 훈련한 연구 8편, 660명을 살폈는데 근거의 질이 낮았고, 치매로 진행하는지를 본 연구는 한 편도 없었습니다.'),
+      h('li', null, 'ACTIVE의 결과는 인지 기능이 좋은 65세 이상 어르신이 정해진 프로그램으로 훈련했을 때의 것입니다. 경도인지장애에서 같은 결과가 나온다고 확인된 것은 아닙니다.'),
+      h('li', null, '좋아지는 것은 주로 연습한 종류의 과제입니다. 걷기, 사람 만나기, 혈압과 혈당 관리, 병원 치료와 함께할 때 의미가 큽니다.')),
+    h('h2', null, '더 알아볼 곳'),
+    h('ul', null,
+      h('li', null, '치매안심센터 인지강화교실. 경도인지장애 진단을 받은 분이 다닐 수 있고, 시군구 보건소마다 있습니다.'),
+      h('li', null, '코그테라. 2025년 5월 식약처 허가를 받은 경도인지장애 디지털치료기기입니다. 의사 처방이 필요하니 다니는 병원에 물어보세요.')),
+    h('h2', null, '설정'),
+    h('div', { class: 'set' }, h('span', null, '글씨 크기'), segCtl([['보통', 1], ['크게', 2], ['아주 크게', 3]], S.opts.fs, function (v) { S.opts.fs = v; applyFont(); save(); })),
+    h('div', { class: 'set' }, h('span', null, '효과음'), segCtl([['켜기', true], ['끄기', false]], S.opts.sound, function (v) { S.opts.sound = v; save(); })),
+    canSpeak() ? h('div', { class: 'set' }, h('span', null, '설명을 소리로 읽어 주기'), segCtl([['켜기', true], ['끄기', false]], S.opts.voice, function (v) { S.opts.voice = v; save(); if (v) speak('설명을 소리로 읽어 드릴게요.', true); else hush(); })) : null,
+    h('div', { class: 'set' }, h('span', null, '일주일 목표'), segCtl([['3번', 3], ['4번', 4], ['5번', 5], ['7번', 7]], S.opts.goal, function (v) { S.opts.goal = v; save(); })),
+    h('h2', null, '기록 옮기기'),
+    h('p', null, '기록은 이 기기의 이 브라우저에만 저장됩니다. 전화기를 바꾸거나 다른 브라우저로 옮길 때는 아래 글을 복사해 두었다가 새 기기에서 붙여 넣으세요.'),
+    code, msg,
+    h('div', { class: 'row c2' },
+      h('button', { class: 'btn', type: 'button', onclick: function () {
+        code.value = enc(); code.focus(); code.select();
+        try { navigator.clipboard.writeText(code.value).then(function () { msg.textContent = '복사했어요.'; }, function () { msg.textContent = '위 글을 길게 눌러 복사해 주세요.'; }); } catch (e) { msg.textContent = '위 글을 길게 눌러 복사해 주세요.'; }
+      } }, '기록 복사하기'),
+      h('button', { class: 'btn', type: 'button', onclick: function () {
+        try {
+          const o = JSON.parse(decodeURIComponent(escape(atob(code.value.trim()))));
+          if (!o || o.v !== 1) throw new Error('bad');
+          adopt(o); save(); applyFont(); msg.textContent = '기록을 불러왔어요.';
+        } catch (e) { msg.textContent = '붙여 넣은 글이 맞지 않아요. 처음부터 끝까지 복사했는지 확인해 주세요.'; }
+      } }, '붙여 넣은 기록 불러오기')),
+    h('button', { class: 'btn-quiet', type: 'button', style: { alignSelf: 'flex-start' }, onclick: function () {
+      dialog({ title: '기록을 모두 지울까요?', text: '조각보와 단계가 처음으로 돌아가요. 되돌릴 수 없어요.', buttons: [{ label: '지우지 않기', value: false, cls: 'btn-main' }, { label: '모두 지우기', value: true }] })
+        .then(function (v) { if (v) { S = blank(); save(); applyFont(); go('home'); } });
+    } }, '기록 모두 지우기'),
+    h('h2', null, '출처'),
+    h('ol', { class: 'src' }, SOURCES.map(function (s) { return h('li', null, h('a', { href: s[1], target: '_blank', rel: 'noopener' }, s[0])); }))));
+}
+const VIEWS = { home: homeView, games: gamesView, records: recordsView, guide: guideView };
+function route() {
+  if (current) { current.kill(); current = null; }
+  document.querySelectorAll('.modal').forEach(function (m) { m.remove(); });
+  (VIEWS[(location.hash || '').replace('#', '')] || homeView)();
+}
+function failScreen() {
+  if (current) { current.kill(); current = null; }
+  mount(h('div', { class: 'result' }, h('h1', null, '화면에 문제가 생겼어요'), h('p', { class: 'score' }, '하던 운동은 저장되어 있어요. 처음 화면에서 다시 시작해 주세요.'),
+    h('button', { class: 'btn btn-main', type: 'button', onclick: function () { go('home'); } }, '처음 화면으로')));
+}
+window.addEventListener('unhandledrejection', function (e) { if (e.reason instanceof Abort) { e.preventDefault(); return; } if (window.console) console.error(e.reason); failScreen(); });
+window.addEventListener('hashchange', route);
+function start() { load(); applyFont(); route(); }
+if (TEST) window.__app = { installCard: installCard, faceSVG: faceSVG, FEATS: FEATS, genPeople: genPeople, runGame: runGame, runSession: runSession, freePlay: freePlay, GAMES: GAMES, state: function () { return S; }, set: function (f) { f(S); save(); }, go: go, levelOf: levelOf };
+try { if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(function () { return { v: 1 }; }); } catch (e) {}
+if (window.claude && window.claude.hot && window.claude.hot.ready) window.claude.hot.ready(start); else start();
+
+</script>
+</body>
+</html>

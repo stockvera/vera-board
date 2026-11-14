@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "기억 조각보",
+  "short_name": "기억 조각보",
+  "description": "하루 15분, 조각을 이어 가는 두뇌 운동",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDEFE6",
+  "theme_color": "#EDEFE6",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

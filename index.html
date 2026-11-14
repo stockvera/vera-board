@@ -1,1373 +1,713 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>베라 시장 국면 보드</title>
-<meta name="description" content="코스피 20년 일봉으로 검증한 바닥 신호·위험 국면과 지금 주식 비중, 지표별 적중률">
+<title>베라 시장 국면 공개 보드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --font-anthropic-sans: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-anthropic-serif: "Noto Serif KR", Georgia, serif;
-  --color-bg: #faf9f6; --color-panel: #ffffff; --color-fg: #1f1e1c; --color-fg-muted: #6b6862; --color-border-line: #e5e2dc;
-  --color-ok: #1f7a4d; --color-warn: #a86b00; --color-bad: #c0392b;
-  --cds-font-size-caption: 13px; --cds-font-size-body: 16px; --cds-font-size-heading: 18px; --cds-font-size-title: 28px;
-  --cds-font-weight-medium: 600;
-  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 14px; --cds-gap-lg: 20px; --cds-gap-xl: 32px;
-  --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 18px; --cds-pad-xl: 28px;
-  --cds-radius: 10px;
-  --cds-chart-grid: #ece9e3; --cds-chart-axis: #b9b4ab; --cds-chart-reference: #8d877d; --cds-chart-muted: #c9c4bb;
-  --cds-surface-popover: #ffffff; --cds-border: #ddd8cf; --cds-shadow-popover: 0 6px 20px rgba(0,0,0,.12); --cds-text-secondary: #6b6862;
-  --cds-dur-slow: .3s;
-  --s0: #2f6fb3; --s1: #d9822b; --s2: #2a9d6a; --s3: #b5487a; --s4: #7a5cc4; --s5: #8a7b5c; --s6: #3fa3b8; --s7: #b0a12f;
+  /* 판정 카드 하나가 화면을 이끌고, 근거가 아래로 이어지는 한 기둥. 단계 색은 방어 빨강 · 경계 호박 · 평소 초록 · 공격 파랑 */
+  --bg: #f2f2ee;
+  --card: #fcfcfb;
+  --ink: #141413;
+  --ink2: #4f4e4a;
+  --mute: #807e78;
+  --line: #e2e1da;
+  --axis: #c6c5bc;
+  --accent: #2a78d6;
+  --att: #2a78d6;
+  --nor: #0ca30c;
+  --cau: #fab219;
+  --def: #d03b3b;
+  --att-w: rgba(42, 120, 214, .14);
+  --nor-w: rgba(12, 163, 12, .10);
+  --cau-w: rgba(250, 178, 25, .22);
+  --def-w: rgba(208, 59, 59, .14);
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #9a9891;
+  --on-cau: #141413;
+  --font: "IBM Plex Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #191816; --color-panel: #22211e; --color-fg: #ece9e3; --color-fg-muted: #a39e95; --color-border-line: #36342f;
-    --color-ok: #4cc38a; --color-warn: #e0a43a; --color-bad: #ef6b5b;
-    --cds-chart-grid: #302e2a; --cds-chart-axis: #57534c; --cds-chart-reference: #8a857c; --cds-chart-muted: #5c5851;
-    --cds-surface-popover: #2b2a26; --cds-border: #46433d; --cds-shadow-popover: 0 6px 20px rgba(0,0,0,.5); --cds-text-secondary: #a39e95;
-    --s0: #6aa5e8; --s1: #f0a35a; --s2: #4cc38a; --s3: #e07aa9; --s4: #a48ef0; --s5: #c2b08a; --s6: #6fcfe0; --s7: #d8c955;
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e0d; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --mute: #908e87; --line: #2d2d2a; --axis: #4a4943;
+    --accent: #3987e5; --att: #3987e5; --nor: #0ca30c; --cau: #fab219; --def: #e05454;
+    --att-w: rgba(57, 135, 229, .20); --nor-w: rgba(12, 163, 12, .16); --cau-w: rgba(250, 178, 25, .18); --def-w: rgba(224, 84, 84, .20);
+    --s1: #3987e5; --s2: #d95926; --s3: #8d8b84;
+    color-scheme: dark;
   }
 }
-html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
-#dash-root { padding: 20px 16px 48px; }
-@media (min-width: 900px) { #dash-root { padding: 32px 32px 64px; } }
-.dash-skeleton { color: transparent !important; background: var(--cds-chart-grid); border-radius: 6px; }
-.vt-foot { max-width: 1200px; margin: 40px auto 0; color: var(--color-fg-muted); font: 13px/1.6 var(--font-anthropic-sans); }
+:root[data-theme="dark"] {
+  --bg: #0e0e0d; --card: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --mute: #908e87; --line: #2d2d2a; --axis: #4a4943;
+  --accent: #3987e5; --att: #3987e5; --nor: #0ca30c; --cau: #fab219; --def: #e05454;
+  --att-w: rgba(57, 135, 229, .20); --nor-w: rgba(12, 163, 12, .16); --cau-w: rgba(250, 178, 25, .18); --def-w: rgba(224, 84, 84, .20);
+  --s1: #3987e5; --s2: #d95926; --s3: #8d8b84;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.7 var(--font); word-break: keep-all; overflow-wrap: anywhere; }
+.wrap { max-width: 800px; margin: 0 auto; padding: 20px 16px 56px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
+h3 { font-size: 16px; font-weight: 600; }
+p { margin: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.mute { color: var(--mute); }
+.ink2 { color: var(--ink2); }
+header.top { display: grid; gap: 6px; margin-bottom: 14px; }
+header.top .sub { color: var(--ink2); font-size: 14px; line-height: 1.6; }
+.basis { font-size: 13px; color: var(--mute); }
+.basis b { color: var(--ink2); font-weight: 600; }
+nav.tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; padding: 8px 0; background: var(--bg); border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+nav.tabs button { font: 600 15px/1 var(--font); color: var(--ink2); background: transparent; border: 1px solid transparent; border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); background: var(--card); border-color: var(--line); }
+nav.tabs button:focus-visible, button:focus-visible, .chip-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.view { display: grid; gap: 16px; }
+.view[hidden] { display: none; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.card > h2 + .lede { margin-top: -4px; }
+.lede { color: var(--ink2); font-size: 15px; line-height: 1.75; }
+.prose { font-size: 17px; line-height: 1.9; color: var(--ink); display: grid; gap: 12px; }
+.prose p { max-width: 62ch; }
+.note { font-size: 13px; color: var(--mute); line-height: 1.65; }
+
+/* 판정 카드 */
+.hero { border-width: 1px; position: relative; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--lvc, var(--mute)); }
+.hero .k { font-size: 14px; color: var(--ink2); font-weight: 500; }
+.hero .big { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.hero .pct { font-size: 64px; line-height: 1; font-weight: 700; letter-spacing: -.02em; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; padding: 5px 12px 5px 10px; border-radius: 999px; background: var(--lvw); color: var(--ink); border: 1px solid var(--lvc); }
+.chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--lvc); display: inline-block; }
+.hero .cash { font-size: 17px; font-weight: 600; }
+.ladder { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.ladder div { border-radius: 8px; padding: 8px 6px; text-align: center; font-size: 13px; line-height: 1.35; color: var(--mute); background: transparent; border: 1px solid var(--line); }
+.ladder div b { display: block; font-size: 16px; color: var(--ink2); font-weight: 600; }
+.ladder div.on { background: var(--lvc); border-color: var(--lvc); color: #fff; }
+.ladder div.on b { color: #fff; }
+.ladder div.on.cau, .ladder div.on.cau b { color: var(--on-cau); }
+.ladder div.old { box-shadow: inset 0 -3px 0 var(--mute); }
+.why { display: grid; gap: 6px; font-size: 16px; line-height: 1.7; }
+.why div { padding-left: 14px; position: relative; }
+.why div::before { content: ""; position: absolute; left: 2px; top: .75em; width: 5px; height: 5px; border-radius: 50%; background: var(--ink2); }
+.hero .meta { font-size: 14px; color: var(--ink2); line-height: 1.7; }
+
+/* 숫자 타일 */
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.tile .l { font-size: 13px; color: var(--ink2); }
+.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+.tile .s { font-size: 13px; color: var(--mute); }
+
+/* 조건 */
+.need { display: grid; gap: 10px; }
+.need .row { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
+.need .to { font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: var(--lvw); border: 1px solid var(--lvc); white-space: nowrap; margin-top: 2px; }
+.need .t { font-size: 16px; line-height: 1.7; }
+.dots { display: inline-flex; gap: 4px; vertical-align: middle; margin-left: 6px; }
+.dots i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--ink2); display: inline-block; }
+.dots i.f { background: var(--ink2); }
+.trig { display: grid; gap: 14px; }
+.trig .tr { display: grid; gap: 4px; }
+.trig .h { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.trig .h .n { font-weight: 600; font-size: 15px; }
+.trig .h .val { font-size: 15px; }
+.trig .sub { font-size: 14px; color: var(--ink2); line-height: 1.6; }
+.mtr { position: relative; height: 22px; margin: 0 7px; }
+.mtr .trk { position: absolute; left: -7px; right: -7px; top: 9px; height: 4px; border-radius: 2px; background: var(--line); }
+.mtr .zone { position: absolute; top: 9px; height: 4px; }
+.mtr .tick { position: absolute; top: 4px; width: 2px; height: 14px; margin-left: -1px; border-radius: 1px; background: var(--ink2); }
+.mtr .dot { position: absolute; top: 3px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--c, var(--ink)); box-shadow: 0 0 0 2.5px var(--card); }
+
+/* 차트 */
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { fill: var(--mute); font: 11px var(--font); }
+.tip { position: absolute; pointer-events: none; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; line-height: 1.55; box-shadow: 0 6px 20px rgba(0,0,0,.12); min-width: 150px; z-index: 3; display: none; }
+.tip b { font-weight: 600; }
+.legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.legend i.sq { width: 12px; height: 12px; border-radius: 3px; }
+.changes { display: grid; gap: 4px; font-size: 14px; color: var(--ink2); }
+.changes div { line-height: 1.8; }
+.changes .num { margin-right: 8px; color: var(--ink); }
+.mini { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--ink); }
+.mini i { width: 9px; height: 9px; border-radius: 3px; background: var(--c); display: inline-block; }
+
+/* 표 */
+.tbl { overflow-x: auto; margin: 0 -4px; padding: 0 4px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: middle; white-space: nowrap; }
+th { font-weight: 600; color: var(--ink2); font-size: 13px; }
+th:first-child, td:first-child { text-align: left; white-space: normal; min-width: 8.5em; }
+td { font-variant-numeric: tabular-nums; }
+tr.base td { color: var(--mute); }
+tr.hl td { background: var(--lvw, var(--att-w)); }
+tr.hl td:first-child { box-shadow: inset 3px 0 0 var(--lvc, var(--accent)); }
+.bar { display: inline-block; vertical-align: middle; height: 6px; border-radius: 3px; background: var(--c, var(--ink2)); margin-left: 6px; }
+.pos { color: var(--ink); }
+.st { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; font-size: 13px; }
+.st i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: var(--c); }
+
+/* 바닥 지표 */
+.ind { display: grid; gap: 12px; }
+.ind .r { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; align-items: center; }
+.ind .r .n { font-size: 15px; font-weight: 500; }
+.ind .r .v { font-size: 14px; color: var(--ink2); text-align: right; }
+.ind .r .m { grid-column: 1 / -1; }
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip-btn { font: 600 13px/1 var(--font); padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink2); cursor: pointer; }
+.chip-btn[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+pre.tele { white-space: pre-wrap; word-break: break-word; font: 14px/1.65 var(--font); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; margin: 0; max-height: 520px; overflow: auto; }
+.btn { font: 600 14px/1 var(--font); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; justify-self: start; }
+.warnbox { border: 1px solid var(--cau); background: var(--cau-w); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+footer { font-size: 13px; color: var(--mute); line-height: 1.7; margin-top: 8px; display: grid; gap: 6px; }
+.lv-att { --lvc: var(--att); --lvw: var(--att-w); }
+.lv-nor { --lvc: var(--nor); --lvw: var(--nor-w); }
+.lv-cau { --lvc: var(--cau); --lvw: var(--cau-w); }
+.lv-def { --lvc: var(--def); --lvw: var(--def-w); }
+.two { display: grid; gap: 16px; }
+@media (min-width: 760px) { .two { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 559px) { .opt { display: none; } }
+.ind.grid2 { grid-template-columns: 1fr; }
+@media (min-width: 640px) { .ind.grid2 { grid-template-columns: 1fr 1fr; gap: 12px 28px; } }
+.ladder div em { display: block; font-style: normal; font-size: 11px; color: var(--ink2); margin-top: 2px; }
+td .sub2 { display: block; font-size: 12px; color: var(--mute); }
+@media (max-width: 420px) { .hero .pct { font-size: 56px; } .card { padding: 16px 14px 18px; } th, td { padding: 9px 5px; } th:first-child, td:first-child { min-width: 7.5em; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
-<div id="dash-root">
+<div class="wrap">
+  <header class="top">
+    <h1>베라 시장 국면 보드</h1>
+    <p class="sub">코스피를 2007년부터 하루 단위로 검증한 비중 규칙. 평일 장 마감 뒤 갱신됨.</p>
+    <p class="basis" id="basis"></p>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="보드 보기">
+    <button role="tab" id="tab-today" aria-controls="v-today" aria-selected="true" data-view="today">오늘</button>
+    <button role="tab" id="tab-rule" aria-controls="v-rule" aria-selected="false" data-view="rule">규칙과 성적</button>
+    <button role="tab" id="tab-data" aria-controls="v-data" aria-selected="false" data-view="data">지표 자료</button>
+  </nav>
+
+  <main>
+    <section class="view" id="v-today" role="tabpanel" aria-labelledby="tab-today">
+      <div id="fallback"></div>
+      <article class="card hero" id="hero" aria-live="polite"></article>
+      <div class="tiles" id="tiles"></div>
+      <article class="card">
+        <h2>비중이 바뀌는 조건</h2>
+        <div class="need" id="need"></div>
+        <div class="trig" id="trig"></div>
+      </article>
+      <article class="card">
+        <h2>최근 흐름</h2>
+        <p class="lede" id="tl-lede"></p>
+        <div class="legend" id="tl-legend"></div>
+        <div class="chart" id="tl-chart" role="img" aria-label="최근 1년 코스피와 50일선·200일선, 날마다 적용된 비중 단계"></div>
+        <div class="changes" id="tl-changes"></div>
+      </article>
+      <article class="card">
+        <h2>지금 같은 장의 과거</h2>
+        <p class="lede" id="an-lede"></p>
+        <div class="tbl"><table id="an-table"></table></div>
+        <p class="note">20일 뒤·60일 뒤는 그날 종가 대비 코스피 수익률. 40일 안 10% 하락·반등은 다음 40거래일 사이 종가로 한 번이라도 닿은 비율. 2007년 1월부터 집계.</p>
+      </article>
+      <article class="card">
+        <h2>바닥 지표</h2>
+        <p class="lede" id="bt-lede"></p>
+        <div class="ind" id="bt-list"></div>
+        <h3 id="bc-title">켜진 개수별 과거 성적</h3>
+        <div class="tbl"><table id="bc-table"></table></div>
+        <p class="note">바닥 지표는 20년 동안 바닥을 잘 맞힌 7개. 각 지표가 지난 1년 중 가장 공포스러운 쪽 10% 안에 들면 켜짐. 숫자는 1년 중 위치(0은 가장 낮음, 100은 가장 높음).</p>
+      </article>
+      <article class="card">
+        <h2>꼭지 지표와 주변 지표</h2>
+        <p class="lede">과열 쪽 신호와, 비중 규칙에는 쓰지 않지만 함께 보는 지표의 1년 중 위치.</p>
+        <div class="ind grid2" id="side-list"></div>
+      </article>
+    </section>
+
+    <section class="view" id="v-rule" role="tabpanel" aria-labelledby="tab-rule" hidden>
+      <article class="card">
+        <h2>새 규칙</h2>
+        <div class="prose" id="rule-text"></div>
+      </article>
+      <article class="card">
+        <h2>바꾼 이유</h2>
+        <div class="prose" id="why-text"></div>
+      </article>
+      <article class="card">
+        <h2>성적</h2>
+        <p class="lede">거래비용 0.05%, 신용 이자 연 6%(100% 넘는 부분), 현금 이자 연 2.5%를 넣은 결과. 2007~2021년으로 기준값을 고르고 2022~2026년은 고른 뒤에 채점함.</p>
+        <div class="tbl"><table id="sim-table"></table></div>
+      </article>
+      <article class="card">
+        <h2>자산 곡선</h2>
+        <div class="legend" id="eq-legend"></div>
+        <div class="chart" id="eq-chart" role="img" aria-label="2007년부터 새 규칙, 이전 규칙, 그냥 보유의 자산 곡선, 로그 눈금"></div>
+        <p class="note">1에서 시작한 자산, 로그 눈금.</p>
+      </article>
+      <article class="card">
+        <h2>큰 하락 때</h2>
+        <div class="tbl"><table id="ep-table"></table></div>
+        <p class="note">구간 수익률은 시작일 종가부터 끝날 종가까지. 평균 비중은 그 구간에 들고 있던 주식 비중의 평균.</p>
+      </article>
+      <article class="card">
+        <h2>5년씩 나눠 본 성적</h2>
+        <div class="tbl"><table id="per-table"></table></div>
+      </article>
+      <article class="card">
+        <h2>약점</h2>
+        <div class="prose" id="weak-text"></div>
+      </article>
+      <article class="card">
+        <h2>20년 국면 지도</h2>
+        <div class="legend" id="map-legend"></div>
+        <div class="chart" id="map-chart" role="img" aria-label="2007년부터 코스피와 새 규칙 비중 단계"></div>
+        <p class="note">코스피 로그 눈금. 바탕색은 그날 새 규칙으로 들고 있던 비중.</p>
+      </article>
+    </section>
+
+    <section class="view" id="v-data" role="tabpanel" aria-labelledby="tab-data" hidden>
+      <article class="card">
+        <h2>텔레그램 글</h2>
+        <p class="lede">평일 장 마감 뒤 개인 대화방으로 가는 글 그대로.</p>
+        <pre class="tele" id="tele"></pre>
+        <button class="btn" id="copy-tele" type="button">글 복사</button>
+      </article>
+      <article class="card">
+        <h2>바닥 지표 성적표</h2>
+        <p class="lede">보드 지표를 하나씩 바닥 신호로 써 봤을 때 20거래일 뒤 코스피가 올라 있던 비율. 아무 날이나 샀을 때는 <span id="hb-base"></span>.</p>
+        <div class="pill-row" id="hb-filter"></div>
+        <div class="tbl"><table id="hb-table"></table></div>
+      </article>
+      <article class="card">
+        <h2>꼭지 지표 성적표</h2>
+        <p class="lede">과열 쪽 10%에 들었을 때 20거래일 뒤 코스피가 내려 있던 비율. 아무 날이나 기준은 <span id="ht-base"></span>.</p>
+        <div class="pill-row" id="ht-filter"></div>
+        <div class="tbl"><table id="ht-table"></table></div>
+      </article>
+      <article class="card">
+        <h2>바닥 신호 장부</h2>
+        <p class="lede">200일선 위에서 업종지수 20일선 비율이 1년 중 하위 10%에 든 날(바닥 신호) 전부. 새 규칙은 이 가운데 변동성 25% 미만인 날만 공격 구간으로 씀.</p>
+        <div class="tbl"><table id="led-table"></table></div>
+      </article>
+      <article class="card">
+        <h2>데이터 점검</h2>
+        <div class="tbl"><table id="audit-table"></table></div>
+        <p class="note" id="audit-note"></p>
+      </article>
+    </section>
+  </main>
+
+  <footer id="foot"></footer>
+</div>
 
 <script src="data.js"></script>
 <script>
-
 (function () {
-  const DATA = window.__DATA__, draws = {}, ondata = [], calcs = {};
-  function visible(el) { return !el.closest('[hidden]'); }
-  function run(name) {
-    document.querySelectorAll('[data-draw="' + name + '"]').forEach(function (el) {
-      if (!visible(el)) return;
-      try { draws[name](el); } catch (e) { console.error(name, e); }
-    });
-  }
-  function runAll() { ondata.forEach(function (f) { try { f(); } catch (e) { console.error(e); } }); Object.keys(draws).forEach(run); }
-  window.dash = {
-    colors: ['var(--s0)', 'var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)', 'var(--s7)'],
-    data: function (id) {
-      if (calcs[id]) return calcs[id]();
-      const d = DATA[id]; return d ? { status: 'ok', data: d, columns: d.length ? Object.keys(d[0]) : [] } : { status: 'missing', data: [] };
-    },
-    draw: function (name, fn) { if (fn) { draws[name] = fn; return; } run(name); },
-    onData: function (fn) { ondata.push(fn); },
-    calc: function (id, o) { calcs[id] = function () { return { status: 'ok', data: o.fn.apply(null, o.inputs.map(function (i) { return DATA[i] || []; })) }; }; },
-    loader: function () {}, setLink: function (n) { try { history.replaceState(null, '', '#' + n); } catch (e) {} },
-    params: function () { return {}; }, setParams: function () {}, resetParams: function () {}, refresh: function () {},
-  };
-  let t = null; const later = function () { clearTimeout(t); t = setTimeout(runAll, 30); };
-  window.addEventListener('resize', later);
-  document.addEventListener('click', function (e) { if (e.target.closest('.vt-tab')) later(); }, true);
-  document.addEventListener('toggle', later, true);
-  window.addEventListener('DOMContentLoaded', runAll);
-})();
-</script>
-<style>
-.vt { font-family: var(--font-anthropic-sans); color: var(--color-fg); font-size: var(--cds-font-size-body); line-height: 1.6; max-width: 1200px; margin-inline: auto; }
-.vt b { font-weight: 600; }
-.vt [hidden] { display: none !important; }
-.vt-head h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0 0 var(--cds-gap-xs); line-height: 1.25; }
-.vt-sub { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin: 0; }
-.vt-take { margin: var(--cds-gap-sm) 0 0; font-size: var(--cds-font-size-heading); line-height: 1.5; }
-.vt-tabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); margin: var(--cds-gap-lg) 0 var(--cds-gap-md); border-bottom: 1px solid var(--color-border-line); }
-.vt-tab { font: inherit; font-size: var(--cds-font-size-body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; margin-bottom: -1px; }
-.vt-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: 600; }
-.vt-page > * + * { margin-top: var(--cds-gap-lg); }
-.vt-h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-xl) 0 var(--cds-gap-xs); }
-.vt-page > .vt-h2:first-child { margin-top: 0; }
-.vt-lead { margin: 0 0 var(--cds-gap-md); color: var(--color-fg-muted); max-width: 70ch; }
-.vt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--cds-gap-md); }
-.vt-grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); }
-.vt-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); container-type: inline-size; min-width: 0; }
-.vt-card h3 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0; line-height: 1.4; }
-.vt-note { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); }
-.vt-big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: calc(var(--cds-font-size-title) * 1.6); line-height: 1.1; font-variant-numeric: tabular-nums; margin: var(--cds-gap-sm) 0 var(--cds-gap-xs); }
-.vt-mid { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.2; font-variant-numeric: tabular-nums; margin: var(--cds-gap-sm) 0 var(--cds-gap-xs); }
-.vt-hero { display: grid; grid-template-columns: minmax(12rem, 16rem) 1fr; gap: var(--cds-gap-lg); align-items: start; }
-@container (max-width: 560px) { .vt-hero { grid-template-columns: 1fr; } }
-.vt-chip { display: inline-block; font-size: var(--cds-font-size-caption); padding: 2px 10px; border-radius: 999px; border: 1px solid var(--color-border-line); }
-.vt-chip.risk { color: var(--color-bad); border-color: currentColor; }
-.vt-chip.win { color: var(--color-ok); border-color: currentColor; }
-.vt-hero p { margin: 0 0 var(--cds-gap-sm); }
-.vt-kv { display: flex; justify-content: space-between; gap: var(--cds-gap-sm); padding: 6px 0; border-top: 1px solid var(--color-border-line); font-variant-numeric: tabular-nums; }
-.vt-kv:first-of-type { border-top: 0; }
-.vt-kv span { color: var(--color-fg-muted); }
-.vt-kv b { text-align: right; }
-.vt-vs { color: var(--color-fg-muted); font-weight: 400; }
-.vt-meter { position: relative; height: 34px; margin: var(--cds-gap-sm) 0 4px; }
-.vt-meter .tr { position: absolute; left: 0; right: 0; top: 10px; height: 8px; border-radius: 4px; background: var(--cds-chart-grid); }
-.vt-meter .zone { position: absolute; top: 10px; height: 8px; border-radius: 4px 0 0 4px; background: var(--color-ok); opacity: .45; }
-.vt-meter .mk { position: absolute; top: 4px; width: 3px; height: 20px; border-radius: 2px; background: var(--color-fg); transform: translateX(-1px); }
-.vt-meter .lb { position: absolute; top: 22px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); transform: translateX(-50%); white-space: nowrap; }
-.vt-rules { margin: var(--cds-gap-sm) 0 0; padding: 0; list-style: none; }
-.vt-rules li { padding: var(--cds-pad-sm) 0; border-top: 1px solid var(--color-border-line); }
-.vt-rules li:first-child { border-top: 0; }
-.vt-rules .t { font-weight: 600; display: block; }
-.vt-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: var(--cds-gap-xs) 0 var(--cds-gap-sm); }
-.vt-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.vt-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
-.vt-legend i.dot { width: 9px; height: 9px; border-radius: 50%; }
-.vt-legend i.box { width: 12px; height: 12px; border-radius: 2px; }
-.vt-legend i.dash { background: none !important; border-top: 2px dashed var(--cds-chart-reference); height: 0; }
-.vt-chart { position: relative; width: 100%; }
-.vt-svg { display: block; overflow: visible; }
-.vt-svg text { font-family: var(--font-anthropic-sans); font-size: var(--cds-font-size-caption); fill: var(--color-fg-muted); }
-.vt-svg text.em { fill: var(--color-fg); font-weight: 600; }
-.vt-tip { position: absolute; z-index: 5; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); pointer-events: none; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.vt-tip-h { color: var(--cds-text-secondary); margin-bottom: 2px; }
-.vt-tip-l { display: flex; align-items: center; gap: 6px; }
-.vt-tip-l i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
-.vt-tip-l b { margin-left: auto; padding-left: 12px; font-weight: 600; }
-.vt-range { display: inline-flex; gap: 4px; margin-bottom: var(--cds-gap-sm); flex-wrap: wrap; }
-.vt-range button, .vt-filter button { font: inherit; font-size: var(--cds-font-size-caption); background: none; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 3px 12px; color: var(--color-fg-muted); cursor: pointer; }
-.vt-range button[aria-pressed="true"], .vt-filter button[aria-pressed="true"] { color: var(--color-fg); border-color: var(--color-fg); }
-.vt-filter { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: var(--cds-gap-sm); }
-.vt-scroll { overflow: auto; max-height: 34rem; }
-.vt-table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
-.vt-table th { text-align: left; font-weight: 600; color: var(--color-fg-muted); padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); position: sticky; top: 0; background: var(--color-panel); white-space: nowrap; cursor: pointer; user-select: none; }
-.vt-table th[aria-sort="ascending"]::after { content: " ▲"; font-size: .7em; }
-.vt-table th[aria-sort="descending"]::after { content: " ▼"; font-size: .7em; }
-.vt-table td { padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); vertical-align: middle; }
-.vt-table .num { text-align: right; }
-.vt-static th { cursor: default; position: static; white-space: normal; }
-.vt-static td { vertical-align: top; }
-.vt-table td.good { background: color-mix(in srgb, var(--color-ok) 16%, transparent); }
-.vt-table td.bad { background: color-mix(in srgb, var(--color-bad) 12%, transparent); }
-.vt-table td.strong { font-weight: 700; }
-.vt-table tr.vt-hl td { font-weight: 600; }
-.vt-table tr.vt-hl td:first-child { box-shadow: inset 3px 0 0 var(--color-ok); }
-.vt-bar { display: flex; align-items: center; gap: 8px; min-width: 120px; }
-.vt-bar .b { position: relative; flex: 1; height: 8px; background: var(--cds-chart-grid); border-radius: 4px; overflow: hidden; }
-.vt-bar .b i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--cds-chart-muted); }
-.vt-bar .b i.lo { background: var(--color-ok); }
-.vt-bar .b i.hi { background: var(--color-bad); }
-.vt-bar .v { width: 2.2em; text-align: right; }
-@container (max-width: 640px) { .opt { display: none; } }
-.vt-fail { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
-.vt-fail i { width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
-.vt-text { max-width: 75ch; }
-.vt-text p { margin: 0 0 var(--cds-gap-sm); }
-.vt-text ul { margin: 0 0 var(--cds-gap-sm); padding-left: 1.2em; }
-.vt-text li { margin-bottom: 6px; }
-[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
-[data-dash-source-state=empty] { color: transparent; }
-</style>
+  "use strict";
+  var D = window.__DATA__ || {};
+  var N = (D.now || [{}])[0] || {};
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  var MINUS = "−";
+  function sgn(s) { return s.replace(/^-/, MINUS); }
+  function pct(v, d, sign) { if (v == null || isNaN(v)) return "-"; d = d == null ? 1 : d; var s = (v * 100).toFixed(d); if (sign !== false && v > 0 && Number(s) !== 0) s = "+" + s; return sgn(s) + "%"; }
+  function p0(v) { return v == null || isNaN(v) ? "-" : Math.round(v * 100) + "%"; }
+  function num(v, d) { if (v == null || isNaN(v)) return "-"; return sgn(Number(v).toLocaleString("ko-KR", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 })); }
+  var WD = "일월화수목금토";
+  function dobj(s) { var p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function kday(s) { if (!s) return "-"; var d = dobj(s); return (d.getMonth() + 1) + "월 " + d.getDate() + "일(" + WD[d.getDay()] + ")"; }
+  function md(s) { if (!s) return "-"; var d = dobj(s); return (d.getMonth() + 1) + "/" + d.getDate(); }
+  function ymd(s) { if (!s) return "-"; return String(s).slice(2).replace(/-/g, "."); }
+  var LV = { 130: ["att", "공격"], 100: ["nor", "평소"], 70: ["cau", "경계"], 50: ["def", "방어"] };
+  function lvKey(p) { var k = LV[p]; return k ? k[0] : "nor"; }
+  function lvName(p) { var k = LV[p]; return k ? k[1] : ""; }
+  function lvOf(e) { return Math.round(e * 100); }
+  function cssv(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function lvColor(p) { return cssv("--" + lvKey(p)); }
+  function lvWash(p) { return cssv("--" + lvKey(p) + "-w"); }
+  var hasNew = N.expo2 != null;
 
-<div class="vt">
-  <header class="vt-head" id="top">
-    <h1>베라 시장 국면 보드</h1>
-    <p class="vt-sub"><span data-draw="v" data-source="info" data-where="key=asof" data-field="value" data-fmt="date">—</span> 종가 기준 · 원자료 <span data-draw="v" data-source="info" data-where="key=collected" data-field="value">—</span> 수집 · 코스피 <span data-draw="v" data-source="info" data-where="key=start" data-field="value" data-fmt="date">—</span>부터 일봉 <span data-draw="v" data-source="info" data-where="key=n_days" data-field="value" data-fmt="n0">—</span>일로 검증</p>
-    <p class="vt-take" data-when="state=window" hidden>지금은 바닥 신호 뒤 구간이라 규칙상 다음 거래일 비중은 <b data-draw="v" data-source="now" data-field="expo" data-fmt="pctint">—</b>입니다. 다만 신호 첫날 이후 코스피는 <b data-draw="v" data-source="now" data-field="since_bot" data-fmt="pct1s">—</b>이고 200일선 <b data-draw="v" data-source="now" data-field="kospi_up">—</b>에 있습니다.</p>
-    <p class="vt-take" data-when="state=risk" hidden>위험 국면입니다. 규칙상 다음 거래일 비중은 <b data-draw="v" data-source="now" data-field="expo" data-fmt="pctint">—</b>로 줄입니다.</p>
-    <p class="vt-take" data-when="state=normal&amp;window_ended=아니오" hidden>바닥 신호와 위험 국면 둘 다 꺼져 있어 규칙상 비중은 <b data-draw="v" data-source="now" data-field="expo" data-fmt="pctint">—</b>입니다.</p>
-    <p class="vt-take" data-when="state=normal&amp;window_ended=예" hidden><b data-draw="v" data-source="now" data-field="last_bot" data-fmt="date">—</b> 바닥 신호는 <b data-draw="v" data-source="now" data-field="ended_date" data-fmt="date">—</b> 코스피가 200일선 아래로 마감하면서 끝났습니다. 규칙상 다음 거래일 비중은 평소 비중인 <b data-draw="v" data-source="now" data-field="expo" data-fmt="pctint">—</b>입니다.</p>
-  </header>
+  /* ---------------- 머리 ---------------- */
+  var info = {}; (D.info || []).forEach(function (r) { info[r.key] = r.value; });
+  $("basis").innerHTML = "<b>" + kday(N.date) + " 종가 기준</b> · " + esc(info.collected || "") + " 계산 · 다음 거래일에 적용할 비중";
 
-  <nav class="vt-tabs" role="tablist" aria-label="보드 화면">
-    <button class="vt-tab" role="tab" data-tab="today" aria-selected="true">지금</button>
-    <button class="vt-tab" role="tab" data-tab="indicators" aria-selected="false">지표 성적표</button>
-    <button class="vt-tab" role="tab" data-tab="signals" aria-selected="false">베라 신호 검증</button>
-    <button class="vt-tab" role="tab" data-tab="crisis" aria-selected="false">위기와 비중 조절</button>
-    <button class="vt-tab" role="tab" data-tab="verify" aria-selected="false">검증 결과</button>
-    <button class="vt-tab" role="tab" data-tab="data" aria-selected="false">데이터와 방법</button>
-  </nav>
+  /* ---------------- 판정 ---------------- */
+  var expo = hasNew ? N.expo2 : N.expo;
+  if (!hasNew) $("fallback").innerHTML = '<div class="warnbox">새 규칙 계산 결과가 이번 회차에 없어 이전 규칙 비중을 보여 줌. 다음 갱신 때 다시 확인됨.</div>';
+  var hero = $("hero"); hero.className = "card hero lv-" + lvKey(expo);
+  var whyLines = (N.why2 || "").split(" · ").filter(Boolean);
+  var prevTxt = (hasNew && N.lvl2_prev != null && N.lvl2_prev !== expo) ? "전날 " + N.lvl2_prev + "%에서 바뀜 · " : "";
+  hero.innerHTML =
+    '<div class="k">다음 거래일 주식 비중</div>' +
+    '<div class="big"><span class="pct">' + expo + '%</span><span class="chip"><i></i>' + lvName(expo) + '</span></div>' +
+    (N.lvl2_cash ? '<div class="cash">' + esc(N.lvl2_cash) + '</div>' : "") +
+    '<div class="ladder" aria-label="비중 단계">' + [130, 100, 70, 50].map(function (p) {
+      var on = p === expo ? " on " + lvKey(p) : "";
+      var old = (hasNew && N.expo === p && p !== expo) ? " old" : "";
+      return '<div class="lv-' + lvKey(p) + on + old + '"><b>' + p + '%</b>' + lvName(p) + (old ? "<em>이전 규칙</em>" : "") + '</div>';
+    }).join("") + '</div>' +
+    (whyLines.length ? '<div class="why">' + whyLines.map(function (t) { return "<div>" + esc(t) + "</div>"; }).join("") + "</div>" : "") +
+    '<div class="meta">' + prevTxt + (hasNew ? kday(N.lvl2_since) + " 종가로 들어와 " + N.lvl2_days + "거래일째" : "") +
+    (hasNew ? " · 이전 규칙(200일선·S&P500만 봄)으로는 " + N.expo + "%" : "") + "</div>";
 
-  <!-- ===================== 지금 ===================== -->
-  <section class="vt-page" id="today">
-    <div class="vt-grid">
-      <div class="vt-card" id="t-weight">
-        <h3>지금 주식 비중</h3>
-        <div class="vt-big" data-draw="v" data-source="now" data-field="expo" data-fmt="pctint" data-fetchpriority="high">—</div>
-        <span class="vt-chip win" data-when="state=window" hidden>바닥 신호 뒤 구간</span>
-        <span class="vt-chip risk" data-when="state=risk" hidden>위험 국면</span>
-        <span class="vt-chip" data-when="state=normal" hidden>평소</span>
-        <p class="vt-note">베라 규칙이 정한 다음 거래일 비중입니다. 평소 <span data-draw="c" data-c="base">—</span>, 바닥 신호 뒤 <span data-draw="c" data-c="hi">—</span>, 위험 국면 <span data-draw="c" data-c="lo">—</span>입니다.</p>
-      </div>
-      <div class="vt-card" id="t-bottom">
-        <h3>바닥 지표</h3>
-        <div class="vt-mid"><span data-draw="v" data-source="hit_summary" data-field="bot_on">—</span> / <span data-draw="v" data-source="hit_summary" data-field="bot_n">—</span>개 켜짐</div>
-        <p class="vt-note" style="margin-top:0">20년 동안 잘 맞던 바닥 지표 가운데 지금 바닥권에 들어온 수</p>
-        <div class="vt-kv"><span>베라 바닥 신호</span><b data-draw="v" data-source="now" data-field="bot_today">—</b></div>
-        <div class="vt-kv"><span>마지막으로 켜진 날</span><b data-draw="v" data-source="now" data-field="last_bot_end" data-fmt="date">—</b></div>
-        <div class="vt-kv"><span>130% 구간 끝난 날</span><b data-draw="v" data-source="now" data-field="ended_date" data-fmt="date">—</b></div>
-        <div class="vt-kv" data-when="kospi_up=아래" hidden><span>20일 뒤 상승 확률</span><b><span data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 아래" data-field="up20" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 아래" data-field="base_up20" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv" data-when="kospi_up=아래" hidden><span>60일 뒤 상승 확률</span><b data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 아래" data-field="up60" data-fmt="pct0">—</b></div>
-        <div class="vt-kv" data-when="kospi_up=아래" hidden><span>40일 안 -5% 더 하락</span><b data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 아래" data-field="dd5" data-fmt="pct0">—</b></div>
-        <div class="vt-kv" data-when="kospi_up=위" hidden><span>20일 뒤 상승 확률</span><b><span data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 위" data-field="up20" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 위" data-field="base_up20" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv" data-when="kospi_up=위" hidden><span>60일 뒤 상승 확률</span><b data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 위" data-field="up60" data-fmt="pct0">—</b></div>
-        <div class="vt-kv" data-when="kospi_up=위" hidden><span>40일 안 -5% 더 하락</span><b data-draw="v" data-source="by_count" data-where="is_now=지금&amp;scope=200일선 위" data-field="dd5" data-fmt="pct0">—</b></div>
-        <p class="vt-note" style="margin-bottom:0">지금처럼 켜진 개수가 같고 코스피가 200일선 같은 쪽에 있던 날들의 과거 결과입니다.</p>
-      </div>
-      <div class="vt-card" id="t-top">
-        <h3>꼭지·위험 지표</h3>
-        <div class="vt-mid"><span data-draw="v" data-source="hit_summary" data-field="top_on">—</span> / <span data-draw="v" data-source="hit_summary" data-field="top_n">—</span>개 켜짐</div>
-        <p class="vt-note" style="margin-top:0">20년 동안 잘 맞던 꼭지 지표 가운데 지금 과열권에 들어온 수</p>
-        <div class="vt-kv"><span>베라 위험 국면</span><b data-draw="v" data-source="now" data-field="risk_today">—</b></div>
-        <div class="vt-kv"><span>코스피 위치</span><b>200일선 <span data-draw="v" data-source="now" data-field="kospi_up">—</span></b></div>
-      </div>
-    </div>
+  /* ---------------- 숫자 타일 ---------------- */
+  var tiles = [
+    ["코스피", num(N.kospi, 2), pct(N.kospi_chg) + " 오늘"],
+    ["50일선 대비", hasNew ? pct(N.gap50) : "-", hasNew ? "50일선 " + num(N.ma50) : ""],
+    ["200일선 대비", pct(N.gap200), "200일선 " + num(N.ma200)],
+    ["20일 변동성", hasNew ? Math.round(N.vol20 * 100) + "%" : "-", hasNew ? "전날 " + Math.round(N.vol20_prev * 100) + "% · 경계 25 · 방어 40" : ""],
+    ["S&P500 125일선 대비", pct(N.sp_gap), (N.sp_gap < 0 ? "아래" : "위") + " · 미국 전날 종가"],
+    ["1년 고점 대비", hasNew ? pct(N.dd252) : "-", hasNew ? num(N.hi252) + " · " + ymd(N.hi252_d) : ""]
+  ];
+  $("tiles").innerHTML = tiles.map(function (t) { return '<div class="tile"><span class="l">' + t[0] + '</span><span class="v num">' + t[1] + '</span><span class="s">' + esc(t[2]) + "</span></div>"; }).join("");
 
-    <div class="vt-card vt-text" id="t-read">
-      <h3>지금 상황 풀어 보기</h3>
-      <p data-when="state=window" hidden style="margin-top:var(--cds-gap-sm)">업종 바닥 게이지가 <b data-draw="v" data-source="now" data-field="last_bot" data-fmt="date">—</b>에 바닥 신호를 켰습니다. 규칙상 신호 다음 날부터 <span data-draw="c" data-c="hold">—</span>거래일 동안은 비중을 <span data-draw="c" data-c="hi">—</span>로 두고, 남은 기간은 <b data-draw="v" data-source="now" data-field="days_left" data-fmt="days">—</b>입니다.</p>
-      <p data-when="state=window" hidden>다만 신호 첫날 <b data-draw="v" data-source="now" data-field="last_bot_kospi" data-fmt="n2">—</b>이던 코스피는 지금까지 <b data-draw="v" data-source="now" data-field="since_bot" data-fmt="pct1s">—</b>이고, 200일선 <b data-draw="v" data-source="now" data-field="kospi_up">—</b>로 내려왔습니다. 코스피가 200일선 아래로 마감하면 이 구간은 그날로 닫힙니다.</p>
-      <p data-when="state=risk" hidden style="margin-top:var(--cds-gap-sm)">코스피가 200일선 아래이고 S&amp;P500도 125일선 아래라 위험 국면입니다. 이 구간은 바닥을 맞히려는 신호가 아니고, 큰 하락을 덜 맞으려고 비중을 <span data-draw="c" data-c="lo">—</span>로 줄이는 구간입니다.</p>
-      <p data-when="state=normal&amp;window_ended=아니오" hidden style="margin-top:var(--cds-gap-sm)">바닥 신호도 위험 국면도 꺼져 있어 평소 비중을 유지합니다.</p>
-      <p data-when="window_ended=예" hidden style="margin-top:var(--cds-gap-sm)"><b data-draw="v" data-source="now" data-field="last_bot" data-fmt="date">—</b>에 켜진 바닥 신호는 <b data-draw="v" data-source="now" data-field="ended_date" data-fmt="date">—</b> 코스피가 <b data-draw="v" data-source="now" data-field="ended_kospi" data-fmt="n2">—</b>로 200일선 아래에서 마감하면서 끝났습니다. 바닥 신호는 오르는 추세 안의 눌림목을 잡는 신호입니다. 추세가 깨지면 신호를 낸 전제도 깨진 것으로 보고 <span data-draw="c" data-c="hi">—</span> 구간을 바로 닫습니다. 신호 첫날 이후 코스피는 <b data-draw="v" data-source="now" data-field="since_bot" data-fmt="pct1s">—</b>입니다.</p>
-      <p data-when="window_ended=예" hidden>이 종료 규칙은 이번 하락을 보고 다시 점검하면서 넣었습니다. 지난 20년 동안 바닥 신호 뒤 <span data-draw="c" data-c="win">—</span>거래일 안에 -10% 넘게 더 빠진 회차는 <b data-draw="v" data-source="now" data-field="done_n" data-fmt="int">—</b>번 중 <b data-draw="v" data-source="now" data-field="fail10_n" data-fmt="int">—</b>번뿐이었는데, 그중 하나가 올해 6월이고 이번이 또 그렇습니다. 200일선을 깨면 닫는 규칙을 20년에 다시 돌려 보니 연수익률은 <b data-draw="v" data-source="sim_summary" data-where="id=all-old" data-field="cagr" data-fmt="pct1s">—</b>에서 <b data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="cagr" data-fmt="pct1s">—</b>로, 최대 낙폭은 <b data-draw="v" data-source="sim_summary" data-where="id=all-old" data-field="mdd" data-fmt="pct1s">—</b>에서 <b data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="mdd" data-fmt="pct1s">—</b>로 조금씩 나아졌습니다. 차이가 크지는 않지만 신호의 전제와 맞는 규칙이라 넣었습니다.</p>
-      <p data-when="kospi_up=아래" hidden>코스피가 200일선 아래에 있는 동안에는 업종 바닥 게이지가 낮아도 새 바닥 신호를 켜지 않습니다. 최근 <span data-draw="c" data-c="f">—</span>거래일 사이 게이지는 <b data-draw="v" data-source="now" data-field="gauge_low20">—</b>까지 내려갔지만, 20년 동안 하락 추세 속에서 게이지가 바닥까지 내려간 뒤의 성적은 하락 추세 아무 날과 별 차이가 없었습니다.</p>
-      <p data-when="verdict=below_deep" hidden>대신 시장이 씻겨 나간 정도는 깊습니다. 지금처럼 코스피가 200일선 아래인데 잘 맞던 바닥 지표가 <span data-draw="c" data-c="like">—</span>개 이상 켜졌던 때는 20년 동안 <b data-draw="v" data-source="now" data-field="like_n" data-fmt="int">—</b>번 있었습니다. <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 올라 있던 비율은 <b data-draw="v" data-source="now" data-field="like_up20" data-fmt="pct0">—</b>, 평균 <b data-draw="v" data-source="now" data-field="like_avg20" data-fmt="pct1s">—</b>였고, <span data-draw="c" data-c="f60">—</span>거래일 뒤에는 <b data-draw="v" data-source="now" data-field="like_up60" data-fmt="pct0">—</b>가 올라 있었습니다. 다만 <b data-draw="v" data-source="now" data-field="like_dn5" data-fmt="pct0">—</b>는 그 뒤 <span data-draw="c" data-c="win">—</span>거래일 안에 <span data-draw="c" data-c="dn5">—</span> 넘게 더 빠졌습니다. 잘 맞던 지표를 20년 전체를 보고 골랐기 때문에 이 숫자는 실제보다 좋게 나왔을 수 있습니다.</p>
-      <p data-when="verdict=below_deep" hidden><b>정리하면</b> 지금은 비중을 줄일 근거도, 신용을 더 쓸 근거도 약한 자리입니다. 규칙대로 평소 비중을 두고, 코스피가 200일선을 되찾은 뒤 새 바닥 신호가 나오거나 S&amp;P500이 125일선을 깨서 위험 국면이 켜질 때 비중을 움직이는 게 20년 검증과 맞는 대응입니다.</p>
-      <p data-when="verdict=below" hidden>잘 맞던 바닥 지표는 7개 중 <b data-draw="v" data-source="now" data-field="good_on" data-fmt="int">—</b>개만 켜져 있어, 하락 추세지만 시장이 크게 씻겨 나간 상태는 아닙니다. 과거 200일선 아래에서 이 지표가 3개 이상 켜졌을 때부터 반등 확률이 눈에 띄게 높아졌습니다.</p>
-      <p data-when="verdict=below" hidden><b>정리하면</b> 위험 국면이 켜지지 않는 한 평소 비중을 두고, 바닥 지표가 더 켜지는지 지켜볼 자리입니다. 반대로 S&amp;P500이 125일선을 깨면 위험 국면이 켜져 비중을 <span data-draw="c" data-c="lo">—</span>로 줄입니다.</p>
-      <p data-when="verdict=above" hidden>코스피가 200일선 위에서 오르는 추세입니다. 이 상태에서 업종 바닥 게이지가 <span data-draw="c" data-c="th">—</span> 이하로 떨어지면 바닥 신호가 켜지고 비중을 <span data-draw="c" data-c="hi">—</span>로 올립니다. 지금 게이지는 <b data-draw="v" data-source="now" data-field="gauge" data-fmt="int">—</b>입니다.</p>
-      <p data-when="verdict=above" hidden><b>정리하면</b> 평소 비중을 유지하면서 눌림을 기다리는 자리입니다. 잘 맞던 꼭지 지표가 여러 개 켜지면 과열을 조심할 때입니다.</p>
-      <p data-when="verdict=window" hidden><b>정리하면</b> 규칙상 비중을 <span data-draw="c" data-c="hi">—</span>로 두는 구간입니다. 그사이 코스피가 200일선 아래로 마감하면 바로 평소 비중으로 돌아갑니다.</p>
-      <p data-when="verdict=risk" hidden><b>정리하면</b> 규칙상 비중을 <span data-draw="c" data-c="lo">—</span>로 줄이는 구간입니다. 코스피가 200일선을 되찾거나 S&amp;P500이 125일선 위로 올라오면 평소 비중으로 돌아갑니다.</p>
-      <p data-when="kospi_up=아래&amp;risk_today=꺼짐" hidden>위험 국면이 꺼져 있는 건 S&amp;P500이 아직 125일선 위에 있어서입니다. 미국은 버티고 한국만 빠지는 장에서는 위험 국면이 켜지지 않는다는 점을 기억해 두세요.</p>
-    </div>
-
-    <div class="vt-card" id="t-botlist">
-      <h3>바닥 지표 지금 상태</h3>
-      <p class="vt-note">지표마다 지금 지난 <span data-draw="c" data-c="lb">—</span> 중 어디쯤인지, 20년 동안 바닥 신호로 얼마나 맞았는지를 같이 놓았습니다. 적중률은 신호가 켜지고 <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 올라 있던 비율입니다. 아무 날이나 사도 <b data-draw="v" data-source="hit_bot" data-row="0" data-field="hit_base" data-fmt="pct0">—</b>는 올라 있었으니 그보다 높아야 쓸모 있는 지표입니다. 적중률 높은 순으로 놓았습니다.</p>
-      <div class="vt-filter" data-filter-for="tb-bot" role="group" aria-label="보기">
-        <button data-val="잘 맞음" aria-pressed="true">잘 맞던 지표만</button><button data-val="" aria-pressed="false">전체 지표</button>
-      </div>
-      <div class="vt-scroll">
-        <table class="vt-table" id="tb-bot" data-source="hit_bot" data-row-key="key" data-filter="good" data-hl="key=vera_bot">
-          <thead><tr>
-            <th data-field="name">지표</th>
-            <th data-field="now" data-fmt="int" data-bar="1" data-bar-on="zone=켜짐">지금 위치</th>
-            <th data-field="zone">상태</th>
-            <th class="opt" data-field="how">켜지는 조건</th>
-            <th class="num" data-field="hit" data-fmt="pct0" data-tone="pair-hi:hit_base">적중률</th>
-            <th class="num opt" data-field="n" data-fmt="int">신호 횟수</th>
-            <th class="num" data-field="consistent" data-fmt="int">나은 구간(3개 중)</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="vt-card" id="t-count">
-      <h3>바닥 지표가 몇 개 켜졌을 때 확률</h3>
-      <p class="vt-note">잘 맞던 바닥 지표 7개 중 몇 개가 켜진 날이었는지로 나눠, 그 뒤 코스피가 어떻게 됐는지 셌습니다. 7개 지표가 모두 있는 <b data-draw="v" data-source="now" data-field="bycount_start" data-fmt="date">—</b>부터 하루하루를 센 숫자입니다. 점선은 그 구간의 아무 날이나 골랐을 때입니다.</p>
-      <div class="vt-filter" data-filter-for="bycount" role="group" aria-label="추세">
-        <button data-val="200일선 아래" aria-pressed="true">코스피 200일선 아래일 때</button><button data-val="200일선 위" aria-pressed="false">200일선 위일 때</button><button data-val="전체" aria-pressed="false">전체</button>
-      </div>
-      <div class="vt-chart" id="count-chart" data-draw="countchart" data-source="by_count" style="min-height:260px"></div>
-      <div class="vt-scroll" style="margin-top:var(--cds-gap-sm)">
-        <table class="vt-table" id="bycount" data-source="by_count" data-row-key="id" data-filter="scope" data-hl="is_now=지금">
-          <thead><tr>
-            <th data-field="label">켜진 개수</th>
-            <th class="num opt" data-field="days" data-fmt="int">날 수</th>
-            <th class="num" data-field="up20" data-fmt="pct0" data-tone="pair-hi:base_up20">20일 뒤 오를 확률</th>
-            <th class="num" data-field="avg20" data-fmt="pct1s">20일 뒤 평균</th>
-            <th class="num" data-field="up60" data-fmt="pct0">60일 뒤 오를 확률</th>
-            <th class="num opt" data-field="rb5" data-fmt="pct0">40일 안 +5% 반등</th>
-            <th class="num" data-field="dd5" data-fmt="pct0">40일 안 -5% 하락</th>
-            <th data-field="is_now">지금</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-      <p data-when="kospi_up=아래" hidden style="margin:var(--cds-gap-sm) 0 0">지금은 코스피가 200일선 아래이고 <b data-draw="v" data-source="now" data-field="good_on" data-fmt="int">—</b>개가 켜져 있습니다. 과거 이런 날은 20거래일 뒤 <b data-draw="v" data-source="by_count" data-where="id=200일선 아래-4" data-field="up20" data-fmt="pct0">—</b> 확률로 올라 있었고 평균은 <b data-draw="v" data-source="by_count" data-where="id=200일선 아래-4" data-field="avg20" data-fmt="pct1s">—</b>, 60거래일 뒤에는 <b data-draw="v" data-source="by_count" data-where="id=200일선 아래-4" data-field="up60" data-fmt="pct0">—</b>였습니다. 같은 하락 추세에서 아무 날이나 고르면 <b data-draw="v" data-source="by_count" data-where="id=200일선 아래-4" data-field="base_up20" data-fmt="pct0">—</b>이니 조금 나은 정도입니다. 반대로 40거래일 안에 -5% 넘게 더 빠진 날도 <b data-draw="v" data-source="by_count" data-where="id=200일선 아래-4" data-field="dd5" data-fmt="pct0">—</b>였습니다.</p>
-      <p class="vt-note">200일선 아래에서는 0~2개일 때와 3개 이상일 때 차이가 뚜렷했고, 앞·중간·채점 세 구간에서 모두 4개 이상일 때 오를 확률이 기준보다 높았습니다(<b data-draw="v" data-source="now" data-field="cons_p1" data-fmt="pct0">—</b> · <b data-draw="v" data-source="now" data-field="cons_p2" data-fmt="pct0">—</b> · <b data-draw="v" data-source="now" data-field="cons_p3" data-fmt="pct0">—</b>, 기준 <b data-draw="v" data-source="now" data-field="cons_p1_base" data-fmt="pct0">—</b> · <b data-draw="v" data-source="now" data-field="cons_p2_base" data-fmt="pct0">—</b> · <b data-draw="v" data-source="now" data-field="cons_p3_base" data-fmt="pct0">—</b>). 200일선 위에서는 날 수가 적어 숫자가 들쭉날쭉합니다. 7개 지표는 20년 성적을 보고 고른 것이라 실제보다 좋게 나왔을 수 있고, 하루하루가 이어진 날들이라 독립된 표본 수는 날 수보다 훨씬 적습니다.</p>
-    </div>
-
-    <div class="vt-card" id="t-toplist">
-      <h3>꼭지 지표 지금 상태</h3>
-      <p class="vt-note">꼭지 쪽 적중률은 신호가 켜지고 <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 내려 있던 비율입니다. 아무 날이나 골라도 <b data-draw="v" data-source="hit_top" data-row="0" data-field="hit_base" data-fmt="pct0">—</b>는 내려 있었습니다.</p>
-      <div class="vt-filter" data-filter-for="tb-top" role="group" aria-label="보기">
-        <button data-val="잘 맞음" aria-pressed="true">잘 맞던 지표만</button><button data-val="" aria-pressed="false">전체 지표</button>
-      </div>
-      <div class="vt-scroll">
-        <table class="vt-table" id="tb-top" data-source="hit_top" data-row-key="key" data-filter="good" data-hl="key=vera_risk">
-          <thead><tr>
-            <th data-field="name">지표</th>
-            <th data-field="now" data-fmt="int" data-bar="1" data-bar-on="zone=켜짐" data-bar-cls="hi">지금 위치</th>
-            <th data-field="zone">상태</th>
-            <th class="opt" data-field="how">켜지는 조건</th>
-            <th class="num" data-field="hit" data-fmt="pct0" data-tone="pair-hi:hit_base">적중률</th>
-            <th class="num opt" data-field="n" data-fmt="int">신호 횟수</th>
-            <th class="num" data-field="consistent" data-fmt="int">나은 구간(3개 중)</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <h2 class="vt-h2">베라 규칙에 쓰는 세 값</h2>
-    <div class="vt-grid">
-      <div class="vt-card" id="c-kospi">
-        <h3>코스피와 200일선 거리</h3>
-        <div class="vt-mid" data-draw="v" data-source="now" data-field="gap200" data-fmt="pct1s">—</div>
-        <div class="vt-kv"><span>코스피</span><b data-draw="v" data-source="now" data-field="kospi" data-fmt="n2">—</b></div>
-        <div class="vt-kv"><span>전일 대비</span><b data-draw="v" data-source="now" data-field="kospi_chg" data-fmt="pct1s">—</b></div>
-        <div class="vt-kv"><span>200일선</span><b data-draw="v" data-source="now" data-field="ma200" data-fmt="n1">—</b></div>
-        <p class="vt-note">위에 있어야 바닥 신호가 켜질 수 있고, 아래면 위험 국면 조건 하나가 찹니다.</p>
-      </div>
-      <div class="vt-card" id="c-sp">
-        <h3>S&amp;P500과 125일선 거리</h3>
-        <div class="vt-mid" data-draw="v" data-source="now" data-field="sp_gap" data-fmt="pct1s">—</div>
-        <div class="vt-kv"><span>위치</span><b>125일선 <span data-draw="v" data-source="now" data-field="sp_up">—</span></b></div>
-        <p class="vt-note">미국 증시가 125일선 아래로 내려가면 위험 국면 두 번째 조건이 찹니다. 한국 시간으로 전날 미국 종가를 씁니다.</p>
-      </div>
-      <div class="vt-card" id="c-gauge">
-        <h3>업종 바닥 게이지</h3>
-        <div class="vt-mid" data-draw="v" data-source="now" data-field="gauge">—</div>
-        <div class="vt-meter" data-draw="meter" data-source="now"></div>
-        <div class="vt-kv"><span>20일선 위 업종</span><b><span data-draw="v" data-source="now" data-field="sec_above">—</span> / <span data-draw="v" data-source="now" data-field="n_sec">—</span>개</b></div>
-        <p class="vt-note">코스피 업종지수 중 20일 평균선 위에 있는 업종 비율이 지난 <span data-draw="c" data-c="lb">—</span> 중 어디쯤인지를 <span data-draw="c" data-c="scale">—</span>으로 매긴 값입니다. <span data-draw="c" data-c="th">—</span> 이하면 거의 모든 업종이 빠진 상태입니다.</p>
-      </div>
-    </div>
-
-    <div class="vt-card" id="recent-card">
-      <h3>최근 <span data-draw="c" data-c="recent">—</span> 흐름</h3>
-      <p class="vt-note">위는 코스피와 200일선, 아래는 업종 바닥 게이지입니다. 초록 음영은 비중 <span data-draw="c" data-c="hi">—</span> 구간, 빨간 음영은 위험 국면입니다. 그래프 위에 손가락이나 마우스를 올리면 날짜별 값이 나옵니다.</p>
-      <div class="vt-legend">
-        <span><i data-color="0"></i>코스피</span>
-        <span><i class="dash"></i>200일선</span>
-        <span><i class="dot" data-color="2"></i>바닥 신호 켜진 날</span>
-        <span><i class="box" style="background:color-mix(in srgb, var(--color-ok) 22%, transparent)"></i>비중 <span data-draw="c" data-c="hi">—</span></span>
-        <span><i class="box" style="background:color-mix(in srgb, var(--color-bad) 18%, transparent)"></i>위험 국면</span>
-      </div>
-      <div class="vt-chart" id="recent-chart" data-draw="recent" data-source="daily" style="min-height:380px"></div>
-    </div>
-
-    <div class="vt-grid2">
-      <div class="vt-card" id="rules">
-        <h3>베라 규칙 세 줄</h3>
-        <p class="vt-note">장 마감 뒤 계산해서 다음 거래일 비중을 정합니다.</p>
-        <ul class="vt-rules">
-          <li><span class="t">바닥 신호, 비중 <span data-draw="c" data-c="hi">—</span></span>코스피가 200일선 위에 있는데 업종 바닥 게이지가 <span data-draw="c" data-c="th">—</span> 이하로 떨어진 날. 다음 날부터 <span data-draw="c" data-c="hold">—</span>거래일 동안 적용하되, 그 사이 코스피가 200일선 아래로 마감하면 다음 날부터 바로 끝냅니다.</li>
-          <li><span class="t">위험 국면, 비중 <span data-draw="c" data-c="lo">—</span></span>코스피가 200일선 아래이고 S&amp;P500도 125일선 아래인 날.</li>
-          <li><span class="t">평소, 비중 <span data-draw="c" data-c="base">—</span></span>둘 다 아닌 날. 둘이 겹치면 이것도 평소 비중으로 봅니다.</li>
-        </ul>
-      </div>
-      <div class="vt-card vt-text" id="glossary">
-        <h3>용어 풀이</h3>
-        <ul style="margin-top:var(--cds-gap-sm)">
-          <li><b>200일선</b>: 최근 200거래일 종가 평균입니다. 코스피가 이 위에 있으면 큰 흐름이 오르는 중으로 봅니다.</li>
-          <li><b>1년 중 위치</b>: 지난 <span data-draw="c" data-c="lb">—</span> 값을 낮은 순으로 줄 세웠을 때 오늘이 아래에서 몇 % 지점인지입니다. 작을수록 1년 중 낮은 쪽입니다.</li>
-          <li><b>켜짐</b>: 지표가 1년 중 가장 낮은 쪽(또는 가장 높은 쪽) <span data-draw="c" data-c="th">—</span>% 안에 들어간 상태입니다.</li>
-          <li><b>적중률</b>: 신호가 켜진 뒤 <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 예상한 방향으로 가 있던 비율입니다. 며칠 연달아 켜지면 한 번으로 셉니다.</li>
-          <li><b>나은 구간</b>: 20년을 세 구간으로 나눠, 그중 몇 구간에서 적중률이 기준보다 높았는지입니다. 3이면 어느 시기든 통했다는 얘기입니다.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== 신호 성적 ===================== -->
-  <section class="vt-page" id="signals" hidden>
-    <h2 class="vt-h2">바닥 신호 성적</h2>
-    <p class="vt-lead">신호가 켜진 날 코스피를 샀다면 어땠는지, 아무 날이나 샀을 때(기준)와 비교했습니다. 신호가 며칠 이어지면 한 번으로 셉니다. 규칙은 앞 기간 성적만 보고 골랐고, 마지막 기간은 고를 때 보지 않은 채점용입니다.</p>
-    <div class="vt-grid">
-      <div class="vt-card" id="k-sel">
-        <h3>고를 때 쓴 기간 <span class="vt-vs" data-draw="v" data-source="info" data-where="key=sel" data-field="value">—</span></h3>
-        <div class="vt-mid"><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="sel_ep" data-fmt="int">—</span>회</div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="f">—</span>거래일 뒤 평균</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="sel_f20" data-fmt="pct1s">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="sel_f20" data-fmt="pct1s">—</span></span></b></div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="up5">—</span> 반등</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="sel_up5" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="sel_up5" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="dn5">—</span> 하락</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="sel_dn5" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="sel_dn5" data-fmt="pct0">—</span></span></b></div>
-      </div>
-      <div class="vt-card" id="k-p3">
-        <h3>채점 기간 <span class="vt-vs" data-draw="v" data-source="info" data-where="key=p3" data-field="value">—</span></h3>
-        <div class="vt-mid"><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p3_ep" data-fmt="int">—</span>회</div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="f">—</span>거래일 뒤 평균</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p3_f20" data-fmt="pct1s">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="p3_f20" data-fmt="pct1s">—</span></span></b></div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="up5">—</span> 반등</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p3_up5" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="p3_up5" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="dn5">—</span> 하락</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p3_dn5" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="p3_dn5" data-fmt="pct0">—</span></span></b></div>
-      </div>
-      <div class="vt-card" id="k-p1">
-        <h3>약했던 구간 <span class="vt-vs" data-draw="v" data-source="info" data-where="key=p1" data-field="value">—</span></h3>
-        <div class="vt-mid"><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p1_ep" data-fmt="int">—</span>회</div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="f">—</span>거래일 뒤 평균</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p1_f20" data-fmt="pct1s">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="p1_f20" data-fmt="pct1s">—</span></span></b></div>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="up5">—</span> 반등</span><b><span data-draw="v" data-source="bottom_cands" data-where="key=bot" data-field="p1_up5" data-fmt="pct0">—</span> <span class="vt-vs">기준 <span data-draw="v" data-source="bottom_cands" data-where="key=base" data-field="p1_up5" data-fmt="pct0">—</span></span></b></div>
-        <p class="vt-note">고를 때 쓴 기간의 앞쪽 절반입니다. 이 구간만 떼어 보면 기준보다 못했습니다. 금융위기 직전처럼 추세가 꺾이는 자리에서 신호가 나온 탓입니다.</p>
-      </div>
-    </div>
-
-    <div class="vt-card" id="long-card">
-      <h3>코스피 전체 흐름과 신호</h3>
-      <p class="vt-note">세로축은 로그 눈금이라 같은 높이가 같은 등락률입니다. 회색 배경이 채점 기간입니다.</p>
-      <div class="vt-range" role="group" aria-label="기간">
-        <button data-range="0" aria-pressed="true">전체</button><button data-range="2520" aria-pressed="false">10년</button><button data-range="1260" aria-pressed="false">5년</button><button data-range="252" aria-pressed="false">1년</button>
-      </div>
-      <div class="vt-legend">
-        <span><i data-color="0"></i>코스피</span>
-        <span><i class="dash"></i>200일선</span>
-        <span><i class="dot" data-color="2"></i>바닥 신호</span>
-        <span><i class="box" style="background:color-mix(in srgb, var(--color-bad) 18%, transparent)"></i>위험 국면</span>
-      </div>
-      <div class="vt-chart" id="long-chart" data-draw="long" data-source="daily info" style="min-height:340px"></div>
-    </div>
-
-    <div class="vt-card" id="cands-card">
-      <h3>미리 정해 둔 바닥 후보끼리 비교</h3>
-      <p class="vt-note">점 하나가 후보 하나의 성적입니다. 신호 뒤 <span data-draw="c" data-c="f">—</span>거래일 평균 수익률이 기준보다 몇 %p 높았는지를 봅니다. 오른쪽일수록 잘 맞았습니다. 채택은 고를 때 쓴 기간 성적 1위로만 정했습니다.</p>
-      <div class="vt-legend">
-        <span><i class="dot" data-color="0"></i>고를 때 쓴 기간</span>
-        <span><i class="dot" data-color="1"></i>채점 기간</span>
-      </div>
-      <div class="vt-chart" id="cands-chart" data-draw="cands" data-source="bottom_cands" style="min-height:330px"></div>
-      <details style="margin-top:var(--cds-gap-sm)">
-        <summary class="vt-note" style="cursor:pointer">숫자 표로 보기</summary>
-        <p class="vt-note">초록 칸은 기준보다 나은 값, 빨간 칸은 못한 값입니다. 머리글을 누르면 정렬됩니다.</p>
-        <div class="vt-scroll">
-          <table class="vt-table" id="bcand" data-source="bottom_cands" data-row-key="key" data-base-key="base" data-hl="pick=채택">
-            <thead><tr>
-              <th data-field="name">후보</th>
-              <th class="num" data-field="sel_ep" data-fmt="int">고를 때 회수</th>
-              <th class="num" data-field="sel_f20" data-fmt="pct1s" data-tone="base-hi">고를 때 20일 뒤</th>
-              <th class="num" data-field="sel_up5" data-fmt="pct0" data-tone="base-hi">고를 때 반등 확률</th>
-              <th class="num" data-field="p3_ep" data-fmt="int">채점 회수</th>
-              <th class="num" data-field="p3_f20" data-fmt="pct1s" data-tone="base-hi">채점 20일 뒤</th>
-              <th class="num" data-field="p3_up5" data-fmt="pct0" data-tone="base-hi">채점 반등 확률</th>
-              <th class="num opt" data-field="p1_f20" data-fmt="pct1s" data-tone="base-hi">앞 구간 20일 뒤</th>
-              <th class="num opt" data-field="p2_f20" data-fmt="pct1s" data-tone="base-hi">중간 구간 20일 뒤</th>
-            </tr></thead>
-            <tbody data-draw="tbl"></tbody>
-          </table>
-        </div>
-      </details>
-    </div>
-
-    <h2 class="vt-h2">위험 국면 성적</h2>
-    <p class="vt-lead">위험 국면은 바닥을 맞히려는 신호가 아닙니다. 켜져 있는 동안 시장이 얼마나 거칠었는지를 봅니다. 하락 확률과 변동성이 꺼진 날보다 높으면 제 역할을 한 것입니다.</p>
-    <div class="vt-grid">
-      <div class="vt-card" id="r-sel">
-        <h3>고를 때 쓴 기간</h3>
-        <div class="vt-mid" data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="sel_share" data-fmt="pct0">—</div>
-        <p class="vt-note" style="margin-top:0">전체 거래일 중 위험 국면이었던 날</p>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="dn5">—</span> 하락 확률</span><b><span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="sel_dn5_on" data-fmt="pct0">—</span> <span class="vt-vs">꺼진 날 <span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="sel_dn5_off" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv"><span>연 변동성</span><b><span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="sel_vol_on" data-fmt="pct0">—</span> <span class="vt-vs">꺼진 날 <span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="sel_vol_off" data-fmt="pct0">—</span></span></b></div>
-      </div>
-      <div class="vt-card" id="r-p3">
-        <h3>채점 기간</h3>
-        <div class="vt-mid" data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="p3_share" data-fmt="pct0">—</div>
-        <p class="vt-note" style="margin-top:0">전체 거래일 중 위험 국면이었던 날</p>
-        <div class="vt-kv"><span><span data-draw="c" data-c="win">—</span>일 안 <span data-draw="c" data-c="dn5">—</span> 하락 확률</span><b><span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="p3_dn5_on" data-fmt="pct0">—</span> <span class="vt-vs">꺼진 날 <span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="p3_dn5_off" data-fmt="pct0">—</span></span></b></div>
-        <div class="vt-kv"><span>연 변동성</span><b><span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="p3_vol_on" data-fmt="pct0">—</span> <span class="vt-vs">꺼진 날 <span data-draw="v" data-source="risk_cands" data-where="key=risk" data-field="p3_vol_off" data-fmt="pct0">—</span></span></b></div>
-        <p class="vt-note">채점 기간에는 변동성이 오히려 꺼진 날 더 컸습니다. 올해처럼 미국은 멀쩡한데 한국만 크게 출렁인 구간을 이 규칙이 잡지 못합니다.</p>
-      </div>
-    </div>
-    <div class="vt-card" id="rcand-card">
-      <h3>위험 국면 후보끼리 비교</h3>
-      <p class="vt-note">켜진 날의 하락 확률과 변동성이 꺼진 날보다 높으면 초록, 낮으면 빨강입니다.</p>
-      <div class="vt-scroll">
-        <table class="vt-table" id="rcand" data-source="risk_cands" data-row-key="key" data-hl="pick=채택">
-          <thead><tr>
-            <th data-field="name">후보</th>
-            <th class="num" data-field="sel_share" data-fmt="pct0">고를 때 켜진 날</th>
-            <th class="num" data-field="sel_dn5_on" data-fmt="pct0" data-tone="pair-hi:sel_dn5_off">고를 때 하락 확률</th>
-            <th class="num opt" data-field="sel_dn5_off" data-fmt="pct0">꺼진 날</th>
-            <th class="num" data-field="sel_vol_on" data-fmt="pct0" data-tone="pair-hi:sel_vol_off">고를 때 변동성</th>
-            <th class="num" data-field="p3_share" data-fmt="pct0">채점 켜진 날</th>
-            <th class="num" data-field="p3_dn5_on" data-fmt="pct0" data-tone="pair-hi:p3_dn5_off">채점 하락 확률</th>
-            <th class="num opt" data-field="p3_dn5_off" data-fmt="pct0">꺼진 날</th>
-            <th class="num" data-field="p3_vol_on" data-fmt="pct0" data-tone="pair-hi:p3_vol_off">채점 변동성</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <h2 class="vt-h2">신호 장부</h2>
-    <p class="vt-lead">20년 동안 켜졌던 신호 전부입니다. 바닥 신호는 켜진 날부터 수익률을, 위험 국면은 켜져 있던 기간과 그 안의 최저점을 적었습니다.</p>
-    <div class="vt-card" id="ledger-card">
-      <div class="vt-filter" data-filter-for="ledger" role="group" aria-label="구분">
-        <button data-val="" aria-pressed="true">전체</button><button data-val="바닥 신호" aria-pressed="false">바닥 신호</button><button data-val="위험 국면" aria-pressed="false">위험 국면</button>
-      </div>
-      <div class="vt-scroll">
-        <table class="vt-table" id="ledger" data-source="ledger" data-row-key="id" data-filter="kind">
-          <thead><tr>
-            <th data-field="kind">구분</th>
-            <th data-field="start" data-fmt="date">시작</th>
-            <th class="opt" data-field="end" data-fmt="date">끝</th>
-            <th class="num" data-field="kospi" data-fmt="n1">코스피</th>
-            <th class="num opt" data-field="gauge" data-fmt="int">게이지</th>
-            <th class="num" data-field="f20" data-fmt="pct1s">20일 뒤</th>
-            <th class="num" data-field="f60" data-fmt="pct1s">60일 뒤</th>
-            <th class="num opt" data-field="best40" data-fmt="pct1s">40일 최고</th>
-            <th class="num" data-field="worst40" data-fmt="pct1s">최저점</th>
-            <th class="num opt" data-field="days" data-fmt="int">기간(일)</th>
-            <th class="opt" data-field="period">구간</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== 위기와 비중 조절 ===================== -->
-  <section class="vt-page" id="crisis" hidden>
-    <h2 class="vt-h2">큰 하락 때 신호는 어땠나</h2>
-    <p class="vt-lead">20년 동안 코스피가 크게 빠진 구간마다 위험 국면이 언제 켜졌고, 켜진 뒤에 얼마나 더 빠졌는지 정리했습니다. 켜진 뒤 남은 하락이 클수록 비중을 줄인 효과가 컸습니다.</p>
-    <div class="vt-card" id="crisis-card">
-      <div class="vt-scroll">
-        <table class="vt-table" id="crises" data-source="crises" data-row-key="name">
-          <thead><tr>
-            <th data-field="name">구간</th>
-            <th class="opt" data-field="peak" data-fmt="date">고점</th>
-            <th class="opt" data-field="trough" data-fmt="date">저점</th>
-            <th class="num" data-field="drawdown" data-fmt="pct1s">고점 대비 낙폭</th>
-            <th data-field="risk_on" data-fmt="date">위험 국면 켜진 날</th>
-            <th class="num" data-field="risk_lag" data-fmt="days">고점 뒤</th>
-            <th class="num opt" data-field="dd_at_on" data-fmt="pct1s">켜질 때까지 하락</th>
-            <th class="num" data-field="dd_after_on" data-fmt="pct1s">켜진 뒤 남은 하락</th>
-            <th class="opt" data-field="bot_first" data-fmt="date">첫 바닥 신호</th>
-            <th class="num opt" data-field="bot_f60" data-fmt="pct1s">그 뒤 60일</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-      <p class="vt-note">위험 국면은 고점에서 보통 한두 달 뒤, 이미 꽤 빠진 다음에 켜집니다. 늦게 켜지는 대신 금융위기나 코로나처럼 길고 깊은 하락에서는 남은 하락을 상당 부분 피했습니다. 엔캐리 청산과 올해 급락처럼 미국은 버티고 한국만 빠진 구간에서는 아예 켜지지 않았습니다.</p>
-    </div>
-
-    <h2 class="vt-h2">비중 조절에 썼다면</h2>
-    <p class="vt-lead">평소 <span data-draw="c" data-c="base">—</span>, 위험 국면 <span data-draw="c" data-c="lo">—</span>, 바닥 신호 뒤 <span data-draw="c" data-c="hold">—</span>거래일 <span data-draw="c" data-c="hi">—</span>(그 사이 200일선을 깨면 종료)로 코스피를 들고 갔다고 가정했습니다. 신호는 다음 날부터 적용하고 비중을 바꿀 때마다 <span data-draw="c" data-c="cost">—</span> 비용을 뺐습니다. 신용 이자는 넣지 않았습니다.</p>
-    <div class="vt-grid">
-      <div class="vt-card" id="s-mdd">
-        <h3>위험 국면만 쓰면 낙폭이 줄었습니다</h3>
-        <div class="vt-mid"><span data-draw="v" data-source="sim_summary" data-where="id=all-risk_only" data-field="mdd" data-fmt="pct1s">—</span></div>
-        <div class="vt-kv"><span>그냥 보유 최대 낙폭</span><b data-draw="v" data-source="sim_summary" data-where="id=all-bh" data-field="mdd" data-fmt="pct1s">—</b></div>
-        <div class="vt-kv"><span>연수익률</span><b><span data-draw="v" data-source="sim_summary" data-where="id=all-risk_only" data-field="cagr" data-fmt="pct1s">—</span> <span class="vt-vs">보유 <span data-draw="v" data-source="sim_summary" data-where="id=all-bh" data-field="cagr" data-fmt="pct1s">—</span></span></b></div>
-        <p class="vt-note">전체 기간 기준입니다. 수익은 거의 같고 가장 깊은 하락이 얕아졌습니다.</p>
-      </div>
-      <div class="vt-card" id="s-full">
-        <h3>바닥 신호까지 쓰면 수익은 조금 늘었습니다</h3>
-        <div class="vt-mid"><span data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="cagr" data-fmt="pct1s">—</span></div>
-        <div class="vt-kv"><span>그냥 보유 연수익률</span><b data-draw="v" data-source="sim_summary" data-where="id=all-bh" data-field="cagr" data-fmt="pct1s">—</b></div>
-        <div class="vt-kv"><span>최대 낙폭</span><b><span data-draw="v" data-source="sim_summary" data-where="id=all-vera" data-field="mdd" data-fmt="pct1s">—</span> <span class="vt-vs">보유 <span data-draw="v" data-source="sim_summary" data-where="id=all-bh" data-field="mdd" data-fmt="pct1s">—</span></span></b></div>
-        <p class="vt-note">채점 기간만 보면 최대 낙폭은 <b data-draw="v" data-source="sim_summary" data-where="id=p3-vera" data-field="mdd" data-fmt="pct1s">—</b>로 그냥 보유 <b data-draw="v" data-source="sim_summary" data-where="id=p3-bh" data-field="mdd" data-fmt="pct1s">—</b>보다 깊었습니다. 올해 급락 직전에 켜진 바닥 신호 때문에 비중이 높은 상태에서 하락을 맞았습니다.</p>
-      </div>
-    </div>
-    <div class="vt-card" id="sim-card">
-      <h3>처음 자산을 1로 놓았을 때</h3>
-      <p class="vt-note">로그 눈금입니다. 회색 배경이 채점 기간입니다.</p>
-      <div class="vt-legend">
-        <span><i data-color="0"></i>바닥 <span data-draw="c" data-c="hi">—</span> + 위험 <span data-draw="c" data-c="lo">—</span></span>
-        <span><i data-color="1"></i>위험 <span data-draw="c" data-c="lo">—</span>만</span>
-        <span><i style="background:var(--cds-chart-muted)"></i>그냥 보유</span>
-      </div>
-      <div class="vt-chart" id="sim-chart" data-draw="simchart" data-source="sim_curve info" style="min-height:320px"></div>
-      <div class="vt-scroll" style="margin-top:var(--cds-gap-md)">
-        <table class="vt-table" id="simtab" data-source="sim_summary" data-row-key="id">
-          <thead><tr>
-            <th data-field="scope">기간</th>
-            <th data-field="strategy">방식</th>
-            <th class="num" data-field="cagr" data-fmt="pct1s">연수익률</th>
-            <th class="num" data-field="mdd" data-fmt="pct1s">최대 낙폭</th>
-            <th class="num opt" data-field="sharpe" data-fmt="x2">샤프</th>
-            <th class="num" data-field="end" data-fmt="mult">끝 자산</th>
-            <th class="num opt" data-field="avg_expo" data-fmt="pct0">평균 비중</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== 지표 성적표 ===================== -->
-  <section class="vt-page" id="indicators" hidden>
-    <h2 class="vt-h2">바닥 지표 성적표</h2>
-    <p class="vt-lead">보드에 있는 지표를 하나씩 바닥 신호로 써 봤을 때 20년 동안 얼마나 맞았는지입니다. 지표가 1년 중 가장 공포스러운 쪽 <span data-draw="c" data-c="th">—</span>%에 들어간 날을 신호로 보고, <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 올라 있었는지 셌습니다. 막대가 점선(아무 날이나 샀을 때)보다 길수록 잘 맞은 지표입니다.</p>
-    <div class="vt-card" id="hit-bot-card">
-      <div class="vt-legend">
-        <span><i class="box" data-color="0"></i>세 구간 모두 기준보다 나음</span>
-        <span><i class="box" data-color="2"></i>베라 바닥 신호</span>
-        <span><i class="box" style="background:var(--cds-chart-muted)"></i>그 밖</span>
-        <span><i class="dash"></i>기준</span>
-      </div>
-      <div class="vt-chart" id="hit-bot-chart" data-draw="hitchart" data-side="bot" data-source="hit_bot" style="min-height:600px"></div>
-      <details style="margin-top:var(--cds-gap-sm)">
-        <summary class="vt-note" style="cursor:pointer">구간별 숫자 표로 보기</summary>
-        <div class="vt-scroll">
-          <table class="vt-table" id="hb-full" data-source="hit_bot" data-row-key="key" data-hl="key=vera_bot">
-            <thead><tr>
-              <th data-field="name">지표</th>
-              <th class="num" data-field="n" data-fmt="int">횟수</th>
-              <th class="num" data-field="hit" data-fmt="pct0" data-tone="pair-hi:hit_base">적중률</th>
-              <th class="num opt" data-field="hit_p1" data-fmt="pct0">앞 구간</th>
-              <th class="num opt" data-field="hit_p2" data-fmt="pct0">중간 구간</th>
-              <th class="num opt" data-field="hit_p3" data-fmt="pct0">채점 구간</th>
-              <th class="num" data-field="avg" data-fmt="pct1s">20일 뒤 평균</th>
-              <th class="num opt" data-field="big" data-fmt="pct0" data-tone="pair-hi:big_base">40일 안 +5% 반등</th>
-              <th class="opt" data-field="note">참고</th>
-            </tr></thead>
-            <tbody data-draw="tbl"></tbody>
-          </table>
-        </div>
-      </details>
-    </div>
-
-    <h2 class="vt-h2">꼭지 지표 성적표</h2>
-    <p class="vt-lead">반대로 지표가 1년 중 가장 과열된 쪽 <span data-draw="c" data-c="th">—</span>%에 들어간 날을 꼭지 신호로 보고, <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피가 내려 있었는지 셌습니다.</p>
-    <div class="vt-card" id="hit-top-card">
-      <div class="vt-legend">
-        <span><i class="box" data-color="0"></i>세 구간 모두 기준보다 나음</span>
-        <span><i class="box" data-color="2"></i>베라 위험 국면 시작</span>
-        <span><i class="box" style="background:var(--cds-chart-muted)"></i>그 밖</span>
-        <span><i class="dash"></i>기준</span>
-      </div>
-      <div class="vt-chart" id="hit-top-chart" data-draw="hitchart" data-side="top" data-source="hit_top" style="min-height:600px"></div>
-      <details style="margin-top:var(--cds-gap-sm)">
-        <summary class="vt-note" style="cursor:pointer">구간별 숫자 표로 보기</summary>
-        <div class="vt-scroll">
-          <table class="vt-table" id="ht-full" data-source="hit_top" data-row-key="key" data-hl="key=vera_risk">
-            <thead><tr>
-              <th data-field="name">지표</th>
-              <th class="num" data-field="n" data-fmt="int">횟수</th>
-              <th class="num" data-field="hit" data-fmt="pct0" data-tone="pair-hi:hit_base">적중률</th>
-              <th class="num opt" data-field="hit_p1" data-fmt="pct0">앞 구간</th>
-              <th class="num opt" data-field="hit_p2" data-fmt="pct0">중간 구간</th>
-              <th class="num opt" data-field="hit_p3" data-fmt="pct0">채점 구간</th>
-              <th class="num" data-field="avg" data-fmt="pct1s">20일 뒤 평균</th>
-              <th class="num opt" data-field="big" data-fmt="pct0" data-tone="pair-hi:big_base">40일 안 -5% 하락</th>
-              <th class="opt" data-field="note">참고</th>
-            </tr></thead>
-            <tbody data-draw="tbl"></tbody>
-          </table>
-        </div>
-      </details>
-    </div>
-
-    <h2 class="vt-h2">성적표에서 읽을 것</h2>
-    <div class="vt-card vt-text" id="hit-read">
-      <ul>
-        <li>바닥 쪽에서 꾸준했던 건 국내 지표입니다. 개인이 한꺼번에 사들일 때, 거래대금이 바짝 식었을 때, 업종과 종목 대부분이 200일선 아래로 내려갔을 때가 세 구간 모두 기준보다 잘 맞았습니다.</li>
-        <li>미국 지표는 앞 구간에서는 괜찮다가 채점 구간에서 대부분 기준 밑으로 떨어졌습니다. 한국 바닥을 잡는 데는 국내 지표가 낫습니다.</li>
-        <li>베라 바닥 신호는 적중률만 보면 <b data-draw="v" data-source="hit_bot" data-where="key=vera_bot" data-field="hit" data-fmt="pct0">—</b>로 중간이지만, 맞았을 때 크기가 커서 <span data-draw="c" data-c="f">—</span>거래일 뒤 평균 수익률은 <b data-draw="v" data-source="hit_bot" data-where="key=vera_bot" data-field="avg" data-fmt="pct1s">—</b>로 가장 높았습니다. 대신 앞 구간 적중률은 <b data-draw="v" data-source="hit_bot" data-where="key=vera_bot" data-field="hit_p1" data-fmt="pct0">—</b>로 약했습니다.</li>
-        <li>꼭지 쪽은 신용융자 ÷ 예탁금이 가장 나았지만 적중률이 <b data-draw="v" data-source="hit_top" data-where="key=crd_dep" data-field="hit" data-fmt="pct0">—</b> 수준입니다. 이것만 보고 팔기에는 약해서 꼭지 신호는 따로 만들지 않았습니다.</li>
-        <li>잘 맞은 지표들을 묶어 점수로 만드는 것도 시험했습니다. 앞 두 구간에서 고른 지표로 점수를 만들었더니 채점 구간에서는 기준과 차이가 거의 없었습니다. 그래서 비중은 베라 규칙 하나로 정하고, 성적표 지표는 지금 시장이 얼마나 씻겨 나갔는지 보는 참고로 씁니다.</li>
-      </ul>
-    </div>
-
-    <details class="vt-card" id="deep" style="margin-top:var(--cds-gap-lg)">
-      <summary style="cursor:pointer"><b>더 깊이: 상관계수와 지표끼리 겹침</b></summary>
-      <p class="vt-note">상관계수는 지표 값과 <span data-draw="c" data-c="f">—</span>거래일 뒤 코스피 수익률의 순위 상관입니다. 0에 가까우면 관계가 약하고, <span data-draw="c" data-c="icstrong">—</span>를 넘으면 굵게 표시했습니다. 구간마다 부호가 자주 바뀌어서 판정 근거로는 쓰지 않았습니다.</p>
-      <div class="vt-scroll">
-        <table class="vt-table" id="indt" data-source="indicators" data-row-key="key">
-          <thead><tr>
-            <th data-field="name">지표</th>
-            <th class="opt" data-field="group">묶음</th>
-            <th class="num" data-field="ic1" data-fmt="x2" data-tone="ic">상관 앞 구간</th>
-            <th class="num" data-field="ic2" data-fmt="x2" data-tone="ic">상관 중간 구간</th>
-            <th class="num" data-field="ic3" data-fmt="x2" data-tone="ic">상관 채점</th>
-            <th class="num" data-field="now" data-fmt="int">지금 위치</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-      <p class="vt-note" style="margin-top:var(--cds-gap-md)">아래는 지표끼리 얼마나 같이 움직였는지입니다. 칸이 진할수록 같이 움직였고, <span data-draw="c" data-c="corrcut">—</span>을 넘는 쌍은 판정에 하나만 남겼습니다.</p>
-      <div class="vt-legend">
-        <span><i class="box" data-color="0"></i>같은 방향</span>
-        <span><i class="box" data-color="3"></i>반대 방향</span>
-      </div>
-      <div class="vt-chart" id="corr-chart" data-draw="corr" data-source="corr" style="min-height:420px"></div>
-    </details>
-  </section>
-
-  <!-- ===================== 검증 ===================== -->
-  <section class="vt-page" id="verify" hidden>
-    <h2 class="vt-h2" style="margin-top:0">공개 전 검증 결과</h2>
-    <p class="vt-lead">2026년 11월 1일에 보드의 숫자가 맞는지 세 갈래로 확인했습니다. 원자료를 외부 출처와 대조했고, 규칙 설명만 받은 별도 작업자가 코드를 새로 짜서 원자료에서 처음부터 다시 계산했고, 페이지 문장에 적힌 내용이 데이터와 맞는지 하나씩 봤습니다.</p>
-    <div class="vt-grid">
-      <div class="vt-card"><h3>코스피 두 출처</h3><div class="vt-mid">5,127 / 5,129일</div><p class="vt-note" style="margin-top:0">키움과 야후 종가가 0.1% 안에서 같은 날. 어긋난 2일도 0.6% 안</p></div>
-      <div class="vt-card"><h3>외부 숫자 대조</h3><div class="vt-mid">11건 일치 · 2건 고침</div><p class="vt-note" style="margin-top:0">코스피 종가·하루 등락, 예탁금, 신용잔고, 투자자 수급을 기사와 재조회 값에 맞춤</p></div>
-      <div class="vt-card"><h3>독립 재계산</h3><div class="vt-mid">전부 일치</div><p class="vt-note" style="margin-top:0">성과 9칸, 바닥 신호 25회, 지금 상태, 위기 9개, 지표 적중률</p></div>
-      <div class="vt-card"><h3>고친 것</h3><div class="vt-mid">2건</div><p class="vt-note" style="margin-top:0">투자자 수급 거래소 기준, 문장 한 곳</p></div>
-    </div>
-
-    <h2 class="vt-h2">원자료를 외부 숫자와 대조</h2>
-    <div class="vt-card">
-      <div class="vt-scroll" style="max-height:none">
-        <table class="vt-table vt-static">
-          <thead><tr><th>항목</th><th>보드 원자료</th><th>외부 출처</th><th>결과</th></tr></thead>
-          <tbody>
-            <tr><td>코스피 종가 20년</td><td>키움 5,135일</td><td>야후 ^KS11, 겹치는 5,129일</td><td class="good">5,127일이 0.1% 안에서 같음</td></tr>
-            <tr><td>코스피 2026.03.04</td><td>5,093.54 (-12.06%)</td><td>외신·국내 기사 12% 넘게 급락</td><td class="good">일치</td></tr>
-            <tr><td>코스피 2026.05.06</td><td>7,384.56</td><td>뉴시스 마감 기사 7,384.56</td><td class="good">일치</td></tr>
-            <tr><td>코스피 2026.07.31</td><td>6,595.45 (+17.91%)</td><td>마감 시황 6,595.45 +17.91%</td><td class="good">일치</td></tr>
-            <tr><td>코스피 2026.09.30</td><td>6,838.04</td><td>경북매일 마감 기사 6,838.04</td><td class="good">일치</td></tr>
-            <tr><td>코스피 2026.10.12</td><td>6,384.24</td><td>아시아경제 마감 기사 6,384.24</td><td class="good">일치</td></tr>
-            <tr><td>코스피 2026.10.30</td><td>5,730.74 (-3.48%)</td><td>속보 5,730.74, 206.92p 하락</td><td class="good">일치</td></tr>
-            <tr><td>투자자예탁금 2026.09.04</td><td>93조 5,499억원</td><td>SBS Biz 93조 5,499억원</td><td class="good">일치</td></tr>
-            <tr><td>신용융자 잔고 2026.09.04</td><td>33조 5,958억원</td><td>SBS Biz 33조 5,958억원</td><td class="good">일치</td></tr>
-            <tr><td>투자자예탁금 2026.10.14</td><td>97조 4,280억원</td><td>SBS Biz 97조 4,280억원</td><td class="good">일치</td></tr>
-            <tr><td>신용융자 잔고 2026.10.14</td><td>33조 7,057억원</td><td>SBS Biz 33조 7,057억원</td><td class="good">일치</td></tr>
-            <tr><td>투자자 수급 2024.08.05</td><td>개인 +1조 6,945억, 외국인 -1조 5,238억</td><td>키움 KRX 기준 재조회</td><td class="good">일치</td></tr>
-            <tr><td>투자자 수급 2026.10.12</td><td>개인 +2조 1,700억, 외국인 -2조 5,089억</td><td>기사 개인 +1조 4,748억, 외국인 -2조 205억</td><td class="bad">불일치, 고침(아래)</td></tr>
-            <tr><td>투자자 수급 2026.10.30</td><td>개인 +1조 119억, 외국인 -1조 3,082억</td><td>기사 개인 +6,210억, 외국인 -1조 6,173억</td><td class="bad">불일치, 고침(아래)</td></tr>
-            <tr><td>S&amp;P500 지수</td><td>야후 ^GSPC</td><td>야후 SPY 날짜별 등락</td><td>2008년 급변동일 15일 빼고 1% 안. 위험 국면은 125일선 위아래만 봄</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="vt-note">기사 숫자는 장 마감 직후 잠정치라 확정치와 몇십억원 다를 수 있습니다. 2008년, 2020년 같은 오래된 날짜는 두 출처 대조로 갈음했습니다.</p>
-    </div>
-
-    <h2 class="vt-h2">독립 재계산</h2>
-    <div class="vt-card vt-text">
-      <p>베라 규칙(200일선, 업종 게이지 10, S&amp;P500 125일선, 40거래일 130% 구간과 200일선 종료, 거래비용 0.05%)을 글로만 받은 별도 작업자가 기존 코드를 보지 않고 원자료에서 처음부터 계산했습니다.</p>
-      <ul>
-        <li><b>시뮬레이션 성과.</b> 고를 때 쓴 기간, 채점 기간, 전체 각각 베라 규칙·위험 70%만·그냥 보유의 연수익률과 최대 낙폭 9칸이 소수점 넷째 자리까지 같았습니다. 전체 기간 베라 규칙 연 8.37%, 최대 낙폭 -49.3%입니다.</li>
-        <li><b>바닥 신호 25회.</b> 신호 날짜, 20거래일 뒤 수익률, 40거래일 안 최저점이 25회 모두 같았습니다. 첫 회차 날짜만 하루 차이가 났는데, 평가 시작일 하루 전에 켜진 신호를 보드는 시작일로 적었기 때문입니다.</li>
-        <li><b>지금 상태.</b> 10월 30일 기준 코스피 5,730.74, 200일선 6,487, 업종 21개 중 3개가 20일선 위, 업종 게이지 13, S&amp;P500 125일선 대비 +2.1%, 다음 거래일 비중 100%가 같았습니다.</li>
-        <li><b>지표 적중률.</b> 기준(아무 날 20일 뒤 상승) 56.4%, 종목 200일선 위 비율 34회 70.6%, 거래대금 과열 30회 70.0%, 업종지수 200일선 위 비율 38회 65.8%가 같았습니다.</li>
-        <li><b>위기 9개.</b> 고점일, 저점일, 낙폭이 코스피 종가와 모두 맞았습니다.</li>
-      </ul>
-    </div>
-
-    <h2 class="vt-h2">고친 것</h2>
-    <div class="vt-card vt-text">
-      <p><b>1. 투자자 수급 거래소 기준.</b> 개인·외국인 순매수를 키움에서 받을 때 KRX와 넥스트레이드를 합친 값으로 받고 있었습니다. 넥스트레이드가 열린 2025년 3월 4일부터 값이 KRX 기준보다 커졌고, 장 마감 직후 받은 날은 넥스트레이드 저녁 거래가 덜 들어가 있었습니다. 2024년 이전 값은 KRX 재조회와 똑같아서 문제가 없습니다. 수집 코드를 KRX 기준으로 바꿨고, 2025년 3월 4일 이후 값은 다음 PC 갱신 때 KRX 기준으로 다시 받아 보드에 반영됩니다. 이 값을 쓰는 지표는 바닥 지표 7개 중 개인 20일 누적 순매수와 외국인 20일 누적 순매수 두 개입니다. 지금 두 지표는 1년 중 중간쯤이라 켜짐과 꺼짐이 바뀔 가능성은 낮지만, 다시 받은 뒤 적중률 숫자는 조금 달라질 수 있습니다.</p>
-      <p><b>2. 문장 한 곳.</b> "하락 추세 속 업종 게이지 바닥은 성적이 기준보다 못했다"고 적혀 있었습니다. 다시 세어 보니 코스피가 200일선 아래일 때 게이지가 10 이하로 내려간 52회는 20일 뒤 오른 비율이 58.8%로, 200일선 아래 아무 날의 58.4%와 거의 같았습니다. 그래서 차이가 없었다는 문장으로 고쳤습니다. 200일선 위에서 켜진 바닥 신호는 같은 기준으로 62.5%입니다.</p>
-    </div>
-
-    <h2 class="vt-h2">검증 뒤에도 남는 한계</h2>
-    <div class="vt-card vt-text">
-      <ul>
-        <li><b>지표를 고른 방식.</b> 잘 맞던 바닥 지표 7개는 20년 전체 성적을 보고 골랐습니다. 세 구간 모두에서 기준보다 나았던 지표만 남겼지만, 앞으로의 성적은 이보다 낮을 수 있습니다.</li>
-        <li><b>채점 기간 최대 낙폭.</b> 2022년 이후 베라 규칙의 최대 낙폭은 -49.3%로 그냥 보유(-40.0%)보다 컸습니다. 2026년 6~7월 하락 때 바닥 신호가 이어서 켜지며 130% 구간이 7월 30일까지 유지됐기 때문입니다. 200일선 종료 규칙은 이 하락이 200일선을 깬 뒤에야 작동했습니다.</li>
-        <li><b>진행 중인 신호.</b> 2026년 10월 7일 바닥 신호는 아직 20거래일이 지나지 않아 성적표에서 빠져 있습니다. 지금까지 신호일 종가보다 최대 19.6% 낮게 내려갔고, 40거래일 안 -10% 넘게 빠진 세 번째 회차가 됐습니다. 끝난 24회 가운데서는 2007년 8월, 2026년 6월 두 번입니다.</li>
-        <li><b>종목 기준 지표.</b> 종목 200일선 위 비율은 지금 시총 상위 300종목으로 계산해서 상장폐지된 종목이 빠져 있습니다. 베라 규칙 자체는 이 문제가 없는 업종지수를 씁니다.</li>
-        <li><b>시뮬레이션 범위.</b> 코스피 지수에 비중만 곱한 계산입니다. 거래비용 0.05%만 넣었고 세금, 신용 이자, 개별 종목 차이는 빠져 있습니다.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ===================== 데이터와 방법 ===================== -->
-  <section class="vt-page" id="data" hidden>
-    <h2 class="vt-h2">데이터 점검</h2>
-    <p class="vt-lead">원자료는 PC의 키움 API, 금융투자협회, 야후에서 받았습니다. 빈 날짜와 비정상적으로 큰 하루 변동을 묶음별로 셌습니다.</p>
-    <div class="vt-card" id="audit-card">
-      <div class="vt-scroll">
-        <table class="vt-table" id="audit" data-source="audit" data-row-key="group">
-          <thead><tr>
-            <th data-field="group">묶음</th>
-            <th class="num" data-field="series" data-fmt="int">종목 수</th>
-            <th class="num" data-field="empty" data-fmt="int">빈 종목</th>
-            <th class="opt" data-field="first" data-fmt="date">처음</th>
-            <th class="opt" data-field="last" data-fmt="date">마지막</th>
-            <th class="num" data-field="coverage" data-fmt="pct0">날짜 채움</th>
-            <th class="num" data-field="max_gap" data-fmt="int">최장 빈 날</th>
-            <th class="num" data-field="jumps" data-fmt="int">큰 하루 변동</th>
-          </tr></thead>
-          <tbody data-draw="tbl"></tbody>
-        </table>
-      </div>
-      <p class="vt-note">큰 하루 변동은 지수 <span data-draw="c" data-c="jidx">—</span>, 종목·ETF <span data-draw="c" data-c="jstk">—</span>, 미국 <span data-draw="c" data-c="jus">—</span>를 넘는 날입니다. 지수 쪽은 대부분 금융위기, 코로나, 올해 급락 때 몰려 있어 실제 움직임으로 봤습니다.</p>
-    </div>
-    <div class="vt-card" id="cross-card">
-      <h3>코스피 두 출처 대조</h3>
-      <div class="vt-kv"><span>겹치는 날</span><b data-draw="v" data-source="info" data-where="key=cross_n" data-field="value" data-fmt="n0">—</b></div>
-      <div class="vt-kv"><span>일간 수익률 상관</span><b data-draw="v" data-source="info" data-where="key=cross_corr" data-field="value" data-fmt="x2">—</b></div>
-      <div class="vt-kv"><span>지수 값 최대 차이</span><b data-draw="v" data-source="info" data-where="key=cross_max" data-field="value" data-fmt="pct2">—</b></div>
-      <div class="vt-kv"><span><span data-draw="c" data-c="bigdiff">—</span> 넘게 어긋난 날</span><b data-draw="v" data-source="info" data-where="key=cross_big" data-field="value" data-fmt="int">—</b></div>
-      <p class="vt-note">키움과 야후의 코스피가 사실상 같아서 판정과 검증에는 키움 값을 씁니다. 20일선 위 비율 같은 지표를 지금 상장된 종목만으로 계산하면 살아남은 종목만 보게 되므로, 베라 규칙에는 그 문제가 없는 업종지수를 썼습니다.</p>
-    </div>
-
-    <h2 class="vt-h2">만든 방법</h2>
-    <div class="vt-card vt-text" id="method">
-      <p><b>재료.</b> 보드에 있는 지표와 새로 만든 지표 <span data-draw="v" data-source="info" data-where="key=n_ind" data-field="value">—</span>개를 매일 계산했습니다. 추세, 20일선 위 업종·종목 비율, 변동성, 신용·예탁금, 투자자별 수급, 환율, 미국 지표, 공포탐욕이 들어 있습니다.</p>
-      <p><b>미래 값 차단.</b> 모든 지표는 그날까지 지난 <span data-draw="c" data-c="lb">—</span> 안에서 몇 % 위치인지로 바꿨습니다. 미래 데이터가 섞이지 않게 하려는 것입니다. 미국 지표는 하루 늦춰 붙였습니다.</p>
-      <p><b>기간 나누기.</b> <span data-draw="v" data-source="info" data-where="key=p1" data-field="value">—</span>, <span data-draw="v" data-source="info" data-where="key=p2" data-field="value">—</span>, <span data-draw="v" data-source="info" data-where="key=p3" data-field="value">—</span> 세 구간으로 나눴습니다. 앞 두 구간으로 후보를 고르고, 마지막 구간은 채점에만 썼습니다.</p>
-      <p><b>후보.</b> 결과를 보기 전에 바닥 후보와 위험 후보를 미리 적어 두고, 고를 때 쓴 기간 성적 1위를 채택했습니다. 신호가 <span data-draw="c" data-c="merge">—</span>거래일 안에 다시 켜지면 같은 회차로 묶었습니다.</p>
-      <p><b>성적 재는 법.</b> 신호 뒤 <span data-draw="c" data-c="f">—</span>거래일과 <span data-draw="c" data-c="f60">—</span>거래일 수익률, <span data-draw="c" data-c="win">—</span>거래일 안에 <span data-draw="c" data-c="up5">—</span> 반등하거나 <span data-draw="c" data-c="dn5">—</span> 하락한 비율을 아무 날이나 샀을 때와 비교했습니다.</p>
-      <p><b>다시 계산.</b> 핵심 숫자는 규칙 설명만 받은 별도 작업자가 원자료에서 처음부터 다시 계산해 맞춰 봤습니다. 자세한 결과는 검증 결과 탭에 있습니다.</p>
-    </div>
-
-    <h2 class="vt-h2">한계</h2>
-    <div class="vt-card vt-text" id="limits">
-      <ul>
-        <li>천장 신호는 찾지 못했습니다. 어떤 지표도 세 구간에서 꼭지를 꾸준히 맞히지 못했습니다.</li>
-        <li>바닥 신호는 추세가 살아 있을 때의 눌림목을 잡는 신호입니다. 큰 하락의 진짜 바닥을 잡는 신호는 아닙니다. <span data-draw="v" data-source="info" data-where="key=n_piv" data-field="value">—</span>개 굵은 저점 가운데 주변 닷새 안에 신호가 있었던 곳은 <span data-draw="v" data-source="info" data-where="key=cap_hit" data-field="value">—</span>개입니다.</li>
-        <li>위험 국면은 늦게 켜지고, 미국은 괜찮은데 한국만 빠지는 하락은 놓칩니다.</li>
-        <li>바닥 신호의 200일선 종료 규칙은 이번 하락을 보고 나서 추가로 시험한 것입니다. 20년 성적이 조금 나아지는 것을 확인하고 넣었지만, 앞으로 쌓이는 데이터로 다시 확인해야 합니다.</li>
-        <li>회수가 적습니다. 채점 기간 바닥 신호는 몇 번 안 되어서 좋은 성적도 운이 섞였을 수 있습니다.</li>
-        <li>시뮬레이션은 코스피 지수 기준이고 세금, 신용 이자, 개별 종목 차이는 빠져 있습니다.</li>
-      </ul>
-    </div>
-  </section>
-</div>
-
-<script>
-window.V = (() => {
-  const C = { th: '10', ma: '200', usma: '125', hi: '130%', lo: '70%', base: '100%', hold: '40', merge: '10', cost: '0.05%',
-              up5: '+5%', dn5: '-5%', win: '40', f: '20', f60: '60', corrcut: '0.7', recent: '6개월', recentN: 130, lb: '1년', scale: '0~100',
-              icstrong: '±0.1', jidx: '±12%', jstk: '±30%', jus: '±25%', bigdiff: '1%', like: '4' };
-  const L = d3.formatLocale({ decimal: '.', thousands: ',', grouping: [3], currency: ['', ''], minus: '-' });
-  const F = {
-    txt: (v) => String(v),
-    int: (v) => L.format(',.0f')(v),
-    n0: (v) => L.format(',.0f')(+v),
-    n1: (v) => L.format(',.1f')(v),
-    n2: (v) => L.format(',.2f')(v),
-    x2: (v) => L.format('.2f')(+v),
-    pct0: (v) => L.format('.0%')(v),
-    pct1s: (v) => L.format('+.1%')(v),
-    pct2: (v) => L.format('.2%')(+v),
-    pctint: (v) => L.format('.0f')(v) + '%',
-    mult: (v) => L.format('.2f')(v) + '배',
-    days: (v) => L.format('.0f')(v) + '거래일',
-    date: (v) => /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v).replace(/-/g, '.') : String(v),
-  };
-  const pick = (rows, where, row) => {
-    if (row != null && row !== '') return rows[+row];
-    if (!where) return rows[0];
-    const conds = where.split('&').map((p) => p.split('=').map(decodeURIComponent));
-    return rows.find((r) => conds.every(([k, v]) => String(r[k]) === v));
-  };
-  const ready = (el, ids) => {
-    const st = ids.map((id) => dash.data(id));
-    const bad = st.find((s) => ['error', 'connect', 'declined', 'missing'].includes(s.status));
-    el.classList.toggle('dash-skeleton', !bad && st.some((s) => s.status !== 'ok'));
-    if (bad) {
-      const d = document.createElement('div'); d.className = 'vt-fail';
-      const dot = document.createElement('i'); const t = document.createElement('span'); t.textContent = '불러오지 못했습니다';
-      d.append(dot, t); el.replaceChildren(d); return false;
+  /* ---------------- 조건 ---------------- */
+  var need = []; try { need = JSON.parse(N.need2 || "[]"); } catch (e) { need = []; }
+  $("need").innerHTML = need.map(function (x) {
+    var to = Math.round(x.to * 100);
+    var lab = to === 0 ? "내려가는 조건" : to >= 130 ? "공격 구간" : to + "%로";
+    var cls = to === 0 ? "lv-" + lvKey(expo === 100 ? 70 : 50) : "lv-" + lvKey(to);
+    var dots = "";
+    if (to > expo && to < 130 && N.n_up && (N.raw2 > expo)) {
+      dots = '<span class="dots" aria-label="확인 ' + N.up_cnt + "/" + N.n_up + '일">' + Array.from({ length: N.n_up }, function (_, i) { return '<i class="' + (i < N.up_cnt ? "f" : "") + '"></i>'; }).join("") + "</span>";
     }
-    return st.every((s) => s.status === 'ok');
-  };
-  const meta = () => { const s = dash.data('info'); const o = {}; if (s.status === 'ok') s.data.forEach((r) => { o[r.key] = r.value; }); return o; };
-  const measure = (svg, strs, cls) => {
-    const g = svg.append('g'); let m = 0;
-    strs.forEach((s) => { const t = g.append('text').attr('class', cls || null).text(s); m = Math.max(m, t.node().getComputedTextLength()); });
-    g.remove(); return m;
-  };
-  const runs = (rows, test) => {
-    const out = []; let s = null;
-    rows.forEach((r, i) => { if (test(r)) { if (s === null) s = i; } else if (s !== null) { out.push([s, i - 1]); s = null; } });
-    if (s !== null) out.push([s, rows.length - 1]); return out;
-  };
-  const tip = (box) => { const t = document.createElement('div'); t.className = 'vt-tip'; t.hidden = true; box.appendChild(t); return t; };
-  const showTip = (box, t, x, y, head, lines) => {
-    t.replaceChildren();
-    const h = document.createElement('div'); h.className = 'vt-tip-h'; h.textContent = head; t.append(h);
-    lines.forEach(([color, name, val]) => {
-      const l = document.createElement('div'); l.className = 'vt-tip-l';
-      if (color) { const sw = document.createElement('i'); sw.style.background = color; l.append(sw); }
-      const n = document.createElement('span'); n.textContent = name; const v = document.createElement('b'); v.textContent = val;
-      l.append(n, v); t.append(l);
-    });
-    t.hidden = false;
-    const bw = box.clientWidth, tw = t.offsetWidth, th = t.offsetHeight;
-    let left = x + 14; if (left + tw > bw) left = x - 14 - tw; if (left < 0) left = Math.max(0, bw - tw);
-    let top = y - th - 10; if (top < 0) top = y + 14;
-    t.style.left = left + 'px'; t.style.top = top + 'px';
-  };
-  const nudge = (items, minGap, lo, hi) => {   // items: [{y}] 겹치지 않게 위아래로 벌림
-    items.sort((a, b) => a.y - b.y);
-    for (let i = 1; i < items.length; i++) if (items[i].y - items[i - 1].y < minGap) items[i].y = items[i - 1].y + minGap;
-    const over = items.length ? items[items.length - 1].y - hi : 0;
-    if (over > 0) items.forEach((it) => { it.y -= over; });
-    items.forEach((it) => { if (it.y < lo) it.y = lo; });
-    return items;
-  };
-  const thin = (arr, max) => { if (arr.length <= max) return arr; const step = Math.ceil(arr.length / max); return arr.filter((_, i) => i % step === 0); };
-  const logTicks = (lo, hi, max) => {
-    const base = [1, 1.5, 2, 3, 5, 7];
-    let out = [];
-    for (let p = Math.floor(Math.log10(lo)) - 1; p <= Math.ceil(Math.log10(hi)); p++) base.forEach((b) => { const v = b * 10 ** p; if (v >= lo && v <= hi) out.push(v); });
-    if (out.length < 3) out = d3.scaleLinear([lo, hi]).ticks(4).filter((v) => v > 0);
-    return thin(out, max);
-  };
-  return { C, F, L, pick, ready, meta, measure, runs, tip, showTip, nudge, thin, logTicks };
-})();
-</script>
+    return '<div class="row ' + cls + '"><span class="to">' + lab + '</span><span class="t">' + esc(x.text) + dots + "</span></div>";
+  }).join("");
 
-<script>
-// 탭
-(() => {
-  const show = (id) => {
-    document.querySelectorAll('.vt-page').forEach((p) => { p.hidden = p.id !== id; });
-    document.querySelectorAll('.vt-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
-  };
-  document.querySelectorAll('.vt-tab').forEach((t) => t.addEventListener('click', () => { show(t.dataset.tab); dash.setLink(t.dataset.tab); }));
-  const h = location.hash.slice(1);
-  const named = h && document.getElementById(h);
-  if (named && named.classList.contains('vt-page')) show(h);
-  else if (named) { const page = named.closest('.vt-page'); if (page) show(page.id); setTimeout(() => named.scrollIntoView(), 300); }
-})();
-// 기간 버튼, 장부 필터, 표 정렬
-(() => {
-  document.querySelectorAll('.vt-range').forEach((g) => g.addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (!b) return;
-    g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    dash.draw('long');
-  }));
-  document.querySelectorAll('.vt-filter').forEach((g) => g.addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (!b) return;
-    g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    dash.draw('tbl'); dash.draw('countchart');
-  }));
-  document.querySelectorAll('.vt-table:not(.vt-static) thead').forEach((hd) => hd.addEventListener('click', (e) => {
-    const th = e.target.closest('th'); if (!th) return;
-    const cur = th.getAttribute('aria-sort');
-    hd.querySelectorAll('th').forEach((x) => x.removeAttribute('aria-sort'));
-    th.setAttribute('aria-sort', cur === 'descending' ? 'ascending' : 'descending');
-    dash.draw('tbl');
-  }));
-})();
-// 오늘 상태에 따라 문장 고르기, 범례 색
-dash.onData(() => {
-  const s = dash.data('now');
-  const r0 = s.status === 'ok' ? s.data[0] : null;
-  const row = r0 ? Object.assign({}, r0, { verdict: r0.state === 'risk' ? 'risk' : r0.state === 'window' ? 'window'
-    : r0.kospi_up === '아래' ? (r0.good_on >= 4 ? 'below_deep' : 'below') : 'above' }) : null;
-  document.querySelectorAll('[data-when]').forEach((el) => {
-    el.hidden = !row || !el.dataset.when.split('&').every((c) => { const [k, v] = c.split('='); return String(row[k]) === v; });
-  });
-  document.querySelectorAll('.vt-legend [data-color]').forEach((el) => { el.style.background = dash.colors[+el.dataset.color]; });
-});
-</script>
-
-<script>
-// 숫자 하나, 상수
-dash.draw('c', (el) => { el.textContent = V.C[el.dataset.c] ?? '—'; });
-dash.draw('v', (el) => {
-  const s = dash.data(el.dataset.source);
-  el.classList.toggle('dash-skeleton', s.status === 'loading');
-  if (s.status !== 'ok') { el.textContent = '—'; return; }
-  const row = V.pick(s.data, el.dataset.where, el.dataset.row);
-  const val = row ? row[el.dataset.field] : null;
-  el.textContent = val == null || val === '' ? '—' : V.F[el.dataset.fmt || 'txt'](val);
-});
-// 게이지 막대
-dash.draw('meter', (el) => {
-  el.replaceChildren();
-  const s = dash.data('now');
-  el.classList.toggle('dash-skeleton', s.status === 'loading');
-  if (s.status !== 'ok') return;
-  const g = s.data[0].gauge, th = +V.C.th;
-  const tr = document.createElement('div'); tr.className = 'tr';
-  const zone = document.createElement('div'); zone.className = 'zone'; zone.style.left = '0'; zone.style.width = th + '%';
-  const mk = document.createElement('div'); mk.className = 'mk'; mk.style.left = Math.max(0, Math.min(100, g)) + '%';
-  const l0 = document.createElement('div'); l0.className = 'lb'; l0.style.left = '0'; l0.style.transform = 'none'; l0.textContent = '0';
-  const l1 = document.createElement('div'); l1.className = 'lb'; l1.style.right = '0'; l1.style.left = 'auto'; l1.style.transform = 'none'; l1.textContent = '100';
-  el.append(tr, zone, mk, l0, l1);
-});
-// 표
-dash.draw('tbl', (tb) => {
-  const t = tb.closest('table'); if (!t) return;
-  tb.replaceChildren();
-  const s = dash.data(t.dataset.source);
-  t.classList.toggle('dash-skeleton', s.status === 'loading');
-  if (s.status !== 'ok') return;
-  const ths = [...t.querySelectorAll('thead th')];
-  let rows = s.data.slice();
-  const fb = document.querySelector(`[data-filter-for="${t.id}"] [aria-pressed="true"]`);
-  if (fb && fb.dataset.val && t.dataset.filter) rows = rows.filter((r) => String(r[t.dataset.filter]) === fb.dataset.val);
-  const sth = ths.find((th) => th.getAttribute('aria-sort'));
-  if (sth) {
-    const f = sth.dataset.field, dir = sth.getAttribute('aria-sort') === 'ascending' ? 1 : -1;
-    rows.sort((a, b) => {
-      const x = a[f], y = b[f];
-      if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
-      return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'ko')) * dir;
-    });
+  var TR = D.trig2 || [];
+  function meterHTML(spec) {
+    // spec: {min,max,marks:[v],cur,color:"var(--x)",zones:[{a,b,c}]}
+    var x = function (v) { return (100 * (Math.max(spec.min, Math.min(spec.max, v)) - spec.min) / (spec.max - spec.min)).toFixed(2); };
+    var h = '<div class="mtr" aria-hidden="true"><div class="trk"></div>';
+    (spec.zones || []).forEach(function (z) { var l = +x(z.a), r = +x(z.b); h += '<div class="zone" style="left:' + l + '%;width:' + Math.max(0, r - l) + '%;background:' + z.c + '"></div>'; });
+    (spec.marks || []).forEach(function (m) { h += '<div class="tick" style="left:' + x(m) + '%"></div>'; });
+    return h + '<div class="dot" style="left:' + x(spec.cur) + '%;--c:' + (spec.color || "var(--ink)") + '"></div></div>';
   }
-  const keys = t.dataset.rowKey.split(',');
-  const base = t.dataset.baseKey ? s.data.find((r) => String(r[keys[0]]) === t.dataset.baseKey) : null;
-  const hl = t.dataset.hl ? t.dataset.hl.split('=') : null;
-  const th0 = +V.C.th;
-  for (const r of rows) {
-    const tr = document.createElement('tr');
-    tr.dataset.key = keys.length > 1 ? keys.map((k) => encodeURIComponent(String(r[k]))).join(',') : String(r[keys[0]]);
-    if (hl && String(r[hl[0]]) === hl[1]) tr.className = 'vt-hl';
-    for (const th of ths) {
-      const td = document.createElement('td');
-      if (th.classList.contains('num')) td.classList.add('num');
-      if (th.classList.contains('opt')) td.classList.add('opt');
-      const f = th.dataset.field, v = r[f];
-      const txt = v == null || v === '' ? '' : V.F[th.dataset.fmt || 'txt'](v);
-      if (th.dataset.bar && v != null) {
-        const w = document.createElement('div'); w.className = 'vt-bar';
-        const b = document.createElement('div'); b.className = 'b';
-        const i = document.createElement('i'); i.style.width = Math.max(2, Math.min(100, v)) + '%';
-        const on = th.dataset.barOn ? String(r[th.dataset.barOn.split('=')[0]]) === th.dataset.barOn.split('=')[1] : v <= th0;
-        if (on) i.className = th.dataset.barCls || 'lo';
-        const n = document.createElement('span'); n.className = 'v'; n.textContent = txt;
-        b.append(i); w.append(b, n); td.append(w);
-      } else td.textContent = txt;
-      const tone = th.dataset.tone;
-      if (tone && typeof v === 'number') {
-        if (tone.startsWith('base-') && base && r !== base && base[f] != null) {
-          const better = tone === 'base-hi' ? v > base[f] : v < base[f];
-          td.classList.add(better ? 'good' : 'bad');
-        } else if (tone.startsWith('pair-hi:')) {
-          const o = r[tone.slice(8)]; if (o != null) td.classList.add(v > o ? 'good' : 'bad');
-        } else if (tone === 'ic' && Math.abs(v) >= 0.1) td.classList.add('strong');
-      }
-      tr.append(td);
+  function trigRow(r) {
+    var h = "", sub = esc(r.note) + (r.side ? '<br><span class="mute">' + esc(r.side) + "</span>" : ""), m = "";
+    if (r.key === "k_ma50" || r.key === "k_ma200") {
+      var g = r.dist;
+      h = num(r.now) + ' <span class="mute">/ ' + (r.key === "k_ma50" ? "50일선 " : "200일선 ") + num(r.thr) + " (" + pct(g) + ")</span>";
+      var lo = Math.min(-0.3, g - 0.05), hi = Math.max(0.15, g + 0.05);
+      m = meterHTML({ min: lo, max: hi, marks: [0], cur: g, color: g < 0 ? "var(--def)" : "var(--nor)", zones: [{ a: lo, b: 0, c: "var(--def-w)" }] });
+    } else if (r.key === "vol20") {
+      h = Math.round(r.now * 100) + '% <span class="mute">/ 경계 25 · 방어 40</span>';
+      var top = Math.max(0.8, r.now + 0.05);
+      m = meterHTML({ min: 0, max: top, marks: [0.25, 0.40], cur: r.now, color: r.now >= 0.4 ? "var(--def)" : r.now >= 0.25 ? "var(--cau)" : "var(--nor)", zones: [{ a: 0.25, b: 0.40, c: "var(--cau-w)" }, { a: 0.40, b: top, c: "var(--def-w)" }] });
+    } else if (r.key === "vol20_25") {
+      return "";
+    } else if (r.key === "sp125") {
+      h = pct(r.now) + ' <span class="mute">/ 125일선 0%</span>';
+      var a = Math.min(-0.1, r.now - 0.02), b = Math.max(0.1, r.now + 0.02);
+      m = meterHTML({ min: a, max: b, marks: [0], cur: r.now, color: r.now < 0 ? "var(--def)" : "var(--nor)", zones: [{ a: a, b: 0, c: "var(--def-w)" }] });
     }
-    tb.append(tr);
+    if (r.key === "vol20" && N.vol20 != null) {
+      var parts = [];
+      if (N.vol20 >= 0.40 && N.vol40_date) parts.push(md(N.vol40_date) + "쯤 40%");
+      if (N.vol20 >= 0.25 && N.vol25_date) parts.push(md(N.vol25_date) + "쯤 25%");
+      if (parts.length) sub = "하루 1%씩 오르내리면 " + parts.join(", ") + " 아래로 내려옴" + (r.side ? '<br><span class="mute">' + esc(r.side) + "</span>" : "");
+    }
+    return '<div class="tr"><div class="h"><span class="n">' + esc(r.name) + '</span><span class="val num">' + h + '</span></div><div>' + m + '</div><div class="sub">' + sub + "</div></div>";
   }
-});
-</script>
+  $("trig").innerHTML = TR.map(trigRow).join("");
 
-<script>
-
-// 잘 맞던 지표 중 지금 켜진 수
-dash.calc('hit_summary', {
-  inputs: ['hit_bot', 'hit_top'],
-  title: '잘 맞던 지표 중 켜진 수',
-  description: '성적표에서 세 구간 모두 기준보다 나았던 지표 가운데 지금 켜진 지표 수',
-  fn: (hit_bot, hit_top) => [{
-    bot_on: hit_bot.filter((r) => r.good && r.zone === '켜짐').length, bot_n: hit_bot.filter((r) => r.good).length,
-    top_on: hit_top.filter((r) => r.good && r.zone === '켜짐').length, top_n: hit_top.filter((r) => r.good).length,
-  }],
-});
-// 지표 성적표 막대
-dash.draw('hitchart', (el) => {
-  el.replaceChildren();
-  const id = 'hit_' + el.dataset.side;
-  if (!V.ready(el, [id])) return;
-  const rows = dash.data(id).data.slice().sort((a, b) => b.hit - a.hit);
-  if (!rows.length) return;
-  const base = rows[0].hit_base;
-  const W = Math.max(300, el.clientWidth);
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%');
-  const p0 = V.L.format('.0%');
-  const need = Math.ceil(V.measure(svg, rows.map((r) => r.name)) + 12);
-  const stacked = need > W * 0.45;
-  const lw = stacked ? 0 : need, rh = stacked ? 38 : 24, top = 24, H = top + rows.length * rh + 6;
-  svg.attr('viewBox', `0 0 ${W} ${H}`);
-  el.style.minHeight = H + 'px';
-  const vw = Math.ceil(V.measure(svg, ['100%']) + 8);
-  const x = d3.scaleLinear([0, Math.max(0.8, d3.max(rows, (r) => r.hit))], [lw + 4, W - vw]);
-  x.ticks(4).forEach((v) => {
-    svg.append('line').attr('x1', x(v)).attr('x2', x(v)).attr('y1', top - 4).attr('y2', H - 4).attr('stroke', 'var(--cds-chart-grid)');
-    svg.append('text').attr('x', x(v)).attr('y', top - 10).attr('text-anchor', 'middle').text(p0(v));
-  });
-  const t = V.tip(el);
-  rows.forEach((r, i) => {
-    const y0 = top + i * rh;
-    const by = stacked ? y0 + 20 : y0 + 5, bh = stacked ? 12 : 14;
-    const fill = r.key.startsWith('vera') ? dash.colors[2] : r.good ? dash.colors[0] : 'var(--cds-chart-muted)';
-    const g = svg.append('g');
-    if (stacked) g.append('text').attr('x', 4).attr('y', y0 + 11).attr('dy', '0.32em').attr('class', r.key.startsWith('vera') || r.good ? 'em' : null).text(r.name);
-    else g.append('text').attr('x', lw - 8).attr('y', by + bh / 2).attr('dy', '0.32em').attr('text-anchor', 'end').attr('class', r.key.startsWith('vera') || r.good ? 'em' : null).text(r.name);
-    g.append('rect').attr('x', x(0)).attr('y', by).attr('width', Math.max(1, x(r.hit) - x(0))).attr('height', bh).attr('rx', 3).attr('fill', fill);
-    g.append('text').attr('x', x(r.hit) + 5).attr('y', by + bh / 2).attr('dy', '0.32em').text(p0(r.hit));
-    g.append('rect').attr('x', 0).attr('y', y0).attr('width', W).attr('height', rh).attr('fill', 'transparent')
-      .on('pointermove', (ev) => {
-        const [px, py] = d3.pointer(ev, svg.node()); const sc = el.clientWidth / W;
-        V.showTip(el, t, px * sc, py * sc, r.name, [[fill, '적중률', p0(r.hit)], [null, '기준', p0(r.hit_base)], [null, '신호 횟수', String(r.n)],
-          [null, '20일 뒤 평균', V.F.pct1s(r.avg)], [null, '나은 구간', `${r.consistent} / 3`]]);
-      })
-      .on('pointerleave', () => { t.hidden = true; });
-  });
-  svg.append('line').attr('x1', x(base)).attr('x2', x(base)).attr('y1', top - 4).attr('y2', H - 4).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
-});
-
-
-// 켜진 개수별 확률 막대
-dash.draw('countchart', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['by_count'])) return;
-  const b = document.querySelector('[data-filter-for="bycount"] [aria-pressed="true"]');
-  const scope = b ? b.dataset.val : '200일선 아래';
-  const rows = dash.data('by_count').data.filter((r) => r.scope === scope).sort((a, z) => a.count - z.count);
-  if (!rows.length) return;
-  const W = Math.max(300, el.clientWidth), top = 22, H1 = 190, H = top + H1 + 40;
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-  const p0 = V.L.format('.0%');
-  const ml = Math.ceil(V.measure(svg, ['100%']) + 10);
-  const x = d3.scaleBand(rows.map((r) => r.label), [ml, W - 8]).padding(0.3);
-  const hi = Math.max(0.8, d3.max(rows, (r) => r.up20) + 0.05);
-  const y = d3.scaleLinear([0, hi], [top + H1, top]);
-  y.ticks(4).forEach((v) => {
-    svg.append('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', 'var(--cds-chart-grid)');
-    svg.append('text').attr('x', ml - 6).attr('y', y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(p0(v));
-  });
-  const bw = Math.min(48, x.bandwidth());
-  const t = V.tip(el);
-  rows.forEach((r) => {
-    const cx = x(r.label) + x.bandwidth() / 2;
-    const fill = r.is_now === '지금' ? dash.colors[2] : r.up20 > r.base_up20 ? dash.colors[0] : 'var(--cds-chart-muted)';
-    svg.append('rect').attr('x', cx - bw / 2).attr('width', bw).attr('y', y(r.up20)).attr('height', y(0) - y(r.up20)).attr('rx', 3).attr('fill', fill);
-    svg.append('text').attr('x', cx).attr('y', y(r.up20) - 6).attr('text-anchor', 'middle').attr('class', r.is_now === '지금' ? 'em' : null).text(p0(r.up20));
-    svg.append('text').attr('x', cx).attr('y', top + H1 + 16).attr('text-anchor', 'middle').attr('class', r.is_now === '지금' ? 'em' : null).text(r.label);
-    if (r.is_now === '지금') svg.append('text').attr('x', cx).attr('y', top + H1 + 32).attr('text-anchor', 'middle').attr('class', 'em').text('지금');
-    svg.append('rect').attr('x', x(r.label)).attr('y', top).attr('width', x.bandwidth()).attr('height', H1).attr('fill', 'transparent')
-      .on('pointermove', (ev) => {
-        const [px, py] = d3.pointer(ev, svg.node()); const sc = el.clientWidth / W;
-        V.showTip(el, t, px * sc, py * sc, `${scope} · ${r.label} 켜진 날`, [[fill, '20일 뒤 오를 확률', p0(r.up20)], [null, '20일 뒤 평균', V.F.pct1s(r.avg20)],
-          [null, '60일 뒤 오를 확률', p0(r.up60)], [null, '40일 안 -5% 하락', p0(r.dd5)], [null, '날 수', String(r.days)]]);
-      })
-      .on('pointerleave', () => { t.hidden = true; });
-  });
-  const base = rows[0].base_up20;
-  svg.append('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y(base)).attr('y2', y(base)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '4 3');
-  svg.append('line').attr('x1', ml).attr('x2', W - 8).attr('y1', y(0)).attr('y2', y(0)).attr('stroke', 'var(--cds-chart-axis)');
-});
-
-// 최근 6개월 차트
-dash.draw('recent', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['daily'])) return;
-  const rows = dash.data('daily').data.slice(-V.C.recentN).map((r) => ({ ...r, t: new Date(r.d) }));
-  if (!rows.length) return;
-  const W = Math.max(300, el.clientWidth), top = 10, H1 = 220, G = 30, H2 = 86, H = top + H1 + G + H2 + 26;
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-  const f0 = V.L.format(',.0f'), f2 = V.L.format(',.2f');
-  const lo = d3.min(rows, (r) => Math.min(r.kospi, r.ma200 ?? r.kospi)), hi = d3.max(rows, (r) => Math.max(r.kospi, r.ma200 ?? r.kospi));
-  const y = d3.scaleLinear([lo * 0.97, hi * 1.02], [top + H1, top]).nice(5);
-  const yt = y.ticks(5);
-  const last = rows[rows.length - 1];
-  const endK = `코스피 ${f2(last.kospi)}`, endM = `200일선 ${f0(last.ma200)}`;
-  const ml = Math.ceil(V.measure(svg, yt.map(f0).concat(['100'])) + 10);
-  const mr = Math.ceil(V.measure(svg, [endK, endM], 'em') + 12);
-  const x = d3.scaleUtc(d3.extent(rows, (r) => r.t), [ml, W - mr]);
-  const step = (W - ml - mr) / Math.max(1, rows.length - 1);
-  const y2 = d3.scaleLinear([0, 100], [top + H1 + G + H2, top + H1 + G]);
-  const bandY0 = top, bandY1 = top + H1 + G + H2;
-  const band = (test, color, op) => V.runs(rows, test).forEach(([a, b]) => svg.append('rect')
-    .attr('x', x(rows[a].t) - step / 2).attr('width', Math.max(1, x(rows[b].t) - x(rows[a].t) + step))
-    .attr('y', bandY0).attr('height', bandY1 - bandY0).attr('fill', color).attr('opacity', op));
-  band((r) => r.expo > 1, 'var(--color-ok)', 0.16);
-  band((r) => r.risk === 1, 'var(--color-bad)', 0.14);
-  const grid = svg.append('g');
-  yt.forEach((v) => {
-    grid.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', 'var(--cds-chart-grid)');
-    grid.append('text').attr('x', ml - 6).attr('y', y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(f0(v));
-  });
-  [50, 100].forEach((v) => {
-    grid.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y2(v)).attr('y2', y2(v)).attr('stroke', 'var(--cds-chart-grid)');
-    grid.append('text').attr('x', ml - 6).attr('y', y2(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(String(v));
-  });
-  svg.append('text').attr('x', ml).attr('y', top + H1 + G - 8).text('업종 바닥 게이지');
-  svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y2(0)).attr('y2', y2(0)).attr('stroke', 'var(--cds-chart-axis)');
-  const th = +V.C.th;
-  const bw = Math.max(1, Math.min(8, step * 0.7));
-  svg.append('g').selectAll('rect').data(rows.filter((r) => r.gauge != null)).join('rect')
-    .attr('x', (r) => x(r.t) - bw / 2).attr('width', bw).attr('y', (r) => y2(r.gauge)).attr('height', (r) => Math.max(0.5, y2(0) - y2(r.gauge)))
-    .attr('rx', Math.min(2, bw / 2)).attr('fill', (r) => r.gauge <= th ? dash.colors[2] : 'var(--cds-chart-muted)');
-  svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y2(th)).attr('y2', y2(th)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 3');
-  svg.append('text').attr('x', W - mr + 6).attr('y', y2(th)).attr('dy', '0.32em').text(`기준 ${th}`);
-  const line = (f) => d3.line().defined((r) => r[f] != null).x((r) => x(r.t)).y((r) => y(r[f]));
-  svg.append('path').datum(rows).attr('d', line('ma200')).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.5).attr('stroke-dasharray', '5 4');
-  svg.append('path').datum(rows).attr('d', line('kospi')).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
-  svg.append('g').selectAll('circle').data(rows.filter((r) => r.bot === 1)).join('circle')
-    .attr('cx', (r) => x(r.t)).attr('cy', (r) => y(r.kospi)).attr('r', 4).attr('fill', dash.colors[2]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5);
-  const labs = V.nudge([{ y: y(last.kospi), t: endK, em: true }, { y: y(last.ma200), t: endM }], 15, top + 6, top + H1);
-  labs.forEach((l) => svg.append('text').attr('x', W - mr + 6).attr('y', l.y).attr('dy', '0.32em').attr('class', l.em ? 'em' : null).text(l.t));
-  // x축
-  const months = d3.utcMonth.range(d3.utcMonth.ceil(rows[0].t), rows[rows.length - 1].t);
-  const maxT = Math.max(2, Math.floor((W - ml - mr) / 56));
-  V.thin(months, maxT).forEach((m) => svg.append('text').attr('x', x(m)).attr('y', H - 6).attr('text-anchor', 'middle').text(d3.utcFormat('%-m월')(m)));
-  // 툴팁
-  const t = V.tip(el), rule = svg.append('line').attr('y1', top).attr('y2', bandY1).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
-  const dot = svg.append('circle').attr('r', 4).attr('fill', dash.colors[0]).attr('opacity', 0);
-  const bis = d3.bisector((r) => r.t).center;
-  svg.append('rect').attr('x', ml).attr('y', top).attr('width', W - ml - mr).attr('height', bandY1 - top).attr('fill', 'transparent')
-    .on('pointermove', (ev) => {
-      const [px, py] = d3.pointer(ev); const r = rows[bis(rows, x.invert(px))];
-      rule.attr('x1', x(r.t)).attr('x2', x(r.t)).attr('opacity', 1); dot.attr('cx', x(r.t)).attr('cy', y(r.kospi)).attr('opacity', 1);
-      const sc = el.clientWidth / W;
-      V.showTip(el, t, x(r.t) * sc, py * sc, V.F.date(r.d), [
-        [dash.colors[0], '코스피', f2(r.kospi)], [null, '200일선', r.ma200 == null ? '' : f0(r.ma200)],
-        [null, '게이지', r.gauge == null ? '' : String(r.gauge)], [null, '다음 날 비중', V.L.format('.0%')(r.expo)]]);
-    })
-    .on('pointerleave', () => { t.hidden = true; rule.attr('opacity', 0); dot.attr('opacity', 0); });
-});
-
-// 20년 차트
-dash.draw('long', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['daily', 'info'])) return;
-  const btn = document.querySelector('.vt-range [aria-pressed="true"]');
-  const n = btn ? +btn.dataset.range : 0;
-  const all = dash.data('daily').data;
-  const rows = (n ? all.slice(-n) : all).map((r) => ({ ...r, t: new Date(r.d) }));
-  if (!rows.length) return;
-  const M = V.meta();
-  const W = Math.max(300, el.clientWidth), top = 18, H1 = 290, H = top + H1 + 26;
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-  const f0 = V.L.format(',.0f'), f2 = V.L.format(',.2f');
-  const lo = d3.min(rows, (r) => Math.min(r.kospi, r.ma200 ?? r.kospi)), hi = d3.max(rows, (r) => Math.max(r.kospi, r.ma200 ?? r.kospi));
-  const y = d3.scaleLog([lo * 0.95, hi * 1.05], [top + H1, top]);
-  const yt = V.logTicks(lo * 0.95, hi * 1.05, 6);
-  const last = rows[rows.length - 1];
-  const endK = f0(last.kospi);
-  const ml = Math.ceil(V.measure(svg, yt.map(f0)) + 10), mr = Math.ceil(V.measure(svg, [endK], 'em') + 12);
-  const x = d3.scaleUtc(d3.extent(rows, (r) => r.t), [ml, W - mr]);
-  const step = (W - ml - mr) / Math.max(1, rows.length - 1);
-  const p3 = M.p3 ? new Date(String(M.p3).slice(0, 4) + '-01-01') : null;
-  if (p3 && p3 < rows[rows.length - 1].t) {
-    const x0 = Math.max(ml, x(p3));
-    svg.append('rect').attr('x', x0).attr('y', top).attr('width', W - mr - x0).attr('height', H1).attr('fill', 'var(--cds-chart-grid)').attr('opacity', 0.6);
-    if (W - mr - x0 > 60) svg.append('text').attr('x', x0 + 6).attr('y', top - 5).text('채점 기간');
+  /* ---------------- 차트 공통 ---------------- */
+  function niceTicks(lo, hi, n) {
+    var span = hi - lo, step = Math.pow(10, Math.floor(Math.log10(span / n))), err = (span / n) / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    var t = [], v = Math.ceil(lo / step) * step; for (; v <= hi + 1e-9; v += step) t.push(v); return t;
   }
-  V.runs(rows, (r) => r.risk === 1).forEach(([a, b]) => svg.append('rect')
-    .attr('x', x(rows[a].t) - step / 2).attr('width', Math.max(1, x(rows[b].t) - x(rows[a].t) + step))
-    .attr('y', top).attr('height', H1).attr('fill', 'var(--color-bad)').attr('opacity', 0.16));
-  yt.forEach((v) => {
-    svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', 'var(--cds-chart-grid)');
-    svg.append('text').attr('x', ml - 6).attr('y', y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(f0(v));
-  });
-  svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', top + H1).attr('y2', top + H1).attr('stroke', 'var(--cds-chart-axis)');
-  const line = (f) => d3.line().defined((r) => r[f] != null).x((r) => x(r.t)).y((r) => y(r[f]));
-  svg.append('path').datum(rows).attr('d', line('ma200')).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)').attr('stroke-width', 1.2).attr('stroke-dasharray', '5 4');
-  svg.append('path').datum(rows).attr('d', line('kospi')).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 1.6).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round');
-  svg.append('g').selectAll('circle').data(rows.filter((r) => r.bot === 1)).join('circle')
-    .attr('cx', (r) => x(r.t)).attr('cy', (r) => y(r.kospi)).attr('r', 3.5).attr('fill', dash.colors[2]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1);
-  svg.append('text').attr('x', W - mr + 6).attr('y', y(last.kospi)).attr('dy', '0.32em').attr('class', 'em').text(endK);
-  const span = (rows[rows.length - 1].t - rows[0].t) / 864e5;
-  const maxT = Math.max(2, Math.floor((W - ml - mr) / 56));
-  const ticks = span > 800 ? d3.utcYear.range(d3.utcYear.ceil(rows[0].t), rows[rows.length - 1].t) : d3.utcMonth.range(d3.utcMonth.ceil(rows[0].t), rows[rows.length - 1].t);
-  const fmt = span > 800 ? d3.utcFormat('%Y') : d3.utcFormat('%y.%m');
-  V.thin(ticks, maxT).forEach((m) => svg.append('text').attr('x', x(m)).attr('y', H - 6).attr('text-anchor', 'middle').text(fmt(m)));
-  const t = V.tip(el), rule = svg.append('line').attr('y1', top).attr('y2', top + H1).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
-  const dot = svg.append('circle').attr('r', 4).attr('fill', dash.colors[0]).attr('opacity', 0);
-  const bis = d3.bisector((r) => r.t).center;
-  svg.append('rect').attr('x', ml).attr('y', top).attr('width', W - ml - mr).attr('height', H1).attr('fill', 'transparent')
-    .on('pointermove', (ev) => {
-      const [px, py] = d3.pointer(ev); const r = rows[bis(rows, x.invert(px))];
-      rule.attr('x1', x(r.t)).attr('x2', x(r.t)).attr('opacity', 1); dot.attr('cx', x(r.t)).attr('cy', y(r.kospi)).attr('opacity', 1);
-      const sc = el.clientWidth / W;
-      const st = r.bot === 1 ? '바닥 신호' : r.risk === 1 ? '위험 국면' : '';
-      const lines = [[dash.colors[0], '코스피', f2(r.kospi)], [null, '200일선', r.ma200 == null ? '' : f0(r.ma200)], [null, '게이지', r.gauge == null ? '' : String(r.gauge)]];
-      if (st) lines.push([null, '상태', st]);
-      V.showTip(el, t, x(r.t) * sc, py * sc, V.F.date(r.d), lines);
-    })
-    .on('pointerleave', () => { t.hidden = true; rule.attr('opacity', 0); dot.attr('opacity', 0); });
-});
+  function el(tag, attrs) { var s = "<" + tag; for (var k in attrs) s += " " + k + '="' + attrs[k] + '"'; return s + "/>"; }
+  function bandRuns(rows, key) { var runs = [], st = 0; for (var i = 1; i <= rows.length; i++) { if (i === rows.length || lvOf(rows[i][key]) !== lvOf(rows[st][key])) { runs.push([st, i - 1, lvOf(rows[st][key])]); st = i; } } return runs; }
+  function attachHover(box, svgW, m, n, xOf, render) {
+    var tip = box.querySelector(".tip"), line = box.querySelector(".xh");
+    function show(ev) {
+      var rect = box.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+      var scale = svgW / rect.width, xv = px * scale, i = Math.round((xv - m.l) / ((svgW - m.l - m.r) / (n - 1)));
+      i = Math.max(0, Math.min(n - 1, i));
+      var cx = xOf(i); line.setAttribute("x1", cx); line.setAttribute("x2", cx); line.style.display = "";
+      tip.innerHTML = render(i); tip.style.display = "block";
+      var tx = cx / scale + 12; if (tx + tip.offsetWidth > rect.width) tx = cx / scale - tip.offsetWidth - 12; tip.style.left = Math.max(0, tx) + "px"; tip.style.top = "8px";
+    }
+    function hide() { tip.style.display = "none"; line.style.display = "none"; }
+    box.addEventListener("mousemove", show); box.addEventListener("mouseleave", hide);
+    box.addEventListener("touchstart", show, { passive: true }); box.addEventListener("touchmove", show, { passive: true });
+  }
 
-// 바닥 후보 비교
-dash.draw('cands', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['bottom_cands'])) return;
-  const rows = dash.data('bottom_cands').data.filter((r) => r.key !== 'base').slice().sort((a, b) => b.sel_ex - a.sel_ex);
-  const W = Math.max(300, el.clientWidth);
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%');
-  const pp = (v) => V.L.format('+.1f')(v * 100) + '%p';
-  const need = Math.ceil(V.measure(svg, rows.map((r) => r.short), 'em') + 14);
-  const stacked = need > W * 0.5;
-  const lw = stacked ? 8 : need, rh = stacked ? 46 : 32, top = 26, H = top + rows.length * rh + 8;
-  svg.attr('viewBox', `0 0 ${W} ${H}`);
-  const vals = rows.flatMap((r) => [r.sel_ex, r.p3_ex]).filter((v) => v != null).concat([0]);
-  const x = d3.scaleLinear(d3.extent(vals), [stacked ? 16 : lw + 8, W - 30]).nice(4);
-  const xt = x.ticks(Math.max(2, Math.floor((W - lw) / 70)));
-  xt.forEach((v) => {
-    svg.append('line').attr('x1', x(v)).attr('x2', x(v)).attr('y1', top - 4).attr('y2', H - 8).attr('stroke', v === 0 ? 'var(--cds-chart-reference)' : 'var(--cds-chart-grid)');
-    svg.append('text').attr('x', x(v)).attr('y', top - 10).attr('text-anchor', 'middle').text(pp(v));
-  });
-  const t = V.tip(el);
-  rows.forEach((r, i) => {
-    const cy = top + i * rh + rh / 2;
-    const g = svg.append('g');
-    const ly = stacked ? cy - 13 : cy, dy = stacked ? 7 : 0;
-    g.append('text').attr('x', stacked ? 8 : lw).attr('y', ly).attr('dy', '0.32em').attr('text-anchor', stacked ? 'start' : 'end').attr('class', r.pick === '채택' ? 'em' : null).text(r.short);
-    if (r.sel_ex != null && r.p3_ex != null) g.append('line').attr('x1', x(r.sel_ex)).attr('x2', x(r.p3_ex)).attr('y1', cy + dy).attr('y2', cy + dy).attr('stroke', 'var(--cds-chart-grid)').attr('stroke-width', 2);
-    if (r.sel_ex != null) g.append('circle').attr('cx', x(r.sel_ex)).attr('cy', cy + dy).attr('r', 6).attr('fill', dash.colors[0]);
-    if (r.p3_ex != null) g.append('circle').attr('cx', x(r.p3_ex)).attr('cy', cy + dy).attr('r', 6).attr('fill', dash.colors[1]);
-    g.append('rect').attr('x', 0).attr('y', cy - rh / 2).attr('width', W).attr('height', rh).attr('fill', 'transparent')
-      .on('pointermove', (ev) => {
-        const [px, py] = d3.pointer(ev, svg.node()); const sc = el.clientWidth / W;
-        V.showTip(el, t, px * sc, py * sc, r.name, [
-          [dash.colors[0], `고를 때 (${r.sel_ep}회)`, pp(r.sel_ex)], [dash.colors[1], `채점 (${r.p3_ep}회)`, pp(r.p3_ex)]]);
-      })
-      .on('pointerleave', () => { t.hidden = true; });
-  });
-});
+  /* ---------------- 최근 흐름 ---------------- */
+  var RC = D.recent2 || [];
+  function drawTimeline() {
+    var box = $("tl-chart"); if (!RC.length) { box.innerHTML = '<p class="note">최근 흐름 자료 없음</p>'; return; }
+    var W = Math.max(320, box.clientWidth), small = W < 560, H = small ? 250 : 300, m = { l: 46, r: 10, t: 10, b: 58 };
+    var n = RC.length, ph = H - m.t - m.b;
+    var vals = []; RC.forEach(function (r) { vals.push(r.k); if (r.ma50) vals.push(r.ma50); if (r.ma200) vals.push(r.ma200); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pad = (hi - lo) * .06; lo -= pad; hi += pad;
+    var X = function (i) { return m.l + (W - m.l - m.r) * i / (n - 1); }, Y = function (v) { return m.t + ph * (1 - (v - lo) / (hi - lo)); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '">';
+    bandRuns(RC, "e").forEach(function (b) { s += el("rect", { x: X(b[0]) - (b[0] ? (X(1) - X(0)) / 2 : 0), y: m.t, width: Math.max(1, X(b[1]) - X(b[0]) + (X(1) - X(0))), height: ph, fill: lvWash(b[2]) }); });
+    niceTicks(lo, hi, small ? 4 : 5).forEach(function (t) { s += el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: cssv("--line"), "stroke-width": 1 }); s += '<text x="' + (m.l - 6) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + num(t) + "</text>"; });
+    var lastM = -1; RC.forEach(function (r, i) { var mo = r.d.slice(5, 7); if (mo !== lastM) { lastM = mo; if ((!small || (+mo) % 2 === 1) && i > 3 && i < n - 3) s += '<text x="' + X(i) + '" y="' + (m.t + ph + 15) + '" text-anchor="middle">' + ((+mo) === 1 ? r.d.slice(2, 4) + "년 1월" : (+mo) + "월") + "</text>"; } });
+    function path(key) { var d = "", pen = false; RC.forEach(function (r, i) { if (r[key] == null) { pen = false; return; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(r[key]).toFixed(1); pen = true; }); return d; }
+    s += '<path d="' + path("ma200") + '" fill="none" stroke="' + cssv("--s3") + '" stroke-width="1.5"/>';
+    s += '<path d="' + path("ma50") + '" fill="none" stroke="' + cssv("--s1") + '" stroke-width="1.5"/>';
+    s += '<path d="' + path("k") + '" fill="none" stroke="' + cssv("--ink") + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    s += '<circle cx="' + X(n - 1) + '" cy="' + Y(RC[n - 1].k) + '" r="4.5" fill="' + cssv("--ink") + '" stroke="' + cssv("--card") + '" stroke-width="2"/>';
+    // 비중 띠 두 줄
+    var y1 = m.t + ph + 24, y2 = y1 + 16;
+    [["e", "새 규칙", y1], ["e_old", "이전 규칙", y2]].forEach(function (row) {
+      bandRuns(RC, row[0]).forEach(function (b) { s += el("rect", { x: X(b[0]) - (b[0] ? (X(1) - X(0)) / 2 : 0), y: row[2], width: Math.max(1, X(b[1]) - X(b[0]) + (X(1) - X(0))), height: 10, fill: lvColor(b[2]), rx: 0 }); });
+      s += '<text x="' + (m.l - 6) + '" y="' + (row[2] + 9) + '" text-anchor="end">' + row[1] + "</text>";
+    });
+    s += '<line class="xh" x1="0" x2="0" y1="' + m.t + '" y2="' + (y2 + 10) + '" stroke="' + cssv("--ink2") + '" stroke-width="1" style="display:none"/>';
+    s += "</svg>";
+    box.innerHTML = s + '<div class="tip"></div>';
+    attachHover(box, W, m, n, X, function (i) {
+      var r = RC[i];
+      return "<b>" + kday(r.d) + "</b><br>코스피 " + num(r.k, 2) + "<br>50일선 " + num(r.ma50) + " · 200일선 " + num(r.ma200) +
+        "<br>20일 변동성 " + (r.vol == null ? "-" : Math.round(r.vol * 100) + "%") + "<br>새 규칙 " + lvOf(r.e) + "% · 이전 규칙 " + lvOf(r.e_old) + "%";
+    });
+  }
+  $("tl-legend").innerHTML = '<span><i style="--c:var(--ink)"></i>코스피</span><span><i style="--c:var(--s1)"></i>50일선</span><span><i style="--c:var(--s3)"></i>200일선</span>' +
+    [50, 70, 100, 130].map(function (p) { return '<span><i class="sq" style="--c:var(--' + lvKey(p) + ')"></i>' + lvName(p) + " " + p + "%</span>"; }).join("");
+  (function () {
+    var ep = (D.ep2 || []).filter(function (r) { return r.name.indexOf("지금 하락") === 0; })[0];
+    var t = "바탕색과 아래 띠는 그날 들고 있던 비중, 아래 목록은 종가로 단계가 바뀐 날(다음 거래일부터 적용). ";
+    if (ep) t += ymd(ep.start) + " 고점부터 코스피 " + pct(ep.kospi) + ", 같은 기간 새 규칙 " + pct(ep.new) + ", 이전 규칙 " + pct(ep.old) + ".";
+    $("tl-lede").textContent = t;
+    var ch = (D.chg2 || []).filter(function (r) { return r.d; }).slice(-6).reverse();
+    $("tl-changes").innerHTML = ch.length ? ch.map(function (r) {
+      var a = lvOf(r.from), b = lvOf(r.to);
+      return '<div><span class="num">' + kday(r.d) + '</span><span class="mini" style="--c:var(--' + lvKey(a) + ')"><i></i>' + a + '%</span>에서 <span class="mini" style="--c:var(--' + lvKey(b) + ')"><i></i>' + b + '%</span>로 <span class="mute">· 코스피 ' + num(r.k) + "</span></div>";
+    }).join("") : "";
+  })();
 
-// 시뮬레이션
-dash.draw('simchart', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['sim_curve', 'info'])) return;
-  const rows = dash.data('sim_curve').data.map((r) => ({ ...r, t: new Date(r.d) }));
-  if (!rows.length) return;
-  const M = V.meta();
-  const S = [{ k: 'vera', name: '바닥+위험', c: dash.colors[0] }, { k: 'risk_only', name: '위험만', c: dash.colors[1] }, { k: 'hold', name: '보유', c: 'var(--cds-chart-muted)' }];
-  const W = Math.max(300, el.clientWidth), top = 18, H1 = 260, H = top + H1 + 26;
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
-  const fx = (v) => V.L.format('.2f')(v) + '배';
-  const lo = d3.min(rows, (r) => Math.min(r.vera, r.risk_only, r.hold)), hi = d3.max(rows, (r) => Math.max(r.vera, r.risk_only, r.hold));
-  const y = d3.scaleLog([lo * 0.92, hi * 1.08], [top + H1, top]);
-  const yt = V.logTicks(lo * 0.92, hi * 1.08, 6);
-  const last = rows[rows.length - 1];
-  const ends = S.map((s) => `${s.name} ${fx(last[s.k])}`);
-  const ml = Math.ceil(V.measure(svg, yt.map((v) => V.L.format('.1f')(v))) + 10), mr = Math.ceil(V.measure(svg, ends, 'em') + 12);
-  const x = d3.scaleUtc(d3.extent(rows, (r) => r.t), [ml, W - mr]);
-  const p3 = M.p3 ? new Date(String(M.p3).slice(0, 4) + '-01-01') : null;
-  if (p3) { const x0 = x(p3); svg.append('rect').attr('x', x0).attr('y', top).attr('width', W - mr - x0).attr('height', H1).attr('fill', 'var(--cds-chart-grid)').attr('opacity', 0.6);
-    if (W - mr - x0 > 60) svg.append('text').attr('x', x0 + 6).attr('y', top - 5).text('채점 기간'); }
-  yt.forEach((v) => {
-    svg.append('line').attr('x1', ml).attr('x2', W - mr).attr('y1', y(v)).attr('y2', y(v)).attr('stroke', 'var(--cds-chart-grid)');
-    svg.append('text').attr('x', ml - 6).attr('y', y(v)).attr('dy', '0.32em').attr('text-anchor', 'end').text(V.L.format('.1f')(v));
-  });
-  [...S].reverse().forEach((s) => svg.append('path').datum(rows).attr('d', d3.line().x((r) => x(r.t)).y((r) => y(r[s.k])))
-    .attr('fill', 'none').attr('stroke', s.c).attr('stroke-width', s.k === 'hold' ? 1.5 : 2).attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round'));
-  const labs = V.nudge(S.map((s, i) => ({ y: y(last[s.k]), t: ends[i], c: s.c })), 15, top + 6, top + H1);
-  labs.forEach((l) => svg.append('text').attr('x', W - mr + 6).attr('y', l.y).attr('dy', '0.32em').attr('class', 'em').text(l.t));
-  const maxT = Math.max(2, Math.floor((W - ml - mr) / 56));
-  V.thin(d3.utcYear.range(d3.utcYear.ceil(rows[0].t), last.t), maxT).forEach((m) => svg.append('text').attr('x', x(m)).attr('y', H - 6).attr('text-anchor', 'middle').text(d3.utcFormat('%Y')(m)));
-  const t = V.tip(el), rule = svg.append('line').attr('y1', top).attr('y2', top + H1).attr('stroke', 'var(--cds-chart-axis)').attr('opacity', 0);
-  const bis = d3.bisector((r) => r.t).center;
-  svg.append('rect').attr('x', ml).attr('y', top).attr('width', W - ml - mr).attr('height', H1).attr('fill', 'transparent')
-    .on('pointermove', (ev) => {
-      const [px, py] = d3.pointer(ev); const r = rows[bis(rows, x.invert(px))];
-      rule.attr('x1', x(r.t)).attr('x2', x(r.t)).attr('opacity', 1);
-      const sc = el.clientWidth / W;
-      V.showTip(el, t, x(r.t) * sc, py * sc, V.F.date(r.d), S.map((s) => [s.c, s.name, fx(r[s.k])]));
-    })
-    .on('pointerleave', () => { t.hidden = true; rule.attr('opacity', 0); });
-});
+  /* ---------------- 지금 같은 장의 과거 ---------------- */
+  (function () {
+    var A = D.anlg2 || []; if (!A.length) return;
+    var base = A[0];
+    var hdr = '<tr><th>조건</th><th>20일 뒤<br>상승</th><th class="opt">20일 뒤<br>평균</th><th class="opt">60일 뒤<br>상승</th><th>40일 안<br>10% 하락</th><th>40일 안<br>10% 반등</th></tr>';
+    function bar(v, ref, c) { if (v == null) return ""; var w = Math.max(2, Math.round(Math.min(1, v) * 40)); return '<span class="bar" style="width:' + w + "px;--c:" + c + '"></span>'; }
+    var rows = A.map(function (a, i) {
+      return '<tr class="' + (i === 0 ? "base" : "") + '"><td>' + esc(a.label) + '<span class="sub2">' + num(a.days) + "일" + (a.eps > 1 ? " · " + a.eps + "번" : "") + "</span></td><td>" + p0(a.up20) +
+        '</td><td class="opt">' + pct(a.avg20) + '</td><td class="opt">' + p0(a.up60) + "</td><td>" + p0(a.dn10) + bar(a.dn10, base.dn10, "var(--def)") + "</td><td>" + p0(a.up10) + bar(a.up10, base.up10, "var(--nor)") + "</td></tr>";
+    }).join("");
+    $("an-table").innerHTML = "<thead>" + hdr + "</thead><tbody>" + rows + "</tbody>";
+    var a = A.filter(function (x) { return x.key === "vol40" || x.key === "vol25"; })[0] || A[1];
+    var t = "";
+    if (a && a.up20 != null) {
+      t = a.label + "였던 날은 20년 동안 " + num(a.days) + "일. 20일 뒤 오른 비율은 " + p0(a.up20) + "로 아무 날(" + p0(base.up20) + ")과 비슷하지만, 40일 안에 10% 더 빠진 비율이 " + p0(a.dn10) + ", 10% 반등한 비율이 " + p0(a.up10) + "로 평소(" + p0(base.dn10) + ", " + p0(base.up10) + ")보다 큼.";
+      if (a.dn10 >= 1.5 * base.dn10 && a.up10 >= 1.5 * base.up10) t += " 방향을 맞히기보다 흔들림을 견디는 비중이 중요한 장.";
+    }
+    $("an-lede").textContent = t;
+  })();
 
-// 상관 히트맵
-dash.draw('corr', (el) => {
-  el.replaceChildren();
-  if (!V.ready(el, ['corr'])) return;
-  const rows = dash.data('corr').data;
-  const keys = [...new Set(rows.map((r) => r.a))];
-  const name = {}; rows.forEach((r) => { name[r.a] = r.a_name; });
-  const val = {}; rows.forEach((r) => { val[r.a + '|' + r.b] = r.rho; });
-  const n = keys.length;
-  const W = Math.max(300, el.clientWidth);
-  const tmp = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', 10).attr('height', 10);
-  const labels = keys.map((k, i) => `${i + 1}. ${name[k]}`);
-  const lw = Math.ceil(V.measure(tmp, labels) + 10); tmp.remove();
-  const cell = Math.max(14, Math.min(40, Math.floor((W - lw - 4) / n)));
-  const top = 22, H = top + cell * n + 4, Wd = lw + cell * n + 4;
-  const svg = d3.select(el).append('svg').attr('class', 'vt-svg').attr('width', '100%').attr('viewBox', `0 0 ${Math.max(W, Wd)} ${H}`);
-  keys.forEach((k, i) => {
-    svg.append('text').attr('x', lw - 8).attr('y', top + i * cell + cell / 2).attr('dy', '0.32em').attr('text-anchor', 'end').text(labels[i]);
-    if (cell >= 20 || i % 2 === 0) svg.append('text').attr('x', lw + i * cell + cell / 2).attr('y', top - 8).attr('text-anchor', 'middle').text(String(i + 1));
+  /* ---------------- 바닥 지표 ---------------- */
+  function indMeter(now, hiSide, on) {
+    var thr = hiSide ? 90 : 10;
+    return meterHTML({ min: 0, max: 100, marks: [thr], cur: now == null ? 50 : now, color: on ? "var(--nor)" : "var(--ink2)", zones: [hiSide ? { a: 90, b: 100, c: "var(--nor-w)" } : { a: 0, b: 10, c: "var(--nor-w)" }] });
+  }
+  function indRow(r, kind) {
+    var hiSide = r.how.indexOf("상위") >= 0, on = r.zone === "켜짐";
+    var gap = r.now == null ? null : (hiSide ? 90 - r.now : r.now - 10);
+    var state = on ? '<span class="st" style="--c:var(--nor)"><i></i>켜짐</span>' : (gap != null && gap <= 1 ? '<span class="st" style="--c:var(--cau)"><i></i>기준선 앞</span>' : '<span class="st" style="--c:var(--axis)"><i></i>꺼짐</span>');
+    return '<div class="r"><span class="n">' + esc(r.name) + '</span><span class="v num">' + (r.now == null ? "-" : r.now) + " · " + state + '</span><div class="m">' + indMeter(r.now, hiSide, on) + '</div></div>';
+  }
+  (function () {
+    var gb = (D.hit_bot || []).filter(function (r) { return r.good; });
+    var on = gb.filter(function (r) { return r.zone === "켜짐"; });
+    gb.sort(function (a, b) { var ga = a.zone === "켜짐" ? -999 : (a.how.indexOf("상위") >= 0 ? 90 - a.now : a.now - 10); var gb_ = b.zone === "켜짐" ? -999 : (b.how.indexOf("상위") >= 0 ? 90 - b.now : b.now - 10); return ga - gb_; });
+    $("bt-list").innerHTML = gb.map(function (r) { return indRow(r, "bot"); }).join("");
+    var scope = N.kospi_up === "위" ? "200일선 위" : "200일선 아래";
+    var BC = (D.by_count || []).filter(function (r) { return r.scope === scope; });
+    var now = BC.filter(function (r) { return r.is_now; })[0];
+    $("bt-lede").textContent = "지금 " + on.length + "/" + gb.length + "개 켜짐. 켜진 것부터, 나머지는 켜지는 기준선에 가까운 순.";
+    $("bc-title").textContent = "켜진 개수별 과거 성적 (코스피 " + scope + "일 때)";
+    var cls = "lv-" + lvKey(expo);
+    $("bc-table").innerHTML = '<thead><tr><th>켜진 개수</th><th>날수</th><th>20일 뒤<br>상승</th><th>20일 뒤<br>평균</th><th>60일 뒤<br>상승</th><th class="opt">40일 안<br>5% 더 하락</th></tr></thead><tbody>' +
+      BC.map(function (r) { return '<tr class="' + (r.is_now ? "hl " + cls : "") + '"><td>' + esc(r.label) + (r.is_now ? " · 지금" : "") + "</td><td>" + num(r.days) + "</td><td>" + p0(r.up20) + "</td><td>" + pct(r.avg20) + "</td><td>" + p0(r.up60) + '</td><td class="opt">' + p0(r.dd5) + "</td></tr>"; }).join("") +
+      '<tr class="base"><td>같은 범위 아무 날</td><td></td><td>' + p0(BC.length ? BC[0].base_up20 : null) + '</td><td></td><td></td><td class="opt"></td></tr></tbody>';
+  })();
+  (function () {
+    var tops = (D.hit_top || []).filter(function (r) { return r.good; });
+    var keys = ["kr_fg", "us_fg", "vix", "k_vol20", "crd_chg20", "flow_frg20", "krw_chg20", "sox_gap50"];
+    var idx = {}; (D.hit_bot || []).forEach(function (r) { idx[r.key] = r; });
+    var html = '<h3 style="grid-column:1/-1">꼭지 지표 ' + tops.filter(function (r) { return r.zone === "켜짐"; }).length + "/" + tops.length + "개 켜짐</h3>" + tops.map(function (r) { return indRow(r, "top"); }).join("");
+    html += '<h3 style="grid-column:1/-1;margin-top:6px">주변 지표</h3>' + keys.filter(function (k) { return idx[k] && idx[k].now != null; }).map(function (k) {
+      var r = idx[k];
+      return '<div class="r"><span class="n">' + esc(r.name) + '</span><span class="v num">' + r.now + '</span><div class="m">' + meterHTML({ min: 0, max: 100, marks: [10, 90], cur: r.now, color: "var(--ink2)", zones: [] }) + "</div></div>";
+    }).join("");
+    $("side-list").innerHTML = html;
+  })();
+
+  /* ---------------- 규칙과 성적 ---------------- */
+  $("rule-text").innerHTML = [
+    "<p>비중은 네 단계. 매일 장 마감 종가로 정하고 다음 거래일에 적용함.</p>",
+    '<p><span class="mini" style="--c:var(--def)"><i></i>방어 50%</span> 코스피가 50일선 아래이고 20일 변동성이 40% 이상일 때, 또는 코스피가 200일선 아래이고 S&P500도 125일선 아래일 때.</p>',
+    '<p><span class="mini" style="--c:var(--cau)"><i></i>경계 70%</span> 코스피가 50일선 아래이고 20일 변동성이 25% 이상일 때, 또는 코스피가 200일선 아래일 때.</p>',
+    '<p><span class="mini" style="--c:var(--nor)"><i></i>평소 100%</span> 위 조건이 하나도 없을 때.</p>',
+    '<p><span class="mini" style="--c:var(--att)"><i></i>공격 130%</span> 코스피가 200일선 위에 있는데 업종지수가 한꺼번에 크게 눌린 날(바닥 신호)이 변동성 25% 미만에서 나오면 40거래일. 그사이 코스피가 200일선 아래로 마감하면 바로 끝남.</p>',
+    "<p>내려갈 때는 조건이 맞은 다음 날 바로 내리고, 올라갈 때는 더 높은 단계 조건이 사흘 연속 나와야 한 칸씩 올림. 하루 반등에 비중을 다시 키웠다가 다음 날 깨지는 일을 줄이려는 장치.</p>",
+    '<p class="note">20일 변동성은 코스피 하루 수익률 20일치의 표준편차를 1년 기준으로 늘린 값. 20년 중간값이 15% 안팎이고, 25%는 상위 20%, 40%는 상위 6% 정도.</p>'
+  ].join("");
+  (function () {
+    var ep = (D.ep2 || []).filter(function (r) { return r.name.indexOf("지금 하락") === 0; })[0];
+    var e6 = (D.ep2 || []).filter(function (r) { return r.name.indexOf("6~7월") >= 0; })[0];
+    var S = {}; (D.sim2 || []).forEach(function (r) { S[r.id] = r; });
+    var t = ["<p>이전 규칙은 코스피 200일선과 S&P500 125일선만 봤음. 2025~2026년처럼 코스피가 200일선보다 훨씬 위에서 급하게 오르다 무너지는 장에서는 200일선이 한참 아래에 있어 위험 신호가 늦게 켜졌고, 하락 초입의 업종 눌림을 바닥 신호로 읽어 130%를 들었음.</p>"];
+    if (e6) t.push("<p>2026년 6~7월 폭락 구간에서 코스피는 " + pct(e6.kospi) + "였는데 이전 규칙은 평균 비중 " + p0(e6.old_avg) + "로 " + pct(e6.old) + "를 냈음. 새 규칙은 평균 " + p0(e6.new_avg) + " 비중으로 " + pct(e6.new) + ".</p>");
+    if (ep) t.push("<p>" + ymd(ep.start) + " 고점 이후 지금까지 코스피 " + pct(ep.kospi) + ", 이전 규칙 " + pct(ep.old) + ", 새 규칙 " + pct(ep.new) + ".</p>");
+    t.push("<p>새 규칙은 20일 변동성과 50일선을 더해 급락이 시작될 때 빨리 줄이고, 변동성이 높은 날의 바닥 신호는 버림. 기준값(25%, 40%, 사흘)은 2007~2021년 자료로만 고르고 2022년 이후는 채점에만 썼음.</p>");
+    if (S["all-new"] && S["all-old"]) t.push("<p>20년 전체로 보면 연수익률은 " + pct(S["all-new"].cagr) + "로 이전 규칙(" + pct(S["all-old"].cagr) + ")과 비슷하고, 최대 낙폭은 " + pct(S["all-new"].mdd) + "로 이전 규칙(" + pct(S["all-old"].mdd) + ")보다 작음.</p>");
+    $("why-text").innerHTML = t.join("");
+  })();
+  (function () {
+    var S = D.sim2 || []; if (!S.length) return;
+    var hdr = '<tr><th>구간 · 방식</th><th>연수익률</th><th>최대 낙폭</th><th>샤프</th><th class="opt">평균 비중</th><th class="opt">연간<br>비중 변경</th></tr>';
+    function rows(scopes) {
+      return scopes.map(function (sc) {
+        var rs = S.filter(function (r) { return r.scope === sc; }); if (!rs.length) return "";
+        return '<tr><td colspan="6" style="padding-top:14px;color:var(--ink2);font-weight:600">' + esc(rs[0].scope_name) + "</td></tr>" + rs.map(function (r) {
+          var cls = r.strategy === "new" ? ' class="hl lv-att"' : r.strategy === "hold" ? ' class="base"' : "";
+          return "<tr" + cls + "><td>" + esc(r.name) + "</td><td>" + pct(r.cagr) + "</td><td>" + pct(r.mdd) + "</td><td>" + (r.sharpe == null ? "-" : r.sharpe.toFixed(2)) + '</td><td class="opt">' + p0(r.avg) + '</td><td class="opt">' + (r.sw == null ? "-" : r.sw.toFixed(1) + "회") + "</td></tr>";
+        }).join("");
+      }).join("");
+    }
+    $("sim-table").innerHTML = "<thead>" + hdr + "</thead><tbody>" + rows(["all", "sel", "test"]) + "</tbody>";
+    $("per-table").innerHTML = "<thead>" + hdr + "</thead><tbody>" + rows(["p0", "p1", "p2", "p3", "p4"]) + "</tbody>";
+  })();
+  (function () {
+    var E = D.ep2 || []; if (!E.length) return;
+    $("ep-table").innerHTML = '<thead><tr><th>구간</th><th>코스피</th><th>새 규칙</th><th>이전 규칙</th><th class="opt">새 규칙<br>최대 낙폭</th><th class="opt">이전 규칙<br>최대 낙폭</th><th class="opt">새 규칙<br>평균 비중</th><th class="opt">이전 규칙<br>평균 비중</th></tr></thead><tbody>' +
+      E.map(function (r) {
+        var cur = r.name.indexOf("지금") === 0;
+        var ym = function (x) { return x.slice(2, 4) + "." + x.slice(5, 7); };
+        return '<tr class="' + (cur ? "hl lv-def" : "") + '"><td>' + esc(r.name.replace(/\(.*\)/, "")) + '<span class="sub2">' + ym(r.start) + "~" + ym(r.end) + "</span></td><td>" + pct(r.kospi) + "</td><td><b>" + pct(r.new) + "</b></td><td>" + pct(r.old) + '</td><td class="opt">' + pct(r.new_mdd) + '</td><td class="opt">' + pct(r.old_mdd) + '</td><td class="opt">' + p0(r.new_avg) + '</td><td class="opt">' + p0(r.old_avg) + "</td></tr>";
+      }).join("") + "</tbody>";
+  })();
+  (function () {
+    var S = {}; (D.sim2 || []).forEach(function (r) { S[r.id] = r; });
+    var t = [];
+    if (S["p1-new"] && S["p1-hold"]) t.push("<p>박스권에 약함. 2012~2016년처럼 코스피가 좁은 범위를 오간 5년은 연 " + pct(S["p1-new"].cagr) + "로 그냥 보유(" + pct(S["p1-hold"].cagr) + ")보다 못했고, 비중을 연 " + S["p1-new"].sw.toFixed(0) + "번 바꿨음.</p>");
+    var e3 = (D.ep2 || []).filter(function (r) { return r.name.indexOf("3월") >= 0; })[0];
+    if (e3) t.push("<p>짧게 깊이 빠졌다가 바로 되돌리는 V자 반등에 늦음. 2026년 3월 급락 구간은 새 규칙 " + pct(e3.new) + ", 이전 규칙 " + pct(e3.old) + ". 바닥 근처에서 비중을 줄였다가 사흘 확인을 거쳐 한 칸씩 올라오기 때문.</p>");
+    var e8 = (D.ep2 || []).filter(function (r) { return r.name.indexOf("2024") >= 0; })[0];
+    if (e8) t.push("<p>2024년 8월 급락처럼 하루 이틀에 끝난 충격은 이미 맞은 뒤에 줄이게 되어 오히려 손해(" + pct(e8.new) + ", 이전 규칙 " + pct(e8.old) + ").</p>");
+    t.push("<p>규칙이 지수 하나만 보므로 종목 비중이나 업종 쏠림은 따로 판단해야 함. 기준값을 20년 자료로 고른 만큼 앞으로는 지금 성적보다 덜 맞을 수 있음.</p>");
+    $("weak-text").innerHTML = t.join("");
+  })();
+  function drawEquity() {
+    var box = $("eq-chart"), C = D.curve2 || []; if (!C.length) return;
+    var W = Math.max(320, box.clientWidth), H = W < 560 ? 240 : 300, m = { l: 44, r: 66, t: 10, b: 24 }, n = C.length, ph = H - m.t - m.b;
+    var vals = []; C.forEach(function (r) { vals.push(r.new, r.old, r.hold); });
+    var lo = Math.log(Math.min.apply(null, vals) * .95), hi = Math.log(Math.max.apply(null, vals) * 1.05);
+    var X = function (i) { return m.l + (W - m.l - m.r) * i / (n - 1); }, Y = function (v) { return m.t + ph * (1 - (Math.log(v) - lo) / (hi - lo)); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '">';
+    [0.5, 1, 2, 3, 4, 5].filter(function (t) { return Math.log(t) >= lo && Math.log(t) <= hi; }).forEach(function (t) { s += el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: cssv("--line"), "stroke-width": 1 }); s += '<text x="' + (m.l - 6) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + t + "</text>"; });
+    var ly = -1; C.forEach(function (r, i) { var y = +r.d.slice(0, 4); if (y !== ly && y % (W < 560 ? 4 : 2) === 0 && r.d.slice(5, 7) === "01") { s += '<text x="' + X(i) + '" y="' + (H - 6) + '" text-anchor="middle">' + y + "</text>"; ly = y; } });
+    var ser = [["hold", "--s3", "그냥 보유"], ["old", "--s2", "이전 규칙"], ["new", "--s1", "새 규칙"]];
+    ser.forEach(function (sr) { var d = ""; C.forEach(function (r, i) { d += (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(r[sr[0]]).toFixed(1); }); s += '<path d="' + d + '" fill="none" stroke="' + cssv(sr[1]) + '" stroke-width="2" stroke-linejoin="round"/>'; });
+    var ends = ser.map(function (sr) { return { y: Y(C[n - 1][sr[0]]), t: sr[2] + " " + C[n - 1][sr[0]].toFixed(2), c: cssv(sr[1]) }; }).sort(function (a, b) { return a.y - b.y; });
+    for (var i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 13) ends[i].y = ends[i - 1].y + 13;
+    ends.forEach(function (e) { s += '<text x="' + (W - m.r + 8) + '" y="' + (e.y + 4) + '" style="fill:var(--ink2)">' + e.t.replace("새 규칙", "새").replace("이전 규칙", "이전").replace("그냥 보유", "보유") + "</text>"; });
+    ser.forEach(function (sr) { s += '<circle cx="' + X(n - 1) + '" cy="' + Y(C[n - 1][sr[0]]) + '" r="4" fill="' + cssv(sr[1]) + '" stroke="' + cssv("--card") + '" stroke-width="2"/>'; });
+    s += '<line class="xh" x1="0" x2="0" y1="' + m.t + '" y2="' + (m.t + ph) + '" stroke="' + cssv("--ink2") + '" stroke-width="1" style="display:none"/></svg>';
+    box.innerHTML = s + '<div class="tip"></div>';
+    attachHover(box, W, m, n, X, function (i) { var r = C[i]; return "<b>" + ymd(r.d) + "</b><br>새 규칙 " + r.new.toFixed(2) + "<br>이전 규칙 " + r.old.toFixed(2) + "<br>그냥 보유 " + r.hold.toFixed(2); });
+  }
+  $("eq-legend").innerHTML = '<span><i style="--c:var(--s1)"></i>새 규칙</span><span><i style="--c:var(--s2)"></i>이전 규칙</span><span><i style="--c:var(--s3)"></i>그냥 보유</span>';
+  function drawMap() {
+    var box = $("map-chart"), R = (D.daily || []).filter(function (r) { return r.e2 != null; }); if (!R.length) return;
+    var step = Math.max(1, Math.floor(R.length / 900)), S2 = R.filter(function (_, i) { return i % step === 0 || i === R.length - 1; });
+    var W = Math.max(320, box.clientWidth), H = W < 560 ? 220 : 280, m = { l: 46, r: 10, t: 10, b: 24 }, n = S2.length, ph = H - m.t - m.b;
+    var lo = Math.log(Math.min.apply(null, S2.map(function (r) { return r.kospi; })) * .95), hi = Math.log(Math.max.apply(null, S2.map(function (r) { return r.kospi; })) * 1.03);
+    var X = function (i) { return m.l + (W - m.l - m.r) * i / (n - 1); }, Y = function (v) { return m.t + ph * (1 - (Math.log(v) - lo) / (hi - lo)); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="' + W + '" height="' + H + '">';
+    bandRuns(S2, "e2").forEach(function (b) { s += el("rect", { x: X(b[0]), y: m.t, width: Math.max(1, X(b[1]) - X(b[0]) + (X(1) - X(0))), height: ph, fill: lvWash(b[2]) }); });
+    [1000, 1500, 2000, 3000, 4000, 6000, 9000].filter(function (t) { return Math.log(t) >= lo && Math.log(t) <= hi; }).forEach(function (t) { s += el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), stroke: cssv("--line"), "stroke-width": 1 }); s += '<text x="' + (m.l - 6) + '" y="' + (Y(t) + 4) + '" text-anchor="end">' + num(t) + "</text>"; });
+    var ly = -1; S2.forEach(function (r, i) { var y = +r.d.slice(0, 4); if (y !== ly && y % (W < 560 ? 4 : 2) === 0 && r.d.slice(5, 7) === "01") { s += '<text x="' + X(i) + '" y="' + (H - 6) + '" text-anchor="middle">' + y + "</text>"; ly = y; } });
+    var d = ""; S2.forEach(function (r, i) { d += (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(r.kospi).toFixed(1); });
+    s += '<path d="' + d + '" fill="none" stroke="' + cssv("--ink") + '" stroke-width="1.6" stroke-linejoin="round"/>';
+    s += '<line class="xh" x1="0" x2="0" y1="' + m.t + '" y2="' + (m.t + ph) + '" stroke="' + cssv("--ink2") + '" stroke-width="1" style="display:none"/></svg>';
+    box.innerHTML = s + '<div class="tip"></div>';
+    attachHover(box, W, m, n, X, function (i) { var r = S2[i]; return "<b>" + ymd(r.d) + "</b><br>코스피 " + num(r.kospi, 2) + "<br>새 규칙 " + lvOf(r.e2) + "% · 이전 규칙 " + lvOf(r.expo) + "%"; });
+  }
+  $("map-legend").innerHTML = [50, 70, 100, 130].map(function (p) { return '<span><i class="sq" style="--c:var(--' + lvKey(p) + ')"></i>' + lvName(p) + " " + p + "%</span>"; }).join("");
+
+  /* ---------------- 지표 자료 ---------------- */
+  $("tele").textContent = ((D.tele2 || [{}])[0] || {}).text || "이번 회차 텔레그램 글 없음";
+  $("copy-tele").addEventListener("click", function () {
+    var b = this; try { navigator.clipboard.writeText($("tele").textContent).then(function () { b.textContent = "복사됨"; setTimeout(function () { b.textContent = "글 복사"; }, 1500); }, function () { b.textContent = "복사 안 됨, 글을 길게 눌러 복사"; }); } catch (e) { b.textContent = "복사 안 됨, 글을 길게 눌러 복사"; }
   });
-  const t = V.tip(el);
-  const f2 = V.L.format('.2f');
-  keys.forEach((a, i) => keys.forEach((b, j) => {
-    const v = val[a + '|' + b]; if (v == null) return;
-    const g = svg.append('g');
-    g.append('rect').attr('x', lw + j * cell + 1).attr('y', top + i * cell + 1).attr('width', cell - 2).attr('height', cell - 2).attr('rx', 2)
-      .attr('fill', i === j ? 'var(--cds-chart-grid)' : v >= 0 ? dash.colors[0] : dash.colors[3]).attr('fill-opacity', i === j ? 1 : Math.min(0.85, Math.abs(v) * 0.9 + 0.04));
-    if (cell >= 32 && i !== j) g.append('text').attr('x', lw + j * cell + cell / 2).attr('y', top + i * cell + cell / 2).attr('dy', '0.32em').attr('text-anchor', 'middle')
-      .attr('class', Math.abs(v) >= 0.7 ? 'em' : null).text(V.L.format('.1f')(v));
-    g.append('rect').attr('x', lw + j * cell).attr('y', top + i * cell).attr('width', cell).attr('height', cell).attr('fill', 'transparent')
-      .on('pointermove', (ev) => {
-        const [px, py] = d3.pointer(ev, svg.node()); const sc = el.clientWidth / Math.max(W, Wd);
-        V.showTip(el, t, px * sc, py * sc, `${name[a]} × ${name[b]}`, [[null, '순위 상관', f2(v)]]);
-      })
-      .on('pointerleave', () => { t.hidden = true; });
-  }));
-});
+  function hitTable(list, tblId, filtId, baseId, side) {
+    var all = list || []; if (!all.length) return;
+    $(baseId).textContent = p0(all[0].hit_base);
+    var mode = "good";
+    function render() {
+      var rows = all.filter(function (r) { return mode === "all" || r.good; });
+      $(tblId).innerHTML = '<thead><tr><th>지표</th><th class="opt">기준</th><th>회차</th><th>적중률</th><th class="opt">2007~16</th><th class="opt">2017~21</th><th class="opt">2022~26</th><th>지금</th><th>상태</th></tr></thead><tbody>' +
+        rows.map(function (r) {
+          return "<tr><td>" + esc(r.name) + '<span class="sub2">' + esc(r.how) + (r.good ? " · 잘 맞음" : "") + '</span></td><td class="opt">' + esc(r.how) + "</td><td>" + r.n + "</td><td><b>" + p0(r.hit) + '</b></td><td class="opt">' + p0(r.hit_p1) + '</td><td class="opt">' + p0(r.hit_p2) + '</td><td class="opt">' + p0(r.hit_p3) + "</td><td>" + (r.now == null ? "-" : r.now) + "</td><td>" + (r.zone === "켜짐" ? '<span class="st" style="--c:var(--nor)"><i></i>켜짐</span>' : '<span class="st" style="--c:var(--axis)"><i></i>꺼짐</span>') + "</td></tr>";
+        }).join("") + "</tbody>";
+      $(filtId).innerHTML = [["good", "잘 맞던 것만"], ["all", "전체 " + all.length + "개"]].map(function (b) { return '<button type="button" class="chip-btn" aria-pressed="' + (mode === b[0]) + '" data-m="' + b[0] + '">' + b[1] + "</button>"; }).join("");
+      Array.prototype.forEach.call($(filtId).querySelectorAll("button"), function (b) { b.addEventListener("click", function () { mode = b.getAttribute("data-m"); render(); }); });
+    }
+    render();
+  }
+  hitTable(D.hit_bot, "hb-table", "hb-filter", "hb-base");
+  hitTable(D.hit_top, "ht-table", "ht-filter", "ht-base");
+  (function () {
+    var L = (D.ledger || []).filter(function (r) { return r.kind === "바닥 신호"; }).slice().reverse();
+    var vol = {}; (D.daily || []).forEach(function (r) { vol[r.d] = r; });
+    $("led-table").innerHTML = "<thead><tr><th>신호 날</th><th>코스피</th><th>20일 뒤</th><th>60일 뒤</th><th>40일 안 최고</th><th>40일 안 최저</th></tr></thead><tbody>" +
+      L.map(function (r) { return "<tr><td>" + ymd(r.start) + "</td><td>" + num(r.kospi) + "</td><td>" + pct(r.f20) + "</td><td>" + pct(r.f60) + "</td><td>" + pct(r.best40) + "</td><td>" + pct(r.worst40) + "</td></tr>"; }).join("") + "</tbody>";
+  })();
+  (function () {
+    var A = D.audit || [];
+    $("audit-table").innerHTML = "<thead><tr><th>묶음</th><th>계열 수</th><th>시작</th><th>끝</th><th>빈 날짜</th><th>큰 하루 변동</th></tr></thead><tbody>" +
+      A.map(function (r) { return "<tr><td>" + esc(r.group) + "</td><td>" + r.series + "</td><td>" + ymd(r.first) + "</td><td>" + ymd(r.last) + "</td><td>" + r.max_gap + "</td><td>" + r.jumps + "</td></tr>"; }).join("") + "</tbody>";
+    $("audit-note").textContent = "원자료 점검은 2026년 10월 31일 기준 고정값. 키움 코스피와 야후 코스피 종가 대조: " + num(info.cross_n) + "일, 일간 수익률 상관 " + info.cross_corr + ", 가장 큰 차이 " + pct(info.cross_max, 2, false) + ".";
+  })();
+
+  /* ---------------- 바닥글 ---------------- */
+  $("foot").innerHTML = "<div>자료: 코스피·업종지수·ETF·종목 키움증권, 투자자예탁금·신용융자 금융투자협회, 미국 지수 야후 파이낸스. 미국 값은 한국 날짜 전날 종가.</div>" +
+    "<div>" + esc(info.start || "") + "부터 " + esc(info.end || "") + "까지 " + num(info.n_days) + "거래일. 새 규칙 " + esc(N.model2 || "") + " 판.</div>" +
+    "<div>과거 데이터로 만든 참고용 규칙이며 투자 권유가 아님.</div>";
+
+  /* ---------------- 보기 전환 ---------------- */
+  var VIEWS = { today: "today", rule: "rule", data: "data" }, drawn = {};
+  function drawFor(v) {
+    if (v === "today") drawTimeline();
+    if (v === "rule") { drawEquity(); drawMap(); }
+    drawn[v] = true;
+  }
+  function show(v) {
+    if (!VIEWS[v]) v = "today";
+    Array.prototype.forEach.call(document.querySelectorAll("nav.tabs button"), function (b) { b.setAttribute("aria-selected", b.getAttribute("data-view") === v ? "true" : "false"); });
+    ["today", "rule", "data"].forEach(function (id) { $("v-" + id).hidden = id !== v; });
+    drawFor(v);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("nav.tabs button"), function (b) {
+    b.addEventListener("click", function () { var v = b.getAttribute("data-view"); if (location.hash !== "#" + v) location.hash = v; else show(v); });
+  });
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1)); });
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { var v = (location.hash.slice(1) || "today"); drawFor(VIEWS[v] ? v : "today"); }, 150); });
+  if (window.matchMedia) { try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { drawFor(location.hash.slice(1) || "today"); }); } catch (e) {} }
+  new MutationObserver(function () { drawFor(location.hash.slice(1) || "today"); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  show(location.hash.slice(1) || "today");
+})();
 </script>
-
-<p class="vt-foot">베라 시장 국면 보드 · 코스피 20년 일봉 백테스트 기반 · 투자 판단의 참고 자료이며 수익을 보장하지 않습니다.</p>
-</div>
 </body>
 </html>

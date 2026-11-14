@@ -4,5 +4,6 @@
 
 - 보기: https://stockvera.github.io/vera-board/
 - 2026.11.14 개편: 비중을 방어 50% · 경계 70% · 평소 100% · 공격 130% 네 단계로 정하는 새 규칙(20일 변동성·50일선·200일선·S&P500 125일선). 예전 페이지는 `old.html`에 그대로 둠
-- 평일 장 마감 뒤 PC가 계산한 결과로 `data.js`만 갱신함
+- 평일 장 마감 뒤 PC가 계산한 결과로 `data.js`만 갱신함. 깃허브 Actions(`.github/workflows/update-data.yml`, 16:45·20:45 예약이지만 실제로는 30~60분 늦게 돎)가 구글 드라이브의 `vera_regime_bundle.json.gz`를 받아 `update_data.py`로 바꾸므로, 그 파일은 링크 공유(보기)가 켜져 있어야 함
+- `update_data.py`는 data.js보다 수집 시각이 같거나 이른 번들은 건너뛰고, 번들에 새 규칙 파일이 없으면 예전 날짜의 새 규칙 숫자를 지움
 - 투자 판단의 참고 자료이며 수익을 보장하지 않음
